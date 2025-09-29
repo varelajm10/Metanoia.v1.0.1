@@ -122,7 +122,7 @@ export default function LoginPage() {
         <div className="mt-16 text-center text-white/60">
           <div className="mb-4 flex items-center justify-center space-x-2">
             <Monitor className="h-5 w-5" />
-            <span className="text-sm">Sistema ERP Modular Matias 1.0.0</span>
+            <span className="text-sm">Sistema ERP Modular Matias 1.0.2</span>
           </div>
           <p className="max-w-sm text-xs">
             Transforma tu negocio con nuestra plataforma de gestión empresarial
@@ -284,7 +284,7 @@ export default function LoginPage() {
             >
               metanoia.click
             </a>{' '}
-            - Matias 1.0.1
+            - Matias 1.0.2
           </p>
           <Link
             href="/"
