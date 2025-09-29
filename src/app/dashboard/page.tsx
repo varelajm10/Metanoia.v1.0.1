@@ -636,7 +636,7 @@ export default function DashboardPage() {
             </div>
             <div className="text-sm text-muted-foreground">
               <span>
-                © 2025{' '}
+                © 2025 Metanoia{' '}
                 <a
                   href="https://metanoia.click"
                   target="_blank"

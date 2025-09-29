@@ -275,7 +275,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>
-            © 2025{' '}
+            © 2025 Metanoia{' '}
             <a
               href="https://metanoia.click"
               target="_blank"
@@ -284,7 +284,7 @@ export default function LoginPage() {
             >
               metanoia.click
             </a>{' '}
-            - Matias 1.0.2
+            v1.0.2
           </p>
           <Link
             href="/"

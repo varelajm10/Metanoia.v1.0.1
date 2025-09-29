@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Monitor } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'Inicio - Matias 1.0.0',
+  title: 'Inicio - Matias 1.0.2',
   description: 'Sistema ERP SaaS modular con arquitectura multi-tenant',
 }
 
@@ -119,7 +119,7 @@ export default function HomePage() {
         {/* Footer */}
         <div className="mt-16 text-center text-sm text-gray-500">
           <p>
-            © 2025{' '}
+            © 2025 Metanoia{' '}
             <a
               href="https://metanoia.click"
               target="_blank"
@@ -128,7 +128,7 @@ export default function HomePage() {
             >
               metanoia.click
             </a>{' '}
-            - Matias 1.0.1
+            v1.0.2
           </p>
         </div>
       </div>
