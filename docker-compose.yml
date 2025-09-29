@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: metanoia-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: metanoia
+      POSTGRES_USER: metanoia_user
+      POSTGRES_PASSWORD: metanoia_password
+      POSTGRES_MULTIPLE_DATABASES: metanoia_tenant1,metanoia_tenant2
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-multiple-databases.sh:/docker-entrypoint-initdb.d/init-multiple-databases.sh
+    ports:
+      - '5432:5432'
+    networks:
+      - metanoia-network
+
+  # Redis para cache y sesiones
+  redis:
+    image: redis:7-alpine
+    container_name: metanoia-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass redis_password
+    volumes:
+      - redis_data:/data
+    ports:
+      - '6379:6379'
+    networks:
+      - metanoia-network
+
+  # Aplicación Next.js
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: metanoia-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://metanoia_user:metanoia_password@postgres:5432/metanoia
+      - REDIS_URL=redis://:redis_password@redis:6379
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-nextauth-secret-change-in-production
+    ports:
+      - '3000:3000'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - metanoia-network
+    volumes:
+      - ./uploads:/app/uploads
+
+  # Nginx como proxy reverso
+  nginx:
+    image: nginx:alpine
+    container_name: metanoia-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    networks:
+      - metanoia-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  metanoia-network:
+    driver: bridge

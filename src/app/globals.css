@@ -1,0 +1,334 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base neutros - Minimalista y limpio */
+    --background: 0 0% 100%;
+    --foreground: 215 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
+
+    /* Color principal - Azul eléctrico tech */
+    --primary: 210 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secundario - Grises profesionales */
+    --secondary: 215 20% 95%;
+    --secondary-foreground: 215 25% 15%;
+    --muted: 215 20% 95%;
+    --muted-foreground: 215 15% 45%;
+
+    /* Acentos - Colores vibrantes estratégicos */
+    --accent: 210 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Estados - Verde, naranja, rojo */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Bordes y inputs */
+    --border: 215 20% 90%;
+    --input: 215 20% 90%;
+    --ring: 210 100% 50%;
+
+    /* Glassmorphism */
+    --glass-bg: 0 0% 100% / 0.8;
+    --glass-border: 215 20% 90% / 0.5;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Base oscuro - Profesional y elegante */
+    --background: 215 25% 8%;
+    --foreground: 215 20% 95%;
+    --card: 215 25% 10%;
+    --card-foreground: 215 20% 95%;
+    --popover: 215 25% 10%;
+    --popover-foreground: 215 20% 95%;
+
+    /* Color principal - Azul eléctrico más brillante */
+    --primary: 210 100% 60%;
+    --primary-foreground: 215 25% 8%;
+
+    /* Secundario - Grises oscuros profesionales */
+    --secondary: 215 20% 15%;
+    --secondary-foreground: 215 20% 95%;
+    --muted: 215 20% 15%;
+    --muted-foreground: 215 15% 65%;
+
+    /* Acentos - Mismos colores vibrantes */
+    --accent: 210 100% 60%;
+    --accent-foreground: 215 25% 8%;
+
+    /* Estados - Ajustados para modo oscuro */
+    --success: 142 76% 46%;
+    --success-foreground: 215 25% 8%;
+    --warning: 38 92% 60%;
+    --warning-foreground: 215 25% 8%;
+    --destructive: 0 84% 70%;
+    --destructive-foreground: 215 20% 95%;
+
+    /* Bordes y inputs */
+    --border: 215 20% 20%;
+    --input: 215 20% 20%;
+    --ring: 210 100% 60%;
+
+    /* Glassmorphism oscuro */
+    --glass-bg: 215 25% 8% / 0.8;
+    --glass-border: 215 20% 20% / 0.5;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-muted-foreground;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-foreground;
+}
+
+/* Loading animations */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Focus styles */
+.focus-visible {
+  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 20%;
+    --ring: 0 0% 20%;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Tech Professional Design System */
+@layer components {
+  /* Glassmorphism effects */
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-card {
+    @apply glass rounded-xl shadow-lg;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary)) 0%,
+      hsl(var(--primary) / 0.8) 100%
+    );
+  }
+
+  .gradient-accent {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--accent)) 0%,
+      hsl(var(--accent) / 0.8) 100%
+    );
+  }
+
+  .gradient-success {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--success)) 0%,
+      hsl(var(--success) / 0.8) 100%
+    );
+  }
+
+  .gradient-warning {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--warning)) 0%,
+      hsl(var(--warning) / 0.8) 100%
+    );
+  }
+
+  /* Enhanced cards with better shadows */
+  .card-enhanced {
+    @apply rounded-xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-primary/5;
+  }
+
+  .card-enhanced:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Modern buttons */
+  .btn-primary-gradient {
+    @apply gradient-primary rounded-lg px-4 py-2 font-medium text-primary-foreground transition-all duration-200 hover:shadow-lg hover:shadow-primary/25;
+  }
+
+  .btn-ghost-modern {
+    @apply rounded-lg px-4 py-2 font-medium transition-all duration-200 hover:bg-accent/50 hover:text-accent-foreground;
+  }
+
+  /* Status badges with better styling */
+  .badge-success {
+    @apply rounded-full border border-success/20 bg-success/10 px-3 py-1 text-xs font-medium text-success;
+  }
+
+  .badge-warning {
+    @apply rounded-full border border-warning/20 bg-warning/10 px-3 py-1 text-xs font-medium text-warning;
+  }
+
+  .badge-destructive {
+    @apply rounded-full border border-destructive/20 bg-destructive/10 px-3 py-1 text-xs font-medium text-destructive;
+  }
+
+  .badge-primary {
+    @apply rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary;
+  }
+
+  /* Sidebar styles */
+  .sidebar-glass {
+    @apply glass border-r border-border/50;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+
+  .hover-glow {
+    @apply transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/10;
+  }
+
+  /* Loading states */
+  .skeleton {
+    @apply animate-pulse rounded bg-muted;
+  }
+
+  /* Focus states */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px hsl(var(--primary) / 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s ease-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}

@@ -1,0 +1,27 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { ServerMaintenanceService } from '@/lib/services/server-maintenance'
+
+// GET /api/servers/maintenance/overdue - Obtener mantenimientos vencidos
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams
+    const tenantId = searchParams.get('tenantId') || 'demo-tenant'
+
+    const overdueMaintenances =
+      await ServerMaintenanceService.getOverdueMaintenances(tenantId)
+
+    return NextResponse.json({
+      success: true,
+      data: overdueMaintenances,
+    })
+  } catch (error) {
+    console.error('Error fetching overdue maintenances:', error)
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Error al obtener mantenimientos vencidos',
+      },
+      { status: 500 }
+    )
+  }
+}

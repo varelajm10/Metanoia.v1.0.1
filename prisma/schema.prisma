@@ -1,0 +1,3265 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo para manejar tenants (multi-tenancy)
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  domain    String?  @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Información de contacto
+  email       String
+  phone       String?
+  address     String?
+  city        String?
+  country     String?
+  timezone    String  @default("UTC")
+  currency    String  @default("USD")
+
+  // Información del contacto principal
+  contactName    String
+  contactEmail   String
+  contactPhone   String?
+
+  // Configuración de suscripción
+  subscriptionPlan      String  @default("BASIC") // BASIC, STANDARD, PREMIUM, ENTERPRISE
+  subscriptionStartDate DateTime
+  subscriptionEndDate   DateTime?
+
+  // Límites del plan
+  maxUsers    Int @default(5)
+  maxServers  Int @default(10)
+  maxStorageGB Int @default(100)
+
+  // Configuración adicional
+  notes        String?
+  customDomain String?
+
+  // Configuración del tenant
+  settings Json?
+  
+  // Relaciones
+  users     User[]
+  customers Customer[]
+  products  Product[]
+  orders    Order[]
+  invoices  Invoice[]
+
+  // Relaciones modulares
+  tenantModules        TenantModule[]
+  tenantModuleFieldValues TenantModuleFieldValue[]
+  tenantModulePermissions TenantModulePermission[]
+  workflows            Workflow[]
+  integrations         Integration[]
+
+  // Relaciones RRHH
+  employees    Employee[]
+  payrolls     Payroll[]
+  vacations    Vacation[]
+  performances Performance[]
+  attendance   Attendance[]
+  
+  // Relaciones Servidores
+  servers      Server[]
+  serverClients ServerClient[]
+  serverAlerts  ServerAlert[]
+  serverMetrics ServerMetric[]
+  serverUserAccesses ServerUserAccess[]
+  maintenanceWindows MaintenanceWindow[]
+  serverCosts  ServerCost[]
+  networkConfigs NetworkConfig[]
+  metricThresholds MetricThreshold[]
+  notifications Notification[]
+  serverHealth ServerHealth[]
+  serverAccessLogs ServerAccessLog[]
+  
+  // Relaciones CRM
+  leads        Lead[]
+  opportunities Opportunity[]
+  contacts     Contact[]
+  communications Communication[]
+  deals        Deal[]
+  
+  // Relaciones Ascensores
+  elevatorClients      ElevatorClient[]
+  elevators            Elevator[]
+  installations        Installation[]
+  maintenanceContracts MaintenanceContract[]
+  maintenanceRecords   MaintenanceRecord[]
+  inspections          Inspection[]
+  elevatorTechnicians  ElevatorTechnician[]
+  elevatorSpareParts   ElevatorSparePart[]
+  workOrders           WorkOrder[]
+  
+  // Relaciones Colegios
+  schoolStudents       SchoolStudent[]
+  schoolParents        SchoolParent[]
+  schoolTeachers       SchoolTeacher[]
+  schoolGradeLevels    SchoolGradeLevel[]
+  schoolSections       SchoolSection[]
+  schoolSubjects       SchoolSubject[]
+  schoolSchedules      SchoolSchedule[]
+  schoolEnrollments    SchoolEnrollment[]
+  schoolGrades         SchoolGrade[]
+  schoolAttendance     SchoolAttendance[]
+  schoolPayments       SchoolPayment[]
+  schoolDisciplinary   SchoolDisciplinary[]
+  schoolLibraryBooks   SchoolLibraryBook[]
+  schoolLibraryLoans   SchoolLibraryLoan[]
+  schoolTransportRoutes SchoolTransportRoute[]
+  schoolTransportAssignments SchoolTransportAssignment[]
+  schoolCafeteriaMenus SchoolCafeteriaMenu[]
+  schoolCafeteriaAssignments SchoolCafeteriaAssignment[]
+  schoolEvaluations    SchoolEvaluation[]
+
+  @@map("tenants")
+}
+
+// Modelo de usuarios con soporte multi-tenant
+model User {
+  id        String   @id @default(cuid())
+  email     String
+  password  String
+  firstName String
+  lastName  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  orders    Order[]
+  invoices  Invoice[]
+  sessions  Session[]
+
+  @@unique([email, tenantId])
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  USER
+}
+
+// Modelo de clientes
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   Json?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  orders   Order[]
+  invoices Invoice[]
+
+  @@map("customers")
+}
+
+// Modelo de productos
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  sku         String?
+  price       Decimal  @db.Decimal(10, 2)
+  cost        Decimal? @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  minStock    Int      @default(0)
+  maxStock    Int?
+  category    String?
+  brand       String?
+  weight      Decimal? @db.Decimal(10, 3)
+  dimensions  Json?
+  isActive    Boolean  @default(true)
+  isDigital   Boolean  @default(false)
+  tags        String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  orderItems OrderItem[]
+
+  @@unique([sku, tenantId])
+  @@map("products")
+}
+
+// Modelo de órdenes
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String
+  status      OrderStatus @default(PENDING)
+  subtotal    Decimal     @db.Decimal(10, 2)
+  taxRate     Decimal     @db.Decimal(5, 2) @default(16)
+  taxAmount   Decimal     @db.Decimal(10, 2) @default(0)
+  discountAmount Decimal  @db.Decimal(10, 2) @default(0)
+  total       Decimal     @db.Decimal(10, 2)
+  paymentMethod String?   @default("CASH")
+  paymentStatus PaymentStatus @default(PENDING)
+  shippingAddress Json?
+  notes       String?
+  expectedDeliveryDate DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderItems OrderItem[]
+  invoice    Invoice?
+
+  @@unique([orderNumber, tenantId])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  REFUNDED
+}
+
+// Modelo de items de orden
+model OrderItem {
+  id        String  @id @default(cuid())
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  discount  Decimal @db.Decimal(5, 2) @default(0)
+  total     Decimal @db.Decimal(10, 2)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+// Modelo de facturas
+model Invoice {
+  id            String        @id @default(cuid())
+  invoiceNumber String
+  status        InvoiceStatus @default(DRAFT)
+  subtotal      Decimal       @db.Decimal(10, 2)
+  tax           Decimal       @db.Decimal(10, 2) @default(0)
+  total         Decimal       @db.Decimal(10, 2)
+  dueDate       DateTime?
+  paidDate      DateTime?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orderId String? @unique
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  @@unique([invoiceNumber, tenantId])
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+// Modelo para sesiones (autenticación)
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// ========================================
+// SISTEMA MODULAR ERP
+// ========================================
+
+// Catálogo de módulos disponibles en el sistema
+model Module {
+  id          String   @id @default(cuid())
+  key         String   @unique // Clave única del módulo (usado en código)
+  name        String   @unique // "CRM", "Inventory", "Accounting", etc.
+  displayName String   // "Gestión de Clientes", "Inventario", etc.
+  description String?
+  version     String   @default("1.0.0")
+  category    ModuleCategory
+  isActive    Boolean  @default(true)
+  isCore      Boolean  @default(false) // Módulos core no se pueden desactivar
+  icon        String?  // Icono del módulo
+  color       String?  // Color del módulo
+  order       Int      @default(0) // Orden de aparición
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Configuración del módulo
+  config      Json?    // Configuración por defecto del módulo
+  features    Json?    // Características disponibles
+  permissions Json?    // Permisos que maneja el módulo
+
+  // Relaciones
+  tenantModules        TenantModule[]
+  moduleFields         ModuleField[]
+  businessTemplateModules BusinessTemplateModule[]
+
+  @@map("modules")
+}
+
+enum ModuleCategory {
+  CORE        // Módulos esenciales (CRM, Users, etc.)
+  BUSINESS    // Módulos de negocio (Inventory, Sales, etc.)
+  FINANCIAL   // Módulos financieros (Accounting, Billing, etc.)
+  ANALYTICS   // Módulos de análisis (Reports, Dashboard, etc.)
+  INTEGRATION // Módulos de integración (API, Webhooks, etc.)
+  CUSTOM      // Módulos personalizados
+}
+
+// Módulos activados por cada tenant
+model TenantModule {
+  id        String   @id @default(cuid())
+  isActive  Boolean  @default(true)
+  isEnabled Boolean  @default(true) // Si está habilitado para uso
+  config    Json?    // Configuración específica del tenant
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Control de habilitación/deshabilitación
+  enabledAt  DateTime? // Cuándo se habilitó
+  disabledAt DateTime? // Cuándo se deshabilitó
+  reason     String?   // Razón del cambio de estado
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relación con módulo
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  modulePermissions TenantModulePermission[]
+
+  @@unique([tenantId, moduleId])
+  @@map("tenant_modules")
+}
+
+// Campos personalizables por módulo
+model ModuleField {
+  id          String      @id @default(cuid())
+  name        String      // Nombre del campo (ej: "company_size", "industry")
+  displayName String      // Nombre para mostrar
+  type        FieldType   // Tipo de campo
+  isRequired  Boolean     @default(false)
+  isVisible   Boolean     @default(true)
+  isEditable  Boolean     @default(true)
+  order       Int         @default(0)
+  config      Json?       // Configuración específica del campo
+  validation  Json?       // Reglas de validación
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relación con módulo
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  fieldValues TenantModuleFieldValue[]
+
+  @@unique([moduleId, name])
+  @@map("module_fields")
+}
+
+// ========================================
+// MÓDULO DE RECURSOS HUMANOS (RRHH)
+// ========================================
+
+// Empleados
+model Employee {
+  id              String   @id @default(cuid())
+  employeeNumber  String   @unique
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String?
+  personalEmail   String?
+  address         String?
+  dateOfBirth     DateTime?
+  gender          String?
+  maritalStatus   String?
+  nationality     String?
+  
+  // Información laboral
+  position        String
+  department      String
+  employmentType  EmploymentType @default(FULL_TIME)
+  hireDate        DateTime
+  terminationDate DateTime?
+  salary          Decimal?
+  managerId       String?
+  
+  // Estado del empleado
+  status          EmployeeStatus @default(ACTIVE)
+  
+  // Información adicional
+  emergencyContact String?
+  emergencyPhone   String?
+  skills          String[] // Array de habilidades
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  manager         Employee? @relation("EmployeeManager", fields: [managerId], references: [id])
+  subordinates    Employee[] @relation("EmployeeManager")
+  payrolls        Payroll[]
+  vacations       Vacation[]
+  performances    Performance[]
+  attendance      Attendance[]
+
+  @@unique([employeeNumber, tenantId])
+  @@map("employees")
+}
+
+// Nómina
+model Payroll {
+  id              String   @id @default(cuid())
+  employeeId      String
+  period          String   // Formato: "2024-01"
+  year            Int
+  month           Int
+  
+  // Salarios
+  basicSalary     Decimal
+  overtimePay     Decimal  @default(0)
+  bonuses         Decimal  @default(0)
+  allowances      Decimal  @default(0)
+  grossSalary     Decimal
+  
+  // Deducciones
+  taxes           Decimal  @default(0)
+  socialSecurity  Decimal  @default(0)
+  healthInsurance Decimal  @default(0)
+  otherDeductions Decimal  @default(0)
+  totalDeductions Decimal  @default(0)
+  
+  // Salario neto
+  netSalary       Decimal
+  
+  // Estado y comentarios
+  status          PayrollStatus @default(PENDING)
+  notes           String?
+  processedAt     DateTime?
+  processedBy     String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, period, tenantId])
+  @@map("payrolls")
+}
+
+// Vacaciones
+model Vacation {
+  id              String   @id @default(cuid())
+  employeeId      String
+  type            VacationType @default(ANNUAL)
+  startDate       DateTime
+  endDate         DateTime
+  days            Int
+  reason          String?
+  
+  // Aprobación
+  status          VacationStatus @default(PENDING)
+  requestedAt     DateTime @default(now())
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectionReason String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("vacations")
+}
+
+// Evaluaciones de desempeño
+model Performance {
+  id              String   @id @default(cuid())
+  employeeId      String
+  reviewPeriod    String   // "2024-Q1", "2024-Annual"
+  reviewType      PerformanceType @default(ANNUAL)
+  
+  // Calificaciones (1-5)
+  overallScore    Float?
+  technicalSkills Float?
+  communication   Float?
+  teamwork        Float?
+  leadership      Float?
+  punctuality     Float?
+  
+  // Comentarios
+  strengths       String?
+  areasForImprovement String?
+  goals           String?
+  comments        String?
+  
+  // Evaluador
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  
+  // Estado
+  status          PerformanceStatus @default(DRAFT)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, reviewPeriod, tenantId])
+  @@map("performances")
+}
+
+// Control de asistencia
+model Attendance {
+  id              String   @id @default(cuid())
+  employeeId      String
+  date            DateTime
+  clockIn         DateTime?
+  clockOut        DateTime?
+  breakStart      DateTime?
+  breakEnd        DateTime?
+  totalHours      Float?
+  
+  // Estado
+  status          AttendanceStatus @default(PRESENT)
+  isLate          Boolean  @default(false)
+  isOvertime      Boolean  @default(false)
+  
+  // Notas
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date, tenantId])
+  @@map("attendance")
+}
+
+// Enums para RRHH
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  TEMPORARY
+  INTERN
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  TERMINATED
+  ON_LEAVE
+}
+
+enum PayrollStatus {
+  PENDING
+  PROCESSED
+  PAID
+  CANCELLED
+}
+
+enum VacationType {
+  ANNUAL
+  SICK
+  MATERNITY
+  PATERNITY
+  EMERGENCY
+  UNPAID
+}
+
+enum VacationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum PerformanceType {
+  PROBATION
+  ANNUAL
+  QUARTERLY
+  PROJECT_BASED
+}
+
+enum PerformanceStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  REVIEWED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  SICK_LEAVE
+  VACATION
+  HOLIDAY
+}
+
+
+enum FieldType {
+  TEXT
+  TEXTAREA
+  NUMBER
+  EMAIL
+  PHONE
+  DATE
+  DATETIME
+  BOOLEAN
+  SELECT
+  MULTISELECT
+  FILE
+  IMAGE
+  URL
+  CURRENCY
+  PERCENTAGE
+}
+
+// Valores específicos de campos por tenant
+model TenantModuleFieldValue {
+  id        String   @id @default(cuid())
+  value     Json?    // Valor del campo
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relación con campo
+  fieldId String
+  field   ModuleField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  // Relación con entidad (opcional, para campos de entidades específicas)
+  entityType String? // "customer", "product", "order", etc.
+  entityId   String? // ID de la entidad específica
+
+  @@unique([tenantId, fieldId, entityType, entityId])
+  @@map("tenant_module_field_values")
+}
+
+// Permisos específicos por módulo y tenant
+model TenantModulePermission {
+  id        String   @id @default(cuid())
+  permission String  // "read", "write", "delete", "export", etc.
+  isGranted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relación con módulo del tenant
+  tenantModuleId String
+  tenantModule   TenantModule @relation(fields: [tenantModuleId], references: [id], onDelete: Cascade)
+
+  // Relación con rol de usuario
+  userRole UserRole
+
+  @@unique([tenantModuleId, userRole, permission])
+  @@map("tenant_module_permissions")
+}
+
+// Workflows personalizables por tenant
+model Workflow {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  moduleId    String?       // Módulo asociado (opcional)
+  trigger     WorkflowTrigger
+  conditions  Json?         // Condiciones del workflow
+  actions     Json          // Acciones a ejecutar
+  isActive    Boolean       @default(true)
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  workflowExecutions WorkflowExecution[]
+
+  @@map("workflows")
+}
+
+enum WorkflowTrigger {
+  CREATE
+  UPDATE
+  DELETE
+  STATUS_CHANGE
+  SCHEDULED
+  MANUAL
+  WEBHOOK
+}
+
+// Ejecuciones de workflows
+model WorkflowExecution {
+  id          String            @id @default(cuid())
+  status      ExecutionStatus   @default(PENDING)
+  input       Json?             // Datos de entrada
+  output      Json?             // Resultado de la ejecución
+  error       String?           // Error si falló
+  executedAt  DateTime?         // Cuándo se ejecutó
+  createdAt   DateTime          @default(now())
+
+  // Relación con workflow
+  workflowId String
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@map("workflow_executions")
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+// Integraciones externas por tenant
+model Integration {
+  id          String           @id @default(cuid())
+  name        String
+  type        IntegrationType
+  config      Json             // Configuración de la integración
+  isActive    Boolean          @default(true)
+  lastSync    DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Multi-tenant
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  webhooks Webhook[]
+
+  @@map("integrations")
+}
+
+enum IntegrationType {
+  STRIPE
+  PAYPAL
+  SHOPIFY
+  WOOCOMMERCE
+  MAILCHIMP
+  SENDGRID
+  TWILIO
+  ZAPIER
+  CUSTOM_API
+}
+
+// Webhooks para integraciones
+model Webhook {
+  id          String      @id @default(cuid())
+  name        String
+  url         String
+  events      String[]    // Eventos que activan el webhook
+  secret      String?     // Secreto para validación
+  isActive    Boolean     @default(true)
+  lastTrigger DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relación con integración
+  integrationId String
+  integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  // Relaciones
+  webhookLogs WebhookLog[]
+
+  @@map("webhooks")
+}
+
+// Logs de webhooks
+model WebhookLog {
+  id          String   @id @default(cuid())
+  event       String
+  payload     Json
+  response    Json?
+  status      Int?     // HTTP status code
+  error       String?
+  triggeredAt DateTime @default(now())
+
+  // Relación con webhook
+  webhookId String
+  webhook   Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@map("webhook_logs")
+}
+
+// Templates predefinidos para diferentes tipos de negocio
+model BusinessTemplate {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  industry    String?  // "retail", "manufacturing", "services", etc.
+  config      Json     // Configuración completa del template
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  templateModules BusinessTemplateModule[]
+
+  @@map("business_templates")
+}
+
+// Módulos incluidos en cada template
+model BusinessTemplateModule {
+  id        String   @id @default(cuid())
+  order     Int      @default(0)
+  config    Json?    // Configuración específica del módulo en este template
+  createdAt DateTime @default(now())
+
+  // Relación con template
+  templateId String
+  template   BusinessTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  // Relación con módulo
+  moduleId String
+  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, moduleId])
+  @@map("business_template_modules")
+}
+
+// MÓDULO DE SERVIDORES
+// Cliente de infraestructura
+model ServerClient {
+  id          String   @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  address     String?
+  city        String?
+  country     String?
+  status      ServerClientStatus @default(ACTIVE)
+  monthlyFee  Decimal?
+  serviceLevel String?
+  contractStart DateTime?
+  contractEnd   DateTime?
+  notes        String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  servers     Server[]
+  
+  @@map("server_clients")
+}
+
+// Servidor de infraestructura
+model Server {
+  id              String   @id @default(cuid())
+  name            String
+  hostname        String?
+  type            String   // Web Server, Database Server, etc.
+  status          ServerStatus @default(ONLINE)
+  ipAddress       String
+  port            Int?
+  protocol        String?
+  location        String
+  
+  // Información geográfica
+  country         String   // País donde está el servidor
+  region          String   // Región (América, Europa, Asia, etc.)
+  city            String   // Ciudad específica
+  timezone        String   // Zona horaria (UTC-5, UTC+0, etc.)
+  currency        String   // Moneda local (USD, EUR, COP, etc.)
+  
+  // Información del datacenter
+  datacenter      String?
+  datacenterCode  String?  // Código del datacenter (DC-001, etc.)
+  rack            String?
+  rackPosition    String?  // Posición en el rack (A1, B2, etc.)
+  provider        String?
+  
+  // Cumplimiento normativo
+  compliance      String[] // GDPR, SOX, HIPAA, etc.
+  
+  // Especificaciones técnicas
+  operatingSystem String?
+  cpu             String?
+  ram             String?
+  storage         String?
+  bandwidth       String?
+  powerConsumption String?
+  temperature     String?
+  
+  // Configuraciones
+  sslCertificate   Boolean @default(false)
+  backupEnabled    Boolean @default(false)
+  monitoringEnabled Boolean @default(true)
+  
+  // Información del cliente
+  clientId        String
+  client          ServerClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  // Fechas importantes
+  installationDate DateTime?
+  lastMaintenance  DateTime?
+  nextMaintenance  DateTime?
+  
+  // Costos y descripción
+  cost            Decimal?
+  costCurrency    String?   // Moneda del costo
+  costPeriod      String?   // MONTHLY, ANNUAL
+  description     String?
+  notes           String?
+  
+  // Información de red
+  publicIP        String?   // IP pública
+  privateIP       String?   // IP privada
+  gateway         String?   // Gateway
+  subnet          String?   // Subnet
+  dnsServers      String[]  // Servidores DNS
+  connectionType  String?   // DEDICATED, SHARED, CLOUD
+  
+  // Métricas de rendimiento
+  uptime          String?
+  lastChecked     DateTime @default(now())
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  alerts          ServerAlert[]
+  metrics         ServerMetric[]
+  userAccesses    ServerUserAccess[]
+  maintenanceWindows MaintenanceWindow[]
+  serverCosts     ServerCost[]
+  networkConfigs  NetworkConfig[]
+  metricThresholds MetricThreshold[]
+  notifications   Notification[]
+  health          ServerHealth?
+  
+  @@map("servers")
+}
+
+// Alertas de servidor
+model ServerAlert {
+  id          String   @id @default(cuid())
+  type        ServerAlertType
+  severity    ServerAlertSeverity
+  title       String
+  description String
+  status      ServerAlertStatus @default(ACTIVE)
+  acknowledged Boolean @default(false)
+  resolvedAt   DateTime?
+  resolvedBy   String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  serverId    String
+  server      Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("server_alerts")
+}
+
+// Métricas de servidor
+model ServerMetric {
+  id          String   @id @default(cuid())
+  metricType  ServerMetricType
+  value       Decimal
+  unit        String?  // %, MB, GB, etc.
+  timestamp   DateTime @default(now())
+  
+  // Metadatos adicionales
+  source      String?  // SNMP, Agent, API, etc.
+  threshold   Decimal? // Umbral configurado
+  isAlert     Boolean  @default(false)
+  
+  serverId    String
+  server      Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("server_metrics")
+}
+
+// Ventanas de mantenimiento
+model MaintenanceWindow {
+  id              String   @id @default(cuid())
+  serverId        String
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Información del mantenimiento
+  title           String
+  description     String
+  type            MaintenanceType @default(SCHEDULED)
+  status          MaintenanceStatus @default(PLANNED)
+  
+  // Fechas y horarios
+  startTime       DateTime
+  endTime         DateTime
+  timezone        String   // Zona horaria del mantenimiento
+  estimatedDuration Int?   // Duración estimada en minutos
+  
+  // Notificaciones
+  notificationsSent Boolean @default(false)
+  notificationChannels String[] // EMAIL, SMS, SLACK, etc.
+  
+  // Impacto
+  slaImpact       Boolean @default(false)
+  expectedDowntime Int?   // Tiempo de inactividad esperado en minutos
+  
+  // Planificación
+  rollbackPlan    String?
+  contactPerson   String?
+  emergencyContact String?
+  
+  // Auditoría
+  createdBy       String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("maintenance_windows")
+}
+
+// Costos detallados de servidores
+model ServerCost {
+  id              String   @id @default(cuid())
+  serverId        String
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Información del costo
+  costType        ServerCostType
+  description     String
+  amount          Decimal
+  currency        String
+  period          CostPeriod @default(MONTHLY)
+  
+  // Fechas
+  startDate       DateTime
+  endDate         DateTime?
+  
+  // Proveedor y facturación
+  provider        String?
+  invoiceNumber   String?
+  paymentStatus   PaymentStatus @default(PENDING)
+  
+  // Auditoría
+  createdBy       String?
+  approvedBy      String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("server_costs")
+}
+
+// Configuración de red
+model NetworkConfig {
+  id              String   @id @default(cuid())
+  serverId        String
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Configuración de red
+  publicIP        String?
+  privateIP       String
+  gateway         String?
+  subnet          String?
+  dnsServers      String[]
+  bandwidth       String?
+  connectionType  NetworkConnectionType @default(DEDICATED)
+  
+  // Información del proveedor
+  isp             String?  // Internet Service Provider
+  contractNumber  String?
+  contractEndDate DateTime?
+  
+  // Configuración avanzada
+  vlan            String?
+  routingTable    Json?    // Tabla de enrutamiento
+  firewallRules   Json?    // Reglas de firewall
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("network_configs")
+}
+
+// Umbrales de alerta para métricas
+model MetricThreshold {
+  id              String   @id @default(cuid())
+  serverId        String
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Configuración del umbral
+  metricType      ServerMetricType
+  warningThreshold Decimal?  // Umbral de advertencia
+  criticalThreshold Decimal? // Umbral crítico
+  isEnabled       Boolean  @default(true)
+  
+  // Notificaciones
+  notifyOnWarning Boolean  @default(true)
+  notifyOnCritical Boolean @default(true)
+  notificationChannels String[] // EMAIL, SMS, SLACK, etc.
+  
+  // Cooldown para evitar spam
+  cooldownMinutes Int      @default(15)
+  lastNotification DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([serverId, metricType, tenantId])
+  @@map("metric_thresholds")
+}
+
+// Notificaciones enviadas
+model Notification {
+  id              String   @id @default(cuid())
+  serverId        String
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Información de la notificación
+  type            NotificationType
+  severity        NotificationSeverity
+  title           String
+  message         String
+  
+  // Canal y estado
+  channel         NotificationChannel
+  status          NotificationStatus @default(PENDING)
+  sentAt          DateTime?
+  deliveredAt     DateTime?
+  failedAt        DateTime?
+  failureReason   String?
+  
+  // Metadatos
+  metadata        Json?    // Datos adicionales
+  retryCount      Int      @default(0)
+  maxRetries      Int      @default(3)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("notifications")
+}
+
+// Estado de salud del servidor
+model ServerHealth {
+  id              String   @id @default(cuid())
+  serverId        String  @unique
+  server          Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  // Estado general
+  overallStatus   ServerHealthStatus @default(HEALTHY)
+  lastChecked     DateTime @default(now())
+  
+  // Métricas actuales
+  cpuUsage        Decimal?
+  memoryUsage     Decimal?
+  diskUsage       Decimal?
+  networkIn       Decimal?
+  networkOut      Decimal?
+  uptime          Int?     // En segundos
+  responseTime    Decimal? // En ms
+  
+  // Alertas activas
+  activeAlerts    Int      @default(0)
+  criticalAlerts  Int      @default(0)
+  warningAlerts   Int      @default(0)
+  
+  // Información del sistema
+  loadAverage     Decimal?
+  processes       Int?
+  connections     Int?
+  temperature     Decimal?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@unique([serverId, tenantId])
+  @@map("server_health")
+}
+
+// Enums para el módulo de servidores
+enum ServerClientStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  WARNING
+}
+
+enum ServerAlertType {
+  CPU_HIGH
+  MEMORY_HIGH
+  DISK_FULL
+  NETWORK_DOWN
+  SERVICE_DOWN
+  CERTIFICATE_EXPIRING
+  BACKUP_FAILED
+  SECURITY_BREACH
+  PERFORMANCE_DEGRADED
+}
+
+enum ServerAlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ServerMetricType {
+  CPU_USAGE
+  MEMORY_USAGE
+  DISK_USAGE
+  NETWORK_IN
+  NETWORK_OUT
+  UPTIME
+  RESPONSE_TIME
+  TEMPERATURE
+  POWER_CONSUMPTION
+}
+
+
+// Enums para mantenimiento
+enum MaintenanceType {
+  SCHEDULED
+  EMERGENCY
+  PLANNED
+  PREVENTIVE
+  CORRECTIVE
+}
+
+enum MaintenanceStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+// Enums para costos
+enum ServerCostType {
+  HARDWARE
+  SOFTWARE
+  BANDWIDTH
+  POWER
+  COOLING
+  MAINTENANCE
+  LICENSING
+  SUPPORT
+  BACKUP
+  MONITORING
+}
+
+enum CostPeriod {
+  HOURLY
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+
+// Enums para red
+enum NetworkConnectionType {
+  DEDICATED
+  SHARED
+  CLOUD
+  HYBRID
+  VIRTUAL
+}
+
+// Enums para monitoreo y notificaciones
+enum NotificationType {
+  METRIC_THRESHOLD
+  SERVER_DOWN
+  MAINTENANCE_REMINDER
+  SECURITY_ALERT
+  PERFORMANCE_DEGRADED
+  DISK_SPACE_LOW
+  CERTIFICATE_EXPIRING
+  BACKUP_FAILED
+}
+
+enum NotificationSeverity {
+  INFO
+  WARNING
+  ERROR
+  CRITICAL
+}
+
+enum NotificationChannel {
+  EMAIL
+  SMS
+  SLACK
+  TEAMS
+  WEBHOOK
+  PUSH
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  RETRYING
+}
+
+enum ServerHealthStatus {
+  HEALTHY
+  WARNING
+  CRITICAL
+  OFFLINE
+  MAINTENANCE
+}
+
+enum ServerAlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+}
+
+
+// MÓDULO CRM - CUSTOMER RELATIONSHIP MANAGEMENT
+// Lead (prospecto)
+model Lead {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  jobTitle    String?
+  industry    String?
+  source      LeadSource @default(WEBSITE)
+  status      LeadStatus @default(NEW)
+  score       Int      @default(0)
+  priority    LeadPriority @default(MEDIUM)
+  notes       String?
+  
+  // Información de seguimiento
+  assignedTo  String?  // User ID
+  lastContact DateTime?
+  nextFollowUp DateTime?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  opportunities Opportunity[]
+  communications Communication[]
+  
+  @@map("leads")
+}
+
+// Oportunidad de venta
+model Opportunity {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  value       Decimal
+  stage       OpportunityStage @default(PROSPECTING)
+  probability Int      @default(10) // Porcentaje de probabilidad de cierre
+  closeDate   DateTime?
+  
+  // Información del cliente
+  leadId      String
+  lead        Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Asignación
+  assignedTo  String?  // User ID
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  communications Communication[]
+  deals        Deal[]
+  
+  @@map("opportunities")
+}
+
+// Contacto (persona específica)
+model Contact {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  mobile      String?
+  jobTitle    String?
+  department  String?
+  
+  // Información de la empresa
+  company     String?
+  industry    String?
+  
+  // Información adicional
+  address     String?
+  city        String?
+  country     String?
+  website     String?
+  
+  // Clasificación
+  type        ContactType @default(CUSTOMER)
+  source      ContactSource @default(WEBSITE)
+  
+  // Seguimiento
+  lastContact DateTime?
+  notes       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  communications Communication[]
+  
+  @@map("contacts")
+}
+
+// Comunicación (llamadas, emails, reuniones)
+model Communication {
+  id          String   @id @default(cuid())
+  type        CommunicationType
+  subject     String?
+  content     String
+  direction   CommunicationDirection
+  status      CommunicationStatus @default(COMPLETED)
+  
+  // Fecha y tiempo
+  scheduledAt DateTime?
+  completedAt DateTime?
+  duration    Int?     // En minutos
+  
+  // Relaciones
+  leadId        String?
+  lead          Lead? @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  opportunityId String?
+  opportunity   Opportunity? @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  contactId     String?
+  contact       Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  // Asignación
+  assignedTo    String?  // User ID
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  tenantId      String
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("communications")
+}
+
+// Deal (negocio cerrado)
+model Deal {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  value       Decimal
+  status      DealStatus @default(ACTIVE)
+  
+  // Fechas importantes
+  closedDate  DateTime?
+  startDate   DateTime?
+  endDate     DateTime?
+  
+  // Relación con oportunidad
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  
+  // Información adicional
+  notes       String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("deals")
+}
+
+// Enums para CRM
+enum LeadSource {
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_MARKETING
+  EVENT
+  COLD_CALL
+  ADVERTISEMENT
+  PARTNER
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATING
+  CLOSED_WON
+  CLOSED_LOST
+  NURTURING
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum OpportunityStage {
+  PROSPECTING
+  QUALIFICATION
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum ContactType {
+  CUSTOMER
+  PROSPECT
+  PARTNER
+  VENDOR
+  COMPETITOR
+}
+
+enum ContactSource {
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_MARKETING
+  EVENT
+  COLD_CALL
+  ADVERTISEMENT
+  PARTNER
+  OTHER
+}
+
+enum CommunicationType {
+  EMAIL
+  PHONE_CALL
+  MEETING
+  DEMO
+  PRESENTATION
+  PROPOSAL
+  FOLLOW_UP
+  NURTURING
+}
+
+enum CommunicationDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum CommunicationStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum DealStatus {
+  ACTIVE
+  CLOSED_WON
+  CLOSED_LOST
+  CANCELLED
+}
+
+// MÓDULO SERVIDORES - GESTIÓN DE USUARIOS
+// Acceso de usuarios a servidores
+model ServerUserAccess {
+  id          String   @id @default(cuid())
+  username    String
+  email       String
+  fullName    String
+  department  String?
+  jobTitle    String?
+  
+  // Información de acceso
+  accessType  ServerAccessType @default(SSH)
+  accessLevel ServerAccessLevel @default(READ_ONLY)
+  status      ServerUserStatus @default(ACTIVE)
+  
+  // Credenciales y configuración
+  sshKey      String?    // Clave SSH pública
+  password    String?    // Hash de contraseña (si aplica)
+  twoFactorEnabled Boolean @default(false)
+  
+  // Fechas de acceso
+  lastLogin   DateTime?
+  lastActivity DateTime?
+  expiresAt   DateTime?
+  
+  // Información adicional
+  notes       String?
+  createdBy   String?    // User ID que creó el acceso
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relaciones
+  serverId    String
+  server      Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones con auditoría
+  accessLogs  ServerAccessLog[]
+  
+  @@map("server_user_accesses")
+}
+
+// Log de accesos a servidores
+model ServerAccessLog {
+  id          String   @id @default(cuid())
+  action      ServerAccessAction
+  ipAddress   String?
+  userAgent   String?
+  success     Boolean
+  failureReason String?
+  
+  // Detalles del acceso
+  sessionDuration Int?  // En minutos
+  commandsExecuted String[] // Lista de comandos ejecutados
+  
+  createdAt   DateTime @default(now())
+  
+  // Relaciones
+  userAccessId String
+  userAccess   ServerUserAccess @relation(fields: [userAccessId], references: [id], onDelete: Cascade)
+  
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("server_access_logs")
+}
+
+// Enums para gestión de usuarios de servidores
+enum ServerAccessType {
+  SSH
+  RDP
+  FTP
+  SFTP
+  WEB
+  API
+  DATABASE
+  CUSTOM
+}
+
+enum ServerAccessLevel {
+  READ_ONLY
+  LIMITED
+  STANDARD
+  ADMINISTRATOR
+  SUPER_ADMIN
+}
+
+enum ServerUserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  EXPIRED
+  PENDING_APPROVAL
+}
+
+enum ServerAccessAction {
+  LOGIN
+  LOGOUT
+  COMMAND_EXECUTION
+  FILE_UPLOAD
+  FILE_DOWNLOAD
+  CONFIGURATION_CHANGE
+  ACCESS_DENIED
+  PASSWORD_CHANGE
+  KEY_ROTATION
+  SUSPENSION
+  ACTIVATION
+}
+
+// ========================================
+// MÓDULO DE GESTIÓN DE ASCENSORES
+// ========================================
+
+// Clientes/Propietarios de ascensores
+model ElevatorClient {
+  id          String   @id @default(cuid())
+  name        String
+  company     String?
+  email       String
+  phone       String?
+  address     String
+  city        String
+  state       String
+  zipCode     String?
+  country     String   @default("México")
+  
+  // Información de contacto
+  contactPerson String?
+  contactPhone  String?
+  contactEmail  String?
+  
+  // Clasificación del cliente
+  clientType    ElevatorClientType @default(INDIVIDUAL)
+  industry      String?    // "Residencial", "Comercial", "Industrial", etc.
+  annualRevenue Decimal?
+  
+  // Estado y notas
+  status        ElevatorClientStatus @default(ACTIVE)
+  notes         String?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId      String
+  tenant        Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  elevators     Elevator[]
+  installations Installation[]
+  maintenanceContracts MaintenanceContract[]
+  
+  @@map("elevator_clients")
+}
+
+// Ascensores
+model Elevator {
+  id              String   @id @default(cuid())
+  serialNumber    String   @unique
+  model           String
+  brand           String
+  capacity        Int      // Capacidad en kg
+  floors          Int      // Número de pisos que sirve
+  speed           Decimal  // Velocidad en m/s
+  
+  // Información técnica
+  motorType       String?  // "AC", "DC", "VFD"
+  controlSystem   String?  // "Microprocessor", "Relay", "PLC"
+  doorType        String?  // "Lateral", "Central", "Telescópica"
+  carDimensions   String?  // "Ancho x Profundidad x Alto" en mm
+  shaftDimensions String?  // "Ancho x Profundidad x Alto" en mm
+  machineLocation String?  // "Sala de máquinas superior", "Sin sala de máquinas", etc.
+  driveType       String?  // "Tracción", "Hidráulico", "Neumático"
+  
+  // Ubicación
+  buildingName    String
+  buildingAddress String
+  buildingType    String?  // "Residencial", "Comercial", "Industrial", "Hospital", etc.
+  floorLocation   String?  // Piso donde está la entrada principal
+  shaftNumber     String?  // Número de hueco (para edificios con varios ascensores)
+  
+  // Estado del ascensor
+  status          ElevatorStatus @default(OPERATIONAL)
+  installationDate DateTime?
+  commissioningDate DateTime?
+  lastInspection  DateTime?
+  nextInspection   DateTime?
+  
+  // Información de mantenimiento
+  maintenanceFrequency String? // "Mensual", "Trimestral", "Semestral", "Anual"
+  warrantyExpiry      DateTime?
+  manufacturingYear   Int?
+  
+  // Cumplimiento normativo
+  certificationNumber String?  // Número de certificación
+  certificationExpiry DateTime?
+  regulatoryBody      String?  // "NOM-053", "EN 81", etc.
+  
+  // Notas y documentación
+  notes           String?
+  specifications  Json?    // Especificaciones técnicas detalladas
+  documents       Json?    // URLs de documentos (manuales, certificados, planos, etc.)
+  photos          Json?    // URLs de fotos
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  clientId        String
+  client          ElevatorClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  installations   Installation[]
+  maintenanceRecords MaintenanceRecord[]
+  inspections     Inspection[]
+  workOrders      WorkOrder[]
+  
+  @@map("elevators")
+}
+
+// Instalaciones (Proyectos de instalación de ascensores)
+model Installation {
+  id              String   @id @default(cuid())
+  projectNumber   String   @unique // Número de proyecto
+  projectName     String
+  description     String?
+  
+  // Fechas del proyecto
+  startDate       DateTime
+  plannedEndDate  DateTime
+  actualEndDate   DateTime?
+  
+  // Estado del proyecto
+  status          InstallationStatus @default(PLANNED)
+  progress        Int @default(0) // Porcentaje de progreso (0-100)
+  
+  // Información del proyecto
+  projectManager  String?
+  teamMembers     String[] // Array de nombres del equipo
+  budget          Decimal?
+  actualCost      Decimal?
+  
+  // Ubicación de la instalación
+  siteAddress     String
+  siteContact     String?
+  sitePhone       String?
+  
+  // Detalles técnicos
+  elevatorType    String   // "Pasajeros", "Carga", "Montacargas", "Hospitalario", etc.
+  numberOfElevators Int    // Cantidad de ascensores en este proyecto
+  
+  // Hitos del proyecto
+  milestones      Json?    // { "fase": "fecha", "estado": "completado" }
+  
+  // Permisos y certificaciones
+  permits         Json?    // Permisos de construcción e instalación
+  
+  // Notas y documentación
+  notes           String?
+  documents       Json?    // Documentos del proyecto
+  photos          Json?    // Fotos del progreso
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  clientId        String
+  client          ElevatorClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  elevatorId      String?
+  elevator        Elevator? @relation(fields: [elevatorId], references: [id], onDelete: SetNull)
+  
+  workOrders      WorkOrder[]
+  
+  @@map("installations")
+}
+
+// Contratos de mantenimiento
+model MaintenanceContract {
+  id              String   @id @default(cuid())
+  contractNumber  String   @unique
+  contractName    String
+  description     String?
+  
+  // Período del contrato
+  startDate       DateTime
+  endDate         DateTime
+  autoRenew       Boolean  @default(false)
+  
+  // Tipo de contrato
+  contractType    MaintenanceContractType @default(PREVENTIVE)
+  frequency       String   // "Mensual", "Bimensual", "Trimestral", "Semestral", "Anual"
+  visitsPerYear   Int      // Número de visitas programadas al año
+  
+  // Información financiera
+  monthlyFee      Decimal?
+  annualFee       Decimal?
+  emergencyRate   Decimal? // Tarifa por llamada de emergencia
+  sparesIncluded  Boolean  @default(false)
+  
+  // Alcance del servicio
+  serviceScope    Json?    // Detalle de lo que incluye el contrato
+  responseTime    String?  // "24 horas", "48 horas", etc.
+  coverage        String?  // "24/7", "Horario laboral", etc.
+  
+  // Estado del contrato
+  status          MaintenanceContractStatus @default(ACTIVE)
+  
+  // Notas
+  notes           String?
+  terms           String?  // Términos y condiciones
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  clientId        String
+  client          ElevatorClient @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  maintenanceRecords MaintenanceRecord[]
+  
+  @@map("maintenance_contracts")
+}
+
+// Registros de mantenimiento
+model MaintenanceRecord {
+  id              String   @id @default(cuid())
+  recordNumber    String   @unique
+  maintenanceType ElevatorMaintenanceType @default(PREVENTIVE)
+  
+  // Fechas
+  scheduledDate   DateTime
+  actualDate      DateTime?
+  completedDate   DateTime?
+  
+  // Información del servicio
+  description     String?
+  findings        String?  // Hallazgos durante el mantenimiento
+  workPerformed   String?  // Trabajo realizado
+  
+  // Estado
+  status          ElevatorMaintenanceStatus @default(SCHEDULED)
+  priority        MaintenancePriority @default(NORMAL)
+  
+  // Técnicos asignados
+  technicianIds   String[] // Array de IDs de técnicos
+  hoursWorked     Decimal?
+  
+  // Repuestos utilizados
+  sparePartsUsed  Json?    // { "partId": "cantidad", "cost": "precio" }
+  totalCost       Decimal?
+  
+  // Checklist
+  checklist       Json?    // Items verificados durante el mantenimiento
+  testResults     Json?    // Resultados de pruebas realizadas
+  
+  // Documentación
+  photos          Json?    // Fotos del trabajo realizado
+  signature       String?  // Firma digital del cliente
+  clientFeedback  String?  // Comentarios del cliente
+  
+  // Notas
+  notes           String?
+  nextAction      String?  // Acciones recomendadas
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  elevatorId      String
+  elevator        Elevator @relation(fields: [elevatorId], references: [id], onDelete: Cascade)
+  
+  contractId      String?
+  contract        MaintenanceContract? @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  
+  @@map("maintenance_records")
+}
+
+// Inspecciones técnicas
+model Inspection {
+  id              String   @id @default(cuid())
+  inspectionNumber String  @unique
+  inspectionType  InspectionType @default(PERIODIC)
+  
+  // Fechas
+  scheduledDate   DateTime
+  inspectionDate  DateTime?
+  expiryDate      DateTime? // Fecha de vencimiento de la certificación
+  
+  // Información de la inspección
+  inspector       String   // Nombre del inspector certificado
+  inspectorLicense String? // Número de licencia del inspector
+  regulatoryBody  String?  // Organismo regulador (ej: "Protección Civil", "NOM-053")
+  
+  // Resultados
+  status          InspectionStatus @default(SCHEDULED)
+  result          InspectionResult?
+  score           Int?     // Puntuación de 0-100
+  
+  // Hallazgos
+  findings        String?  // Hallazgos generales
+  defects         Json?    // Defectos encontrados con severidad
+  recommendations String?  // Recomendaciones
+  correctiveActions String? // Acciones correctivas requeridas
+  
+  // Certificación
+  certificateNumber String?
+  certificateIssued Boolean @default(false)
+  certificateUrl    String? // URL del certificado PDF
+  
+  // Documentación
+  checklist       Json?    // Checklist de inspección
+  photos          Json?    // Fotos de la inspección
+  documents       Json?    // Documentos relacionados
+  
+  // Notas
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  elevatorId      String
+  elevator        Elevator @relation(fields: [elevatorId], references: [id], onDelete: Cascade)
+  
+  @@map("inspections")
+}
+
+// Técnicos especializados
+model ElevatorTechnician {
+  id              String   @id @default(cuid())
+  employeeNumber  String   @unique
+  firstName       String
+  lastName        String
+  email           String   @unique
+  phone           String
+  
+  // Información profesional
+  specialization  String[] // "Hidráulicos", "Tracción", "Montacargas", etc.
+  certifications  Json?    // Certificaciones y licencias
+  experience      Int?     // Años de experiencia
+  skillLevel      TechnicianLevel @default(JUNIOR)
+  
+  // Estado
+  status          TechnicianStatus @default(ACTIVE)
+  availability    Boolean  @default(true)
+  
+  // Información de contacto de emergencia
+  emergencyContact String?
+  emergencyPhone   String?
+  
+  // Documentación
+  photo           String?  // URL de foto
+  documents       Json?    // Documentos (licencias, certificados, etc.)
+  
+  // Notas
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("elevator_technicians")
+}
+
+// Repuestos y componentes
+model ElevatorSparePart {
+  id              String   @id @default(cuid())
+  partNumber      String   @unique
+  partName        String
+  description     String?
+  category        String   // "Motor", "Cables", "Puertas", "Controles", "Seguridad", etc.
+  
+  // Información del proveedor
+  manufacturer    String?
+  supplier        String?
+  
+  // Compatibilidad
+  compatibleBrands String[] // Marcas compatibles
+  compatibleModels String[] // Modelos compatibles
+  
+  // Inventario
+  currentStock    Int      @default(0)
+  minStock        Int      @default(5)
+  maxStock        Int?
+  location        String?  // Ubicación en el almacén
+  
+  // Precios
+  unitCost        Decimal
+  unitPrice       Decimal  // Precio de venta
+  
+  // Información adicional
+  weight          Decimal?
+  dimensions      String?
+  warranty        String?  // Período de garantía
+  
+  // Notas
+  notes           String?
+  photo           String?  // URL de foto del repuesto
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  @@map("elevator_spare_parts")
+}
+
+// Órdenes de trabajo
+model WorkOrder {
+  id              String   @id @default(cuid())
+  workOrderNumber String   @unique
+  title           String
+  description     String?
+  
+  // Tipo de orden
+  orderType       WorkOrderType @default(MAINTENANCE)
+  priority        WorkOrderPriority @default(NORMAL)
+  
+  // Fechas
+  createdDate     DateTime @default(now())
+  scheduledDate   DateTime?
+  startDate       DateTime?
+  completedDate   DateTime?
+  dueDate         DateTime?
+  
+  // Estado
+  status          WorkOrderStatus @default(OPEN)
+  
+  // Asignación
+  assignedTo      String[] // IDs de técnicos asignados
+  estimatedHours  Decimal?
+  actualHours     Decimal?
+  
+  // Costos
+  estimatedCost   Decimal?
+  actualCost      Decimal?
+  
+  // Trabajo realizado
+  workPerformed   String?
+  findings        String?
+  resolution      String?
+  
+  // Materiales y repuestos
+  materials       Json?    // Materiales utilizados
+  
+  // Documentación
+  photos          Json?    // Fotos del trabajo
+  documents       Json?    // Documentos relacionados
+  signature       String?  // Firma del cliente
+  
+  // Satisfacción del cliente
+  clientFeedback  String?
+  rating          Int?     // 1-5 estrellas
+  
+  // Notas
+  notes           String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Multi-tenant
+  tenantId        String
+  tenant          Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Relaciones
+  elevatorId      String?
+  elevator        Elevator? @relation(fields: [elevatorId], references: [id], onDelete: SetNull)
+  
+  installationId  String?
+  installation    Installation? @relation(fields: [installationId], references: [id], onDelete: SetNull)
+  
+  @@map("work_orders")
+}
+
+// ========================================
+// ENUMS PARA EL MÓDULO DE ASCENSORES
+// ========================================
+
+enum ElevatorClientType {
+  INDIVIDUAL
+  COMPANY
+  PROPERTY_MANAGER
+  CONSTRUCTOR
+  ARCHITECT
+  GOVERNMENT
+}
+
+enum ElevatorClientStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECTIVE
+  SUSPENDED
+}
+
+enum ElevatorStatus {
+  OPERATIONAL
+  OUT_OF_SERVICE
+  UNDER_MAINTENANCE
+  UNDER_INSPECTION
+  DECOMMISSIONED
+  EMERGENCY_STOP
+}
+
+enum InstallationStatus {
+  PLANNED
+  IN_PROGRESS
+  TESTING
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+enum MaintenanceContractType {
+  PREVENTIVE
+  FULL_SERVICE
+  EMERGENCY_ONLY
+  INSPECTION_ONLY
+}
+
+enum MaintenanceContractStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  CANCELLED
+  PENDING_RENEWAL
+}
+
+enum ElevatorMaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  EMERGENCY
+  INSPECTION
+  MODERNIZATION
+}
+
+enum ElevatorMaintenanceStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  PENDING_PARTS
+}
+
+enum MaintenancePriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+  EMERGENCY
+}
+
+enum InspectionType {
+  PERIODIC
+  ANNUAL
+  POST_INSTALLATION
+  POST_MODERNIZATION
+  SPECIAL
+  EMERGENCY
+}
+
+enum InspectionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum InspectionResult {
+  PASSED
+  FAILED
+  CONDITIONAL
+  PENDING_CORRECTIONS
+}
+
+enum TechnicianLevel {
+  APPRENTICE
+  JUNIOR
+  INTERMEDIATE
+  SENIOR
+  MASTER
+  SPECIALIST
+}
+
+enum TechnicianStatus {
+  ACTIVE
+  ON_LEAVE
+  INACTIVE
+  TRAINING
+}
+
+enum WorkOrderType {
+  MAINTENANCE
+  REPAIR
+  INSTALLATION
+  INSPECTION
+  MODERNIZATION
+  EMERGENCY
+}
+
+enum WorkOrderPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+  EMERGENCY
+}
+
+enum WorkOrderStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+  CLOSED
+}
+
+// ============================================
+// MÓDULO DE GESTIÓN DE COLEGIOS
+// ============================================
+
+// Estudiantes
+model SchoolStudent {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Información personal
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime
+  gender        SchoolGender
+  bloodType     String?
+  allergies     String?
+  medicalNotes  String?
+  
+  // Información de contacto
+  email         String?
+  phone         String?
+  address       String
+  city          String
+  state         String?
+  zipCode       String?
+  
+  // Información académica
+  studentCode   String   @unique
+  grade         String
+  section       String?
+  enrollmentDate DateTime
+  status        SchoolStudentStatus @default(ACTIVE)
+  
+  // Información de padres/tutores
+  parents       SchoolParent[]
+  
+  // Relaciones
+  enrollments   SchoolEnrollment[]
+  grades        SchoolGrade[]
+  attendance    SchoolAttendance[]
+  payments      SchoolPayment[]
+  disciplinary  SchoolDisciplinary[]
+  library       SchoolLibraryLoan[]
+  transport     SchoolTransportAssignment[]
+  cafeteria     SchoolCafeteriaAssignment[]
+  
+  // Metadata
+  photoUrl      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentCode])
+  @@index([status])
+}
+
+// Padres/Tutores
+model SchoolParent {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Información personal
+  firstName     String
+  lastName      String
+  relationship  SchoolRelationship
+  email         String
+  phone         String
+  cellPhone     String?
+  workPhone     String?
+  occupation    String?
+  
+  // Información de contacto
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  
+  // Estudiantes asociados
+  students      SchoolStudent[]
+  
+  // Configuración
+  isPrimaryContact Boolean @default(false)
+  canPickup     Boolean @default(true)
+  emergencyContact Boolean @default(false)
+  
+  // Metadata
+  photoUrl      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([email])
+}
+
+// Docentes
+model SchoolTeacher {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Información personal
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime?
+  gender        SchoolGender
+  email         String   @unique
+  phone         String
+  cellPhone     String?
+  
+  // Información profesional
+  teacherCode   String   @unique
+  specialization String
+  degree        String
+  certifications String?
+  hireDate      DateTime
+  status        SchoolTeacherStatus @default(ACTIVE)
+  
+  // Información laboral
+  employmentType SchoolEmploymentType
+  salary        Decimal?
+  department    String?
+  
+  // Información de contacto
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  
+  // Relaciones
+  subjects      SchoolSubject[]
+  schedules     SchoolSchedule[]
+  evaluations   SchoolEvaluation[]
+  
+  // Metadata
+  photoUrl      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([teacherCode])
+  @@index([status])
+}
+
+// Grados/Niveles
+model SchoolGradeLevel {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  name          String
+  code          String
+  level         String   // 'preschool', 'elementary', 'middle', 'high'
+  description   String?
+  capacity      Int?
+  
+  // Relaciones
+  sections      SchoolSection[]
+  subjects      SchoolSubject[]
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@unique([tenantId, code])
+}
+
+// Secciones
+model SchoolSection {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  gradeLevelId  String
+  gradeLevel    SchoolGradeLevel @relation(fields: [gradeLevelId], references: [id], onDelete: Cascade)
+  
+  name          String
+  code          String
+  capacity      Int
+  academicYear  String
+  
+  // Relaciones
+  enrollments   SchoolEnrollment[]
+  schedules     SchoolSchedule[]
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@unique([tenantId, code, academicYear])
+}
+
+// Materias/Asignaturas
+model SchoolSubject {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  name          String
+  code          String
+  description   String?
+  credits       Int?
+  hoursPerWeek  Int?
+  
+  gradeLevelId  String?
+  gradeLevel    SchoolGradeLevel? @relation(fields: [gradeLevelId], references: [id], onDelete: SetNull)
+  
+  teacherId     String?
+  teacher       SchoolTeacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
+  
+  // Relaciones
+  schedules     SchoolSchedule[]
+  grades        SchoolGrade[]
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@unique([tenantId, code])
+}
+
+// Horarios
+model SchoolSchedule {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  subjectId     String
+  subject       SchoolSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  teacherId     String
+  teacher       SchoolTeacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  
+  sectionId     String
+  section       SchoolSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  dayOfWeek     Int      // 0=domingo, 1=lunes, etc.
+  startTime     String
+  endTime       String
+  classroom     String?
+  academicYear  String
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([teacherId])
+  @@index([sectionId])
+}
+
+// Matrículas
+model SchoolEnrollment {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  sectionId     String
+  section       SchoolSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  academicYear  String
+  enrollmentDate DateTime
+  status        SchoolEnrollmentStatus @default(ENROLLED)
+  
+  // Metadata
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([academicYear])
+}
+
+// Calificaciones
+model SchoolGrade {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  subjectId     String
+  subject       SchoolSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  academicYear  String
+  term          String   // 'Q1', 'Q2', 'Q3', 'Q4', 'SEMESTER1', 'SEMESTER2', 'ANNUAL'
+  gradeValue    Decimal
+  maxGradeValue Decimal  @default(100)
+  gradeType     SchoolGradeType @default(NUMERICAL)
+  comments      String?
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([subjectId])
+  @@index([academicYear])
+}
+
+// Asistencia
+model SchoolAttendance {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  date          DateTime
+  status        SchoolAttendanceStatus
+  arrivalTime   String?
+  departureTime String?
+  comments      String?
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([date])
+}
+
+// Pagos
+model SchoolPayment {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  paymentType   SchoolPaymentType
+  amount        Decimal
+  dueDate       DateTime
+  paymentDate   DateTime?
+  status        SchoolPaymentStatus @default(PENDING)
+  
+  // Información del pago
+  concept       String
+  academicYear  String
+  month         String?
+  
+  // Método de pago
+  paymentMethod String?
+  transactionId String?
+  receiptNumber String?
+  
+  // Metadata
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+// Registros disciplinarios
+model SchoolDisciplinary {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  incidentDate  DateTime
+  incidentType  SchoolIncidentType
+  severity      SchoolSeverity
+  description   String
+  action        String
+  reportedBy    String
+  status        SchoolDisciplinaryStatus @default(OPEN)
+  
+  // Metadata
+  resolvedDate  DateTime?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([incidentDate])
+}
+
+// Biblioteca - Libros
+model SchoolLibraryBook {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  isbn          String?
+  title         String
+  author        String
+  publisher     String?
+  publishYear   Int?
+  category      String
+  language      String   @default("Español")
+  
+  // Inventario
+  totalCopies   Int      @default(1)
+  availableCopies Int    @default(1)
+  location      String?
+  
+  // Estado
+  status        SchoolLibraryBookStatus @default(AVAILABLE)
+  
+  // Relaciones
+  loans         SchoolLibraryLoan[]
+  
+  // Metadata
+  coverUrl      String?
+  description   String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([isbn])
+  @@index([category])
+}
+
+// Biblioteca - Préstamos
+model SchoolLibraryLoan {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  bookId        String
+  book          SchoolLibraryBook @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  loanDate      DateTime @default(now())
+  dueDate       DateTime
+  returnDate    DateTime?
+  status        SchoolLoanStatus @default(ACTIVE)
+  
+  // Metadata
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+  @@index([bookId])
+  @@index([status])
+}
+
+// Transporte - Rutas
+model SchoolTransportRoute {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  routeName     String
+  routeCode     String
+  description   String?
+  startTime     String
+  endTime       String
+  
+  // Conductor y vehículo
+  driverName    String
+  driverPhone   String
+  vehiclePlate  String
+  vehicleModel  String?
+  vehicleCapacity Int
+  
+  status        SchoolRouteStatus @default(ACTIVE)
+  
+  // Relaciones
+  students      SchoolTransportAssignment[]
+  
+  // Metadata
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@unique([tenantId, routeCode])
+}
+
+// Transporte - Asignaciones
+model SchoolTransportAssignment {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  routeId       String
+  route         SchoolTransportRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  pickupAddress String
+  pickupTime    String
+  dropoffAddress String
+  dropoffTime   String
+  
+  status        SchoolTransportAssignmentStatus @default(ACTIVE)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([routeId])
+  @@index([studentId])
+}
+
+// Comedor - Menús
+model SchoolCafeteriaMenu {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  date          DateTime
+  mealType      SchoolMealType
+  menuName      String
+  description   String?
+  
+  // Información nutricional
+  calories      Int?
+  proteins      Decimal?
+  carbohydrates Decimal?
+  fats          Decimal?
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([date])
+}
+
+// Comedor - Asignaciones
+model SchoolCafeteriaAssignment {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  studentId     String
+  student       SchoolStudent @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  plan          SchoolCafeteriaPlan
+  dietaryRestrictions String?
+  allergies     String?
+  
+  status        SchoolCafeteriaAssignmentStatus @default(ACTIVE)
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([studentId])
+}
+
+// Evaluaciones de docentes
+model SchoolEvaluation {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  teacherId     String
+  teacher       SchoolTeacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  
+  evaluationDate DateTime
+  evaluationType SchoolEvaluationType
+  evaluator     String
+  
+  // Criterios de evaluación
+  teaching      Decimal  // 1-5
+  planning      Decimal  // 1-5
+  discipline    Decimal  // 1-5
+  communication Decimal  // 1-5
+  overall       Decimal  // 1-5
+  
+  comments      String?
+  recommendations String?
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([teacherId])
+  @@index([evaluationDate])
+}
+
+// ============================================
+// ENUMS PARA EL MÓDULO DE COLEGIOS
+// ============================================
+
+enum SchoolGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum SchoolStudentStatus {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  TRANSFERRED
+  EXPELLED
+  WITHDRAWN
+}
+
+enum SchoolRelationship {
+  FATHER
+  MOTHER
+  GUARDIAN
+  GRANDPARENT
+  OTHER
+}
+
+enum SchoolTeacherStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum SchoolEmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  SUBSTITUTE
+}
+
+enum SchoolEnrollmentStatus {
+  ENROLLED
+  WITHDRAWN
+  TRANSFERRED
+  GRADUATED
+  EXPELLED
+}
+
+enum SchoolGradeType {
+  NUMERICAL
+  LETTER
+  PASS_FAIL
+  DESCRIPTIVE
+}
+
+enum SchoolAttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+  SICK
+}
+
+enum SchoolPaymentType {
+  ENROLLMENT
+  TUITION
+  TRANSPORT
+  CAFETERIA
+  LIBRARY
+  UNIFORM
+  MATERIALS
+  EXTRACURRICULAR
+  OTHER
+}
+
+enum SchoolPaymentStatus {
+  PENDING
+  PAID
+  PARTIAL
+  OVERDUE
+  CANCELLED
+}
+
+enum SchoolIncidentType {
+  BEHAVIORAL
+  ACADEMIC
+  ATTENDANCE
+  BULLYING
+  VIOLENCE
+  THEFT
+  OTHER
+}
+
+enum SchoolSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum SchoolDisciplinaryStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum SchoolLibraryBookStatus {
+  AVAILABLE
+  CHECKED_OUT
+  RESERVED
+  MAINTENANCE
+  LOST
+  DAMAGED
+}
+
+enum SchoolLoanStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+  LOST
+}
+
+enum SchoolRouteStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SchoolTransportAssignmentStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SchoolMealType {
+  BREAKFAST
+  LUNCH
+  SNACK
+  DINNER
+}
+
+enum SchoolCafeteriaPlan {
+  FULL
+  PARTIAL
+  NONE
+}
+
+enum SchoolCafeteriaAssignmentStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SchoolEvaluationType {
+  ANNUAL
+  SEMESTER
+  QUARTERLY
+  OBSERVATION
+  PEER_REVIEW
+}
