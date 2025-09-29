@@ -1,0 +1,10 @@
+{
+  "interval": 30,
+  "enabled": true,
+  "pushToGitHub": true,
+  "logLevel": "INFO",
+  "maxLogSize": 1048576,
+  "createdAt": "2025-09-29T22:01:28.896Z",
+  "version": "1.0.0",
+  "description": "Configuración para commit automático de Metanoia V1.0.1"
+}
