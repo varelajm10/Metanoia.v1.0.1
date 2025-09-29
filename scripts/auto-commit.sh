@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 🤖 Script de Commit Automático - Metanoia V1.0.1
+# 🤖 Script de Commit Automático - Metanoia V1.0.2
 # Este script hace commit automático cada 30 minutos en Linux/Mac
 
 # Configuración
@@ -98,7 +98,7 @@ execute_commit
 
 # Mostrar información
 echo ""
-echo "🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.1"
+echo "🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.2"
 echo "====================================="
 echo "📝 El script está ejecutándose en segundo plano"
 echo "⏰ Hace commit automático cada $INTERVAL_MINUTES minutos"

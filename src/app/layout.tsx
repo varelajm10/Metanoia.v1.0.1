@@ -7,7 +7,7 @@ import { AuthProvider } from '@/hooks/useAuth'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Matias 1.0.1 - Sistema ERP SaaS',
+  title: 'Matias 1.0.2 - Sistema ERP SaaS',
   description: 'Sistema ERP SaaS modular con arquitectura multi-tenant',
   keywords: [
     'ERP',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL('https://metanoia.click'),
   openGraph: {
-    title: 'Matias 1.0.1 - Sistema ERP SaaS',
+    title: 'Matias 1.0.2 - Sistema ERP SaaS',
     description: 'Sistema ERP SaaS modular con arquitectura multi-tenant',
     url: 'https://metanoia.click',
     siteName: 'Metanoia',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Matias 1.0.1 - Sistema ERP SaaS',
+    title: 'Matias 1.0.2 - Sistema ERP SaaS',
     description: 'Sistema ERP SaaS modular con arquitectura multi-tenant',
     creator: '@metanoia',
   },

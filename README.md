@@ -1,4 +1,4 @@
-# 🚀 Metanoia V1.0.1 - Sistema ERP Modular SaaS
+# 🚀 Metanoia V1.0.2 - Sistema ERP Modular SaaS
 
 ## 📋 Descripción
 
@@ -105,8 +105,8 @@
 
 1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/tu-usuario/Metanoia.v1.0.1.git
-cd Metanoia.v1.0.1
+git clone https://github.com/tu-usuario/Metanoia.v1.0.2.git
+cd Metanoia.v1.0.2
 ```
 
 2. **Instalar dependencias**
@@ -140,7 +140,7 @@ npm run dev
 ## 📊 Estructura del Proyecto
 
 ```
-Metanoia_v1.0.1/
+Metanoia_v1.0.2/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── api/               # APIs REST
@@ -250,7 +250,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - **Desarrollador**: Juan
 - **Email**: [tu-email@ejemplo.com]
 - **GitHub**: [tu-usuario]
-- **Proyecto**: [https://github.com/tu-usuario/Metanoia.v1.0.1]
+- **Proyecto**: [https://github.com/tu-usuario/Metanoia.v1.0.2]
 
 ## 🙏 Agradecimientos
 

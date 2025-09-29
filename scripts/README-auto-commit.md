@@ -1,4 +1,4 @@
-# 🤖 Commit Automático - Metanoia V1.0.1
+# 🤖 Commit Automático - Metanoia V1.0.2
 
 ## 📋 Descripción
 

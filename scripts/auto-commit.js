@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🤖 Script de Commit Automático - Metanoia V1.0.1
+ * 🤖 Script de Commit Automático - Metanoia V1.0.2
  * 
  * Este script hace commit automático cada 30 minutos
  * para mantener el código respaldado constantemente.
@@ -270,7 +270,7 @@ global.autoCommit = autoCommit;
 autoCommit.start();
 
 // Mostrar ayuda
-console.log('\n🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.1');
+console.log('\n🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.2');
 console.log('=====================================');
 console.log('📝 El script está ejecutándose en segundo plano');
 console.log('⏰ Hace commit automático cada 30 minutos');

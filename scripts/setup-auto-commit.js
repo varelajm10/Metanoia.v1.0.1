@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🔧 Script de Configuración para Commit Automático
+ * 🔧 Script de Configuración para Commit Automático - Metanoia V1.0.2
  * 
  * Este script configura el commit automático en el sistema
  * y proporciona opciones de configuración.
@@ -99,7 +99,7 @@ class AutoCommitSetup {
       ...this.config,
       createdAt: new Date().toISOString(),
       version: '1.0.0',
-      description: 'Configuración para commit automático de Metanoia V1.0.1'
+      description: 'Configuración para commit automático de Metanoia V1.0.2'
     };
 
     try {
@@ -288,7 +288,7 @@ Si encuentras problemas:
    * Ejecutar configuración completa
    */
   async setup() {
-    console.log('🔧 CONFIGURANDO COMMIT AUTOMÁTICO - METANOIA V1.0.1');
+    console.log('🔧 CONFIGURANDO COMMIT AUTOMÁTICO - METANOIA V1.0.2');
     console.log('================================================');
     console.log('');
 

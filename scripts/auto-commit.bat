@@ -1,8 +1,8 @@
 @echo off
-REM 🤖 Script de Commit Automático - Metanoia V1.0.1
+REM 🤖 Script de Commit Automático - Metanoia V1.0.2
 REM Este script hace commit automático cada 30 minutos en Windows
 
-echo 🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.1
+echo 🤖 COMMIT AUTOMÁTICO - METANOIA V1.0.2
 echo =====================================
 echo 📝 Iniciando commit automático cada 30 minutos...
 echo ⏰ Presiona Ctrl+C para detener

@@ -632,7 +632,7 @@ export default function DashboardPage() {
                   M
                 </span>
               </div>
-              <span className="font-semibold">Matias 1.0.1</span>
+              <span className="font-semibold">Matias 1.0.2</span>
             </div>
             <div className="text-sm text-muted-foreground">
               <span>
@@ -644,7 +644,8 @@ export default function DashboardPage() {
                   className="text-primary transition-colors hover:text-primary/80"
                 >
                   metanoia.click
-                </a>
+                </a>{' '}
+                v1.0.2
               </span>
             </div>
           </div>

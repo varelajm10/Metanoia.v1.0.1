@@ -2,7 +2,7 @@
 # 🤖 Script de Inicio para Commit Automático
 # Generado automáticamente por setup-auto-commit.js
 
-echo "🚀 Iniciando commit automático para Metanoia V1.0.1..."
+echo "🚀 Iniciando commit automático para Metanoia V1.0.2..."
 echo "📁 Directorio: $(pwd)"
 echo "⏰ Intervalo: 30 minutos"
 echo ""
