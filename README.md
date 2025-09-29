@@ -1,313 +1,237 @@
-# Metanoia V1.0.1 - Sistema ERP SaaS Modular
+# 🚀 Metanoia V1.0.1 - Sistema ERP Modular SaaS
 
-![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?logo=next.js&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white)
+## 📋 Descripción
 
-Sistema ERP SaaS modular con arquitectura multi-tenant, diseñado para escalabilidad, seguridad y mantenibilidad.
+**Metanoia** es un sistema ERP modular SaaS multi-tenant diseñado para empresas que necesitan gestión integral de sus operaciones. El sistema incluye módulos especializados para diferentes industrias y puede escalarse según las necesidades del negocio.
 
-## 🚀 Características Principales
+## 🎯 Características Principales
 
-- **Multi-Tenant**: Arquitectura multi-tenant con separación por schema para máxima seguridad
-- **Modular**: Módulos independientes (CRM, Inventario, Contabilidad, etc.)
-- **Escalable**: Diseñado para crecer con tu negocio
-- **Seguro**: Autenticación JWT, encriptación de datos y mejores prácticas de seguridad
-- **Responsive**: Diseño mobile-first con UI moderna
-- **API-First**: Documentación OpenAPI/Swagger integrada
+### 🏗️ Arquitectura Multi-tenant
+- **Separación por tenant**: Cada cliente tiene su propio espacio de datos
+- **Configuración independiente**: Cada tenant puede personalizar sus módulos
+- **Escalabilidad**: Soporte para miles de tenants simultáneos
 
-## 🛠 Stack Tecnológico
+### 🧩 Sistema Modular
+- **Módulos independientes**: Cada módulo puede activarse/desactivarse
+- **Configuración flexible**: Personalización por tenant
+- **APIs RESTful**: Integración fácil con sistemas externos
+
+## 📦 Módulos Disponibles
+
+### 🎓 **Gestión de Colegios** (NUEVO)
+- **Gestión de Estudiantes**: Registro, matrícula, historial académico
+- **Gestión de Docentes**: Personal académico, horarios, evaluaciones
+- **Gestión Académica**: Grados, secciones, materias, horarios
+- **Control de Asistencia**: Registro diario, reportes, alertas
+- **Gestión Financiera**: Pagos de matrícula, pensiones, servicios
+- **Biblioteca Digital**: Catálogo, préstamos, devoluciones
+- **Transporte Escolar**: Rutas, asignaciones, seguimiento
+- **Comedor**: Menús, planes alimentarios, control nutricional
+- **Disciplina**: Registro de incidentes, seguimiento
+- **Portal de Padres**: Acceso a información de sus hijos
+
+### 🏢 **Gestión de Ascensores**
+- **Gestión de Clientes**: Empresas que requieren servicios
+- **Instalaciones**: Proyectos de instalación de ascensores
+- **Mantenimiento**: Contratos, programación, seguimiento
+- **Inspecciones**: Checklist, certificaciones, reportes
+- **Técnicos**: Personal especializado, certificaciones
+- **Repuestos**: Inventario, compras, control de stock
+- **Órdenes de Trabajo**: Asignación, seguimiento, completado
+
+### 🖥️ **Gestión de Servidores**
+- **Monitoreo**: Estado, métricas, alertas en tiempo real
+- **Mantenimiento**: Programación, seguimiento, historial
+- **Red**: Análisis de conectividad, configuración
+- **Clientes**: Gestión de clientes de servicios de hosting
+- **Usuarios**: Acceso y permisos del sistema
+
+### 👥 **Recursos Humanos**
+- **Empleados**: Registro, nómina, vacaciones
+- **Evaluaciones**: Desempeño, objetivos, seguimiento
+- **Capacitación**: Cursos, certificaciones, desarrollo
+
+### 📊 **CRM y Ventas**
+- **Clientes**: Gestión de relaciones comerciales
+- **Leads**: Prospección, seguimiento, conversión
+- **Oportunidades**: Pipeline de ventas, cierre
+
+### 📦 **Inventario**
+- **Productos**: Catálogo, stock, precios
+- **Órdenes**: Pedidos, facturación, envíos
+- **Reportes**: Análisis de ventas, stock bajo
+
+## 🛠️ Stack Tecnológico
 
 ### Frontend
-
-- **Next.js 14+** con App Router para SSR/SSG y SEO optimizado
+- **Next.js 14+** con App Router para SSR/SSG
 - **React 18+** como framework principal
-- **TypeScript** para tipado estático y mejor DX
-- **Tailwind CSS** para estilos rápidos y consistentes
-- **shadcn/ui** para componentes UI modernos y accesibles
-- **React Hook Form + Zod** para manejo de formularios y validación
-- **TanStack Query** para gestión de estado del servidor
+- **TypeScript** para tipado estático
+- **Tailwind CSS** para estilos rápidos
+- **shadcn/ui** para componentes modernos
+- **React Hook Form + Zod** para formularios
+- **TanStack Query** para gestión de estado
 
 ### Backend
-
-- **Node.js + Express/Fastify** para API REST
-- **Prisma ORM** para base de datos y migraciones
-- **PostgreSQL** como base de datos principal (optimizada para multi-tenant)
-- **Redis** para cache y gestión de sesiones
+- **Node.js + Express** para API REST
+- **Prisma ORM** para base de datos
+- **PostgreSQL** como base de datos principal
+- **Redis** para cache y sesiones
 - **JWT** para autenticación
-- **Bcrypt** para hashing seguro de contraseñas
+- **Bcrypt** para hashing seguro
 
-### Multi-Tenant & Infraestructura
-
+### Infraestructura
 - **Docker + Docker Compose** para containerización
-- **Nginx** como proxy reverso y load balancer
-- **AWS/Vercel** para hosting y despliegue
-- **Stripe** para pagos y suscripciones SaaS
-- **SendGrid/Resend** para emails transaccionales
+- **Nginx** como proxy reverso
+- **AWS/Vercel** para hosting
+- **Stripe** para pagos SaaS
+- **SendGrid/Resend** para emails
 
 ### Herramientas de Desarrollo
-
-- **ESLint + Prettier** para linting y formateo de código
-- **Husky + lint-staged** para Git hooks automáticos
-- **Jest + Testing Library** para testing unitario e integración
-- **Storybook** para documentación de componentes
-
-### Monitoreo y Analytics
-
-- **Sentry** para error tracking y monitoring
-- **Posthog/Mixpanel** para analytics de usuario
-- **LogRocket** para session replay y debugging
-
-## 📋 Prerrequisitos
-
-- Node.js 18+
-- npm 8+
-- Docker y Docker Compose
-- PostgreSQL 15+
-- Redis 7+
+- **ESLint + Prettier** para linting
+- **Husky + lint-staged** para Git hooks
+- **Jest + Testing Library** para testing
+- **Storybook** para documentación
 
 ## 🚀 Instalación y Configuración
 
-### 1. Clonar el repositorio
+### Prerrequisitos
+- Node.js 18+
+- PostgreSQL 14+
+- Redis 6+
+- Docker (opcional)
 
+### Instalación Local
+
+1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/your-org/metanoia-v1.git
-cd metanoia-v1
+git clone https://github.com/tu-usuario/Metanoia.v1.0.1.git
+cd Metanoia.v1.0.1
 ```
 
-### 2. Instalar dependencias
-
+2. **Instalar dependencias**
 ```bash
 npm install
 ```
 
-### 3. Configurar variables de entorno
-
+3. **Configurar variables de entorno**
 ```bash
 cp env.example .env.local
+# Editar .env.local con tus configuraciones
 ```
 
-Edita el archivo `.env.local` con tus configuraciones:
-
-```env
-# Base de datos
-DATABASE_URL="postgresql://metanoia_user:metanoia_password@localhost:5432/metanoia"
-
-# Redis
-REDIS_URL="redis://localhost:6379"
-
-# Autenticación JWT
-JWT_SECRET="your-super-secret-jwt-key-change-in-production"
-JWT_EXPIRES_IN="7d"
-
-# Stripe (Pagos)
-STRIPE_PUBLIC_KEY="pk_test_..."
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
-
-# Email (SendGrid/Resend)
-EMAIL_FROM="noreply@metanoia.click"
-SENDGRID_API_KEY="SG..."
-RESEND_API_KEY="re_..."
-```
-
-### 4. Configurar base de datos
-
-```bash
-# Generar cliente de Prisma
-npm run prisma:generate
-
-# Ejecutar migraciones
-npm run prisma:migrate
-
-# Poblar base de datos con datos de ejemplo
-npm run prisma:seed
-```
-
-### 5. Iniciar servicios con Docker
-
+4. **Configurar base de datos**
 ```bash
 # Iniciar PostgreSQL y Redis
 docker-compose up -d postgres redis
 
-# O iniciar todos los servicios
-docker-compose up -d
+# Ejecutar migraciones
+npm run prisma:migrate
+
+# Poblar datos iniciales
+npm run prisma:seed
 ```
 
-### 6. Iniciar la aplicación en desarrollo
-
+5. **Iniciar servidor de desarrollo**
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
-
-## 📚 Scripts Disponibles
-
-### Desarrollo
-
-```bash
-npm run dev          # Iniciar servidor de desarrollo
-npm run build        # Construir para producción
-npm run start        # Iniciar servidor de producción
-```
-
-### Base de Datos
-
-```bash
-npm run prisma:generate  # Generar cliente de Prisma
-npm run prisma:migrate   # Ejecutar migraciones
-npm run prisma:seed      # Poblar base de datos
-npm run prisma:studio    # Abrir Prisma Studio
-npm run prisma:reset     # Resetear base de datos
-npm run db:setup         # Configurar base de datos completa
-```
-
-### Testing
-
-```bash
-npm run test         # Ejecutar tests
-npm run test:watch   # Ejecutar tests en modo watch
-npm run test:coverage # Ejecutar tests con coverage
-```
-
-### Linting y Formateo
-
-```bash
-npm run lint         # Ejecutar ESLint
-npm run lint:fix     # Ejecutar ESLint con autofix
-npm run format       # Formatear código con Prettier
-npm run format:check # Verificar formateo
-npm run type-check   # Verificar tipos de TypeScript
-```
-
-### Storybook
-
-```bash
-npm run storybook        # Iniciar Storybook
-npm run build-storybook  # Construir Storybook
-```
-
-## 🏗 Arquitectura
-
-### Estructura del Proyecto
+## 📊 Estructura del Proyecto
 
 ```
-metanoia-v1/
+Metanoia_v1.0.1/
 ├── src/
-│   ├── app/                 # App Router de Next.js
-│   ├── components/          # Componentes React
-│   │   └── ui/             # Componentes UI de shadcn
-│   ├── lib/                # Utilidades y configuración
-│   ├── hooks/              # Custom hooks
-│   ├── types/              # Definiciones de tipos
-│   ├── utils/              # Funciones utilitarias
-│   └── server/             # Lógica del servidor
-├── prisma/                 # Schema y migraciones
-├── docs/                   # Documentación
-├── tests/                  # Tests
-├── storybook/              # Configuración de Storybook
-├── docker/                 # Configuración de Docker
-└── .storybook/             # Configuración de Storybook
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/               # APIs REST
+│   │   ├── dashboard/         # Páginas del dashboard
+│   │   └── login/            # Página de login
+│   ├── components/           # Componentes reutilizables
+│   │   ├── ui/              # Componentes base
+│   │   ├── modules/         # Componentes de módulos
+│   │   └── elevators/       # Componentes específicos
+│   ├── lib/                 # Utilidades y servicios
+│   │   ├── services/        # Servicios de base de datos
+│   │   ├── validations/     # Schemas Zod
+│   │   └── modules/         # Sistema de módulos
+│   ├── hooks/               # React hooks personalizados
+│   └── types/               # Tipos TypeScript
+├── prisma/                  # Schema y migraciones
+├── docs/                    # Documentación técnica
+├── scripts/                 # Scripts de utilidad
+└── docker/                  # Configuración Docker
 ```
 
-### Multi-Tenancy
-
-El sistema implementa multi-tenancy usando:
-
-1. **Separación por Schema**: Cada tenant tiene su propio schema en PostgreSQL
-2. **Middleware de Tenant**: Middleware que identifica el tenant basado en el dominio o header
-3. **Context de Tenant**: Context React para manejar el tenant actual
-4. **Filtrado Automático**: Prisma filtra automáticamente por tenant
-
-### Módulos del Sistema
-
-- **CRM**: Gestión de clientes, contactos y oportunidades
-- **Inventario**: Control de productos, stock y movimientos
-- **Facturación**: Órdenes, facturas y pagos
-- **Contabilidad**: Reportes financieros y análisis
-- **Usuarios**: Gestión de usuarios y permisos
-- **Configuración**: Configuración del sistema y tenant
-
-## 🔐 Seguridad
-
-- **Autenticación JWT** con refresh tokens
-- **Autorización basada en roles** (RBAC)
-- **Encriptación de contraseñas** con bcrypt
-- **Rate limiting** para prevenir ataques
-- **CORS** configurado correctamente
-- **Headers de seguridad** con Helmet
-- **Validación de entrada** con Zod
-- **Sanitización de datos** para prevenir XSS
-
-## 🧪 Testing
-
-El proyecto incluye:
-
-- **Unit Tests** con Jest y Testing Library
-- **Integration Tests** para APIs
-- **Component Tests** con Storybook
-- **E2E Tests** (opcional con Playwright)
-- **Coverage Reports** con umbrales mínimos
+## 🔧 Scripts Disponibles
 
 ```bash
-# Ejecutar todos los tests
-npm run test
+# Desarrollo
+npm run dev              # Servidor de desarrollo
+npm run build           # Build de producción
+npm run start           # Servidor de producción
 
-# Ejecutar tests con coverage
-npm run test:coverage
+# Base de datos
+npm run prisma:generate # Generar cliente Prisma
+npm run prisma:migrate  # Ejecutar migraciones
+npm run prisma:seed     # Poblar datos iniciales
 
-# Ejecutar tests en modo watch
-npm run test:watch
+# Testing
+npm run test            # Ejecutar tests
+npm run test:watch      # Tests en modo watch
+
+# Linting
+npm run lint            # Ejecutar ESLint
+npm run lint:fix        # Corregir errores automáticamente
+npm run format          # Formatear con Prettier
 ```
 
-## 📦 Despliegue
+## 🎯 Módulo de Colegios - Funcionalidades
 
-### Docker
+### 📚 Gestión Académica
+- **Grados y Secciones**: Organización por niveles educativos
+- **Materias**: Asignaturas por grado y sección
+- **Horarios**: Planificación de clases
+- **Matrículas**: Proceso de inscripción
+- **Calificaciones**: Sistema de evaluación
 
-```bash
-# Construir imagen
-docker build -t metanoia-v1 .
+### 👨‍🎓 Gestión de Estudiantes
+- **Registro**: Datos personales y académicos
+- **Historial**: Seguimiento académico completo
+- **Asistencia**: Control diario de presencia
+- **Disciplina**: Registro de incidentes
+- **Padres**: Información de contacto
 
-# Ejecutar contenedor
-docker run -p 3000:3000 metanoia-v1
-```
+### 👨‍🏫 Gestión de Docentes
+- **Personal**: Registro de docentes
+- **Asignaciones**: Materias y secciones
+- **Evaluaciones**: Desempeño docente
+- **Horarios**: Disponibilidad y carga
 
-### Docker Compose
+### 💰 Gestión Financiera
+- **Matrícula**: Pagos de inscripción
+- **Pensiones**: Pagos mensuales
+- **Servicios**: Transporte, comedor, biblioteca
+- **Reportes**: Estados de cuenta, morosidad
 
-```bash
-# Iniciar todos los servicios
-docker-compose up -d
+### 🏫 Servicios Auxiliares
+- **Biblioteca**: Catálogo digital, préstamos
+- **Transporte**: Rutas, asignaciones, seguimiento
+- **Comedor**: Menús, planes nutricionales
+- **Notificaciones**: Alertas automáticas
 
-# Ver logs
-docker-compose logs -f
+## 📈 Valor Comercial
 
-# Parar servicios
-docker-compose down
-```
+### 💼 Precios Sugeridos por Módulo
+- **Módulo de Colegios**: $500-1000/mes
+- **Módulo de Ascensores**: $300-800/mes
+- **Módulo de Servidores**: $200-500/mes
+- **Sistema Completo**: $2000-5000/mes
 
-### Vercel (Recomendado)
-
-1. Conectar repositorio a Vercel
-2. Configurar variables de entorno
-3. Desplegar automáticamente
-
-### AWS
-
-1. Configurar ECS/EKS
-2. Usar RDS para PostgreSQL
-3. Usar ElastiCache para Redis
-4. Configurar Load Balancer
-
-## 📖 Documentación
-
-- [Guía de Desarrollo](docs/development.md)
-- [API Documentation](docs/api.md)
-- [Arquitectura](docs/architecture.md)
-- [Multi-Tenancy](docs/multi-tenancy.md)
-- [Seguridad](docs/security.md)
-- [Despliegue](docs/deployment.md)
+### 🎯 Mercado Objetivo
+- **Colegios privados**: 500-2000 estudiantes
+- **Empresas de ascensores**: Mantenimiento e instalación
+- **Proveedores de hosting**: Gestión de servidores
+- **Empresas medianas**: Necesidades ERP completas
 
 ## 🤝 Contribución
 
@@ -317,33 +241,25 @@ docker-compose down
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-### Estándares de Código
-
-- Usar TypeScript estricto
-- Seguir las reglas de ESLint y Prettier
-- Escribir tests para nuevas funcionalidades
-- Documentar APIs y componentes
-- Usar conventional commits
-
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 🆘 Soporte
+## 📞 Contacto
 
-- **Documentación**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/your-org/metanoia-v1/issues)
-- **Discusiones**: [GitHub Discussions](https://github.com/your-org/metanoia-v1/discussions)
-- **Email**: support@metanoia.click
+- **Desarrollador**: Juan
+- **Email**: [tu-email@ejemplo.com]
+- **GitHub**: [tu-usuario]
+- **Proyecto**: [https://github.com/tu-usuario/Metanoia.v1.0.1]
 
 ## 🙏 Agradecimientos
 
-- [Next.js](https://nextjs.org/) - Framework React
-- [Prisma](https://prisma.io/) - ORM para TypeScript
-- [shadcn/ui](https://ui.shadcn.com/) - Componentes UI
-- [Tailwind CSS](https://tailwindcss.com/) - Framework CSS
-- [Vercel](https://vercel.com/) - Plataforma de despliegue
+- Next.js team por el framework
+- Prisma team por el ORM
+- Tailwind CSS por el sistema de estilos
+- shadcn/ui por los componentes
+- La comunidad de desarrolladores
 
 ---
 
-**© 2025 metanoia.click - Metanoia V1.0.1**
+**© 2024 Metanoia.click - Sistema ERP Modular SaaS**
