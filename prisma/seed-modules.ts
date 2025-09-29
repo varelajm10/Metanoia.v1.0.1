@@ -8,12 +8,272 @@ const prisma = new PrismaClient()
 
 // Definir módulos directamente aquí para evitar problemas de importación
 const modules = [
+  // ========================================
+  // MÓDULOS DE FASE 1 - CRÍTICOS
+  // ========================================
+  
+  // 1. Módulo de Inventario/Stock
+  {
+    id: 'inventory',
+    name: 'Inventory',
+    displayName: 'Inventario y Stock',
+    description: 'Gestión completa de inventario, productos, proveedores y stock',
+    version: '1.0.0',
+    category: 'BUSINESS' as any,
+    isCore: true,
+    icon: 'Package',
+    color: '#3B82F6',
+    order: 1,
+    config: {
+      defaultSettings: {
+        enableBarcodeScanning: true,
+        enableLowStockAlerts: true,
+        enableStockMovements: true,
+        enableSupplierManagement: true,
+        enablePurchaseOrders: true,
+        enableProductVariants: true,
+        enableProductImages: true,
+      },
+      customizableFields: [],
+      workflows: [],
+      integrations: [],
+    },
+    features: [
+      {
+        id: 'product_management',
+        name: 'Gestión de Productos',
+        description: 'Registro y gestión completa de productos con códigos de barras',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'stock_management',
+        name: 'Control de Stock',
+        description: 'Control de inventario en tiempo real con alertas',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'supplier_management',
+        name: 'Gestión de Proveedores',
+        description: 'Administración de proveedores y órdenes de compra',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'stock_movements',
+        name: 'Movimientos de Stock',
+        description: 'Registro de entradas, salidas y ajustes de inventario',
+        isEnabled: true,
+        config: {},
+      },
+    ],
+    permissions: [
+      { action: 'read', roles: ['USER', 'MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'write', roles: ['MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'delete', roles: ['ADMIN', 'SUPER_ADMIN'] },
+    ],
+  },
+
+  // 2. Módulo de Contabilidad
+  {
+    id: 'accounting',
+    name: 'Accounting',
+    displayName: 'Contabilidad',
+    description: 'Sistema contable completo con plan de cuentas y reportes fiscales',
+    version: '1.0.0',
+    category: 'FINANCIAL' as any,
+    isCore: true,
+    icon: 'Calculator',
+    color: '#10B981',
+    order: 2,
+    config: {
+      defaultSettings: {
+        enableChartOfAccounts: true,
+        enableJournalEntries: true,
+        enableBankReconciliation: true,
+        enableTaxManagement: true,
+        enableFinancialReports: true,
+        enableBalanceSheet: true,
+        enableIncomeStatement: true,
+      },
+      customizableFields: [],
+      workflows: [],
+      integrations: [],
+    },
+    features: [
+      {
+        id: 'chart_of_accounts',
+        name: 'Plan de Cuentas',
+        description: 'Configuración y gestión del plan de cuentas contable',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'journal_entries',
+        name: 'Asientos Contables',
+        description: 'Registro de asientos contables con validación automática',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'bank_reconciliation',
+        name: 'Conciliación Bancaria',
+        description: 'Conciliación de cuentas bancarias y control de movimientos',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'financial_reports',
+        name: 'Reportes Financieros',
+        description: 'Balance general, estado de resultados y reportes fiscales',
+        isEnabled: true,
+        config: {},
+      },
+    ],
+    permissions: [
+      { action: 'read', roles: ['MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'write', roles: ['ADMIN', 'SUPER_ADMIN'] },
+      { action: 'delete', roles: ['SUPER_ADMIN'] },
+    ],
+  },
+
+  // 3. Módulo de Ventas
+  {
+    id: 'sales',
+    name: 'Sales',
+    displayName: 'Ventas',
+    description: 'Gestión completa de ventas, cotizaciones y comisiones',
+    version: '1.0.0',
+    category: 'BUSINESS' as any,
+    isCore: true,
+    icon: 'ShoppingCart',
+    color: '#F59E0B',
+    order: 3,
+    config: {
+      defaultSettings: {
+        enableQuotes: true,
+        enableSalesPipeline: true,
+        enableCommissions: true,
+        enableDiscounts: true,
+        enableSalesReports: true,
+        enableCustomerManagement: true,
+        enableSalespersonManagement: true,
+      },
+      customizableFields: [],
+      workflows: [],
+      integrations: [],
+    },
+    features: [
+      {
+        id: 'quote_management',
+        name: 'Gestión de Cotizaciones',
+        description: 'Creación y seguimiento de cotizaciones',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'sales_pipeline',
+        name: 'Pipeline de Ventas',
+        description: 'Seguimiento del proceso de ventas',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'commission_management',
+        name: 'Gestión de Comisiones',
+        description: 'Cálculo y pago de comisiones a vendedores',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'discount_management',
+        name: 'Gestión de Descuentos',
+        description: 'Configuración de descuentos y promociones',
+        isEnabled: true,
+        config: {},
+      },
+    ],
+    permissions: [
+      { action: 'read', roles: ['USER', 'MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'write', roles: ['MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'delete', roles: ['ADMIN', 'SUPER_ADMIN'] },
+    ],
+  },
+
+  // 4. Módulo de Facturación
+  {
+    id: 'billing',
+    name: 'Billing',
+    displayName: 'Facturación',
+    description: 'Sistema de facturación electrónica con gestión de pagos',
+    version: '1.0.0',
+    category: 'FINANCIAL' as any,
+    isCore: true,
+    icon: 'FileText',
+    color: '#EF4444',
+    order: 4,
+    config: {
+      defaultSettings: {
+        enableElectronicInvoicing: true,
+        enablePaymentTracking: true,
+        enableCreditNotes: true,
+        enableDebitNotes: true,
+        enableInvoiceTemplates: true,
+        enableTaxConfiguration: true,
+        enablePaymentMethods: true,
+      },
+      customizableFields: [],
+      workflows: [],
+      integrations: [],
+    },
+    features: [
+      {
+        id: 'invoice_management',
+        name: 'Gestión de Facturas',
+        description: 'Creación y gestión de facturas electrónicas',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'payment_tracking',
+        name: 'Seguimiento de Pagos',
+        description: 'Control de pagos y métodos de pago',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'credit_debit_notes',
+        name: 'Notas de Crédito y Débito',
+        description: 'Gestión de notas de crédito y débito',
+        isEnabled: true,
+        config: {},
+      },
+      {
+        id: 'invoice_templates',
+        name: 'Plantillas de Factura',
+        description: 'Configuración de plantillas personalizadas',
+        isEnabled: true,
+        config: {},
+      },
+    ],
+    permissions: [
+      { action: 'read', roles: ['USER', 'MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'write', roles: ['MANAGER', 'ADMIN', 'SUPER_ADMIN'] },
+      { action: 'delete', roles: ['ADMIN', 'SUPER_ADMIN'] },
+    ],
+  },
+
+  // ========================================
+  // MÓDULOS EXISTENTES
+  // ========================================
+  
+  // Módulo de RRHH (existente)
   {
     id: 'hr',
     name: 'HR',
     displayName: 'Recursos Humanos',
-    description:
-      'Módulo completo de gestión de recursos humanos, nómina y talento',
+    description: 'Módulo completo de gestión de recursos humanos, nómina y talento',
     version: '1.0.0',
     category: 'BUSINESS' as any,
     isCore: false,
