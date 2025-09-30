@@ -50,6 +50,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 interface MaintenanceStats {
@@ -218,13 +219,13 @@ export default function MaintenanceDashboardPage() {
         resetForm()
         fetchMaintenanceWindows()
         fetchStats()
-        alert('Mantenimiento creado exitosamente')
+        toast.success('Mantenimiento creado exitosamente')
       } else {
-        alert(`Error: ${result.error}`)
+        toast.error(`Error: ${result.error}`)
       }
     } catch (error) {
       console.error('Error creating maintenance:', error)
-      alert('Error al crear mantenimiento')
+      toast.error('Error al crear mantenimiento')
     }
   }
 

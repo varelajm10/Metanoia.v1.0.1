@@ -57,7 +57,7 @@ export default function MaintenancePage() {
     scheduledDate: '',
     technician: '',
     description: '',
-    priority: 'medium'
+    priority: 'medium',
   })
 
   useEffect(() => {
@@ -207,14 +207,19 @@ export default function MaintenancePage() {
   const handleInputChange = (field: string, value: string) => {
     setNewScheduleData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }))
   }
 
   const handleSubmitSchedule = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!newScheduleData.elevatorId || !newScheduleData.type || !newScheduleData.scheduledDate || !newScheduleData.technician) {
+
+    if (
+      !newScheduleData.elevatorId ||
+      !newScheduleData.type ||
+      !newScheduleData.scheduledDate ||
+      !newScheduleData.technician
+    ) {
       alert('Por favor completa todos los campos requeridos')
       return
     }
@@ -228,7 +233,11 @@ export default function MaintenancePage() {
       technician: newScheduleData.technician,
       status: 'scheduled',
       description: newScheduleData.description,
-      priority: newScheduleData.priority as 'low' | 'medium' | 'high' | 'urgent'
+      priority: newScheduleData.priority as
+        | 'low'
+        | 'medium'
+        | 'high'
+        | 'urgent',
     }
 
     setSchedules(prev => [newSchedule, ...prev])
@@ -239,7 +248,7 @@ export default function MaintenancePage() {
       scheduledDate: '',
       technician: '',
       description: '',
-      priority: 'medium'
+      priority: 'medium',
     })
   }
 
@@ -251,7 +260,7 @@ export default function MaintenancePage() {
       scheduledDate: '',
       technician: '',
       description: '',
-      priority: 'medium'
+      priority: 'medium',
     })
   }
 
@@ -464,7 +473,9 @@ export default function MaintenancePage() {
                   <Label htmlFor="elevator">Ascensor *</Label>
                   <Select
                     value={newScheduleData.elevatorId}
-                    onValueChange={(value) => handleInputChange('elevatorId', value)}
+                    onValueChange={value =>
+                      handleInputChange('elevatorId', value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar ascensor" />
@@ -486,7 +497,7 @@ export default function MaintenancePage() {
                   <Label htmlFor="type">Tipo de Mantenimiento *</Label>
                   <Select
                     value={newScheduleData.type}
-                    onValueChange={(value) => handleInputChange('type', value)}
+                    onValueChange={value => handleInputChange('type', value)}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar tipo" />
@@ -500,18 +511,22 @@ export default function MaintenancePage() {
                 </div>
                 <div>
                   <Label htmlFor="date">Fecha Programada *</Label>
-                  <Input 
-                    type="date" 
-                    id="date" 
+                  <Input
+                    type="date"
+                    id="date"
                     value={newScheduleData.scheduledDate}
-                    onChange={(e) => handleInputChange('scheduledDate', e.target.value)}
+                    onChange={e =>
+                      handleInputChange('scheduledDate', e.target.value)
+                    }
                   />
                 </div>
                 <div>
                   <Label htmlFor="technician">Técnico Asignado *</Label>
                   <Select
                     value={newScheduleData.technician}
-                    onValueChange={(value) => handleInputChange('technician', value)}
+                    onValueChange={value =>
+                      handleInputChange('technician', value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar técnico" />
@@ -527,7 +542,9 @@ export default function MaintenancePage() {
                   <Label htmlFor="priority">Prioridad</Label>
                   <Select
                     value={newScheduleData.priority}
-                    onValueChange={(value) => handleInputChange('priority', value)}
+                    onValueChange={value =>
+                      handleInputChange('priority', value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar prioridad" />
@@ -548,16 +565,20 @@ export default function MaintenancePage() {
                   placeholder="Describe el mantenimiento a realizar..."
                   rows={3}
                   value={newScheduleData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('description', e.target.value)
+                  }
                 />
               </div>
               <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={handleCancelSchedule}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelSchedule}
+                >
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  Programar Mantenimiento
-                </Button>
+                <Button type="submit">Programar Mantenimiento</Button>
               </div>
             </form>
           </CardContent>

@@ -21,7 +21,7 @@ import {
   Clock,
   AlertCircle,
   Settings,
-  Template,
+  FileTemplate,
   Percent,
   BarChart3,
   Eye,
@@ -127,11 +127,15 @@ export default function BillingDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Métodos de Pago</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Métodos de Pago
+            </CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalPaymentMethods || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalPaymentMethods || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.activePaymentMethods || 0} activos
             </p>
@@ -144,20 +148,24 @@ export default function BillingDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalPayments || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Pagos procesados
-            </p>
+            <div className="text-2xl font-bold">
+              {stats?.totalPayments || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Pagos procesados</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notas de Crédito</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Notas de Crédito
+            </CardTitle>
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalCreditNotes || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalCreditNotes || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.approvedCreditNotes || 0} aprobadas
             </p>
@@ -166,11 +174,15 @@ export default function BillingDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Notas de Débito</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Notas de Débito
+            </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalDebitNotes || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalDebitNotes || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.approvedDebitNotes || 0} aprobadas
             </p>
@@ -196,10 +208,14 @@ export default function BillingDashboard() {
                 <div className="flex-1">
                   <p className="font-medium">Métodos Activos</p>
                   <p className="text-sm text-muted-foreground">
-                    {stats?.activePaymentMethods || 0} de {stats?.totalPaymentMethods || 0} métodos
+                    {stats?.activePaymentMethods || 0} de{' '}
+                    {stats?.totalPaymentMethods || 0} métodos
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activo
                 </Badge>
               </div>
@@ -211,9 +227,7 @@ export default function BillingDashboard() {
                     Gestión de métodos de pago
                   </p>
                 </div>
-                <Badge variant="outline">
-                  Configurar
-                </Badge>
+                <Badge variant="outline">Configurar</Badge>
               </div>
 
               <Button variant="outline" size="sm" className="w-full">
@@ -247,7 +261,10 @@ export default function BillingDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Procesado
                 </Badge>
               </div>
@@ -262,7 +279,10 @@ export default function BillingDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-blue-600 border-blue-200">
+                <Badge
+                  variant="outline"
+                  className="border-blue-200 text-blue-600"
+                >
                   Flujo
                 </Badge>
               </div>
@@ -296,11 +316,15 @@ export default function BillingDashboard() {
                   <div className="flex-1">
                     <p className="font-medium">Notas Aprobadas</p>
                     <p className="text-sm text-muted-foreground">
-                      {stats?.approvedCreditNotes || 0} de {stats?.totalCreditNotes || 0} notas
+                      {stats?.approvedCreditNotes || 0} de{' '}
+                      {stats?.totalCreditNotes || 0} notas
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Aprobada
                 </Badge>
               </div>
@@ -311,11 +335,16 @@ export default function BillingDashboard() {
                   <div className="flex-1">
                     <p className="font-medium">Pendientes</p>
                     <p className="text-sm text-muted-foreground">
-                      {(stats?.totalCreditNotes || 0) - (stats?.approvedCreditNotes || 0)} por aprobar
+                      {(stats?.totalCreditNotes || 0) -
+                        (stats?.approvedCreditNotes || 0)}{' '}
+                      por aprobar
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Pendiente
                 </Badge>
               </div>
@@ -346,11 +375,15 @@ export default function BillingDashboard() {
                   <div className="flex-1">
                     <p className="font-medium">Notas Aprobadas</p>
                     <p className="text-sm text-muted-foreground">
-                      {stats?.approvedDebitNotes || 0} de {stats?.totalDebitNotes || 0} notas
+                      {stats?.approvedDebitNotes || 0} de{' '}
+                      {stats?.totalDebitNotes || 0} notas
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Aprobada
                 </Badge>
               </div>
@@ -361,11 +394,16 @@ export default function BillingDashboard() {
                   <div className="flex-1">
                     <p className="font-medium">Pendientes</p>
                     <p className="text-sm text-muted-foreground">
-                      {(stats?.totalDebitNotes || 0) - (stats?.approvedDebitNotes || 0)} por aprobar
+                      {(stats?.totalDebitNotes || 0) -
+                        (stats?.approvedDebitNotes || 0)}{' '}
+                      por aprobar
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Pendiente
                 </Badge>
               </div>
@@ -397,10 +435,14 @@ export default function BillingDashboard() {
                 <div className="flex-1">
                   <p className="font-medium">Plantillas Activas</p>
                   <p className="text-sm text-muted-foreground">
-                    {stats?.activeTemplates || 0} de {stats?.totalTemplates || 0} plantillas
+                    {stats?.activeTemplates || 0} de{' '}
+                    {stats?.totalTemplates || 0} plantillas
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activa
                 </Badge>
               </div>
@@ -429,10 +471,14 @@ export default function BillingDashboard() {
                 <div className="flex-1">
                   <p className="font-medium">Configuraciones Activas</p>
                   <p className="text-sm text-muted-foreground">
-                    {stats?.activeTaxConfigs || 0} de {stats?.totalTaxConfigs || 0} configuraciones
+                    {stats?.activeTaxConfigs || 0} de{' '}
+                    {stats?.totalTaxConfigs || 0} configuraciones
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activa
                 </Badge>
               </div>

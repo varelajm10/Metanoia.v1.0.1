@@ -2010,9 +2010,7 @@ export const AVAILABLE_MODULES: ModuleDefinition[] = [
           id: 'attendance_alert',
           name: 'Alerta de Asistencia',
           trigger: 'SCHEDULED',
-          conditions: [
-            { field: 'attendanceRate', operator: '<', value: '80' },
-          ],
+          conditions: [{ field: 'attendanceRate', operator: '<', value: '80' }],
           actions: [
             {
               type: 'email',
@@ -2050,9 +2048,7 @@ export const AVAILABLE_MODULES: ModuleDefinition[] = [
           id: 'library_overdue',
           name: 'Libro Vencido',
           trigger: 'SCHEDULED',
-          conditions: [
-            { field: 'returnDate', operator: '<', value: 'today' },
-          ],
+          conditions: [{ field: 'returnDate', operator: '<', value: 'today' }],
           actions: [
             {
               type: 'email',
@@ -2346,13 +2342,34 @@ export const AVAILABLE_MODULES: ModuleDefinition[] = [
       { name: 'TeacherList', path: '@/app/dashboard/schools/teachers/page' },
       { name: 'TeacherForm', path: '@/components/schools/TeacherForm' },
       { name: 'TeacherDetail', path: '@/components/schools/TeacherDetail' },
-      { name: 'AcademicManagement', path: '@/app/dashboard/schools/academic/page' },
-      { name: 'AttendanceManagement', path: '@/app/dashboard/schools/attendance/page' },
-      { name: 'PaymentManagement', path: '@/app/dashboard/schools/payments/page' },
-      { name: 'LibraryManagement', path: '@/app/dashboard/schools/library/page' },
-      { name: 'TransportManagement', path: '@/app/dashboard/schools/transport/page' },
-      { name: 'CafeteriaManagement', path: '@/app/dashboard/schools/cafeteria/page' },
-      { name: 'DisciplinaryManagement', path: '@/app/dashboard/schools/discipline/page' },
+      {
+        name: 'AcademicManagement',
+        path: '@/app/dashboard/schools/academic/page',
+      },
+      {
+        name: 'AttendanceManagement',
+        path: '@/app/dashboard/schools/attendance/page',
+      },
+      {
+        name: 'PaymentManagement',
+        path: '@/app/dashboard/schools/payments/page',
+      },
+      {
+        name: 'LibraryManagement',
+        path: '@/app/dashboard/schools/library/page',
+      },
+      {
+        name: 'TransportManagement',
+        path: '@/app/dashboard/schools/transport/page',
+      },
+      {
+        name: 'CafeteriaManagement',
+        path: '@/app/dashboard/schools/cafeteria/page',
+      },
+      {
+        name: 'DisciplinaryManagement',
+        path: '@/app/dashboard/schools/discipline/page',
+      },
       { name: 'SchoolReports', path: '@/app/dashboard/schools/reports/page' },
     ],
   },

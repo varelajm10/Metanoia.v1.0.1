@@ -187,9 +187,13 @@ export class SchoolAttendancePaymentsService {
   static async bulkCreateAttendance(
     tenantId: string,
     date: string,
-    attendanceData: Array<{ studentId: string; status: string; comments?: string }>
+    attendanceData: Array<{
+      studentId: string
+      status: string
+      comments?: string
+    }>
   ) {
-    const data = attendanceData.map((item) => ({
+    const data = attendanceData.map(item => ({
       tenantId,
       studentId: item.studentId,
       date: new Date(date),
@@ -464,7 +468,7 @@ export class SchoolAttendancePaymentsService {
     dueDate: string,
     studentIds: string[]
   ) {
-    const data = studentIds.map((studentId) => ({
+    const data = studentIds.map(studentId => ({
       tenantId,
       studentId,
       paymentType: paymentType as any,

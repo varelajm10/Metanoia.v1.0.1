@@ -1,0 +1,194 @@
+name: Deploy Metanoia ERP
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: metanoia-erp
+  EKS_CLUSTER_NAME: metanoia-cluster
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  test:
+    name: Ejecutar Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar linting
+        run: npm run lint
+
+      - name: Ejecutar type checking
+        run: npm run type-check
+
+      - name: Ejecutar tests
+        run: npm run test:coverage
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-jwt-secret
+          NEXTAUTH_SECRET: test-nextauth-secret
+
+      - name: Subir coverage a Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  build-and-push:
+    name: Construir y Publicar Imagen Docker
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login a Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Configurar Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Desplegar en EKS
+    runs-on: ubuntu-latest
+    needs: [test, build-and-push]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Configurar kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configurar EKS cluster
+        run: |
+          aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER_NAME }}
+
+      - name: Verificar conexión al cluster
+        run: kubectl get nodes
+
+      - name: Crear namespace si no existe
+        run: |
+          kubectl create namespace metanoia --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Aplicar configuración de Kubernetes
+        run: |
+          # Actualizar la imagen en los manifiestos
+          find k8s/ -name "*.yaml" -o -name "*.yml" | xargs sed -i "s|IMAGE_TAG|${{ env.IMAGE_TAG }}|g"
+          find k8s/ -name "*.yaml" -o -name "*.yml" | xargs sed -i "s|ECR_REPOSITORY|${{ env.ECR_REPOSITORY }}|g"
+          find k8s/ -name "*.yaml" -o -name "*.yml" | xargs sed -i "s|AWS_REGION|${{ env.AWS_REGION }}|g"
+
+          # Aplicar todos los manifiestos
+          kubectl apply -f k8s/ -n metanoia
+
+      - name: Verificar despliegue
+        run: |
+          kubectl get pods -n metanoia
+          kubectl get services -n metanoia
+          kubectl get ingress -n metanoia
+
+      - name: Esperar que los pods estén listos
+        run: |
+          kubectl wait --for=condition=ready pod -l app=metanoia-app -n metanoia --timeout=300s
+
+      - name: Verificar salud de la aplicación
+        run: |
+          # Obtener la URL del servicio
+          kubectl get service metanoia-app -n metanoia -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo "LoadBalancer no disponible"
+
+          # Verificar logs de los pods
+          kubectl logs -l app=metanoia-app -n metanoia --tail=50
+
+  notify:
+    name: Notificar Despliegue
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always() && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Notificar éxito
+        if: needs.deploy.result == 'success'
+        run: |
+          echo "✅ Despliegue exitoso de Metanoia ERP v1.0.1"
+          echo "🚀 Aplicación desplegada en EKS cluster: ${{ env.EKS_CLUSTER_NAME }}"
+          echo "📦 Imagen: ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}"
+
+      - name: Notificar fallo
+        if: needs.deploy.result == 'failure'
+        run: |
+          echo "❌ Fallo en el despliegue de Metanoia ERP"
+          echo "🔍 Revisar logs del workflow para más detalles"

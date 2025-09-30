@@ -13,16 +13,26 @@ const productSchema = z.object({
   price: z.number().positive('El precio debe ser positivo'),
   cost: z.number().positive('El costo debe ser positivo').optional(),
   stock: z.number().int().min(0, 'El stock no puede ser negativo').default(0),
-  minStock: z.number().int().min(0, 'El stock mínimo no puede ser negativo').default(0),
-  maxStock: z.number().int().positive('El stock máximo debe ser positivo').optional(),
+  minStock: z
+    .number()
+    .int()
+    .min(0, 'El stock mínimo no puede ser negativo')
+    .default(0),
+  maxStock: z
+    .number()
+    .int()
+    .positive('El stock máximo debe ser positivo')
+    .optional(),
   category: z.string().optional(),
   brand: z.string().optional(),
   weight: z.number().positive('El peso debe ser positivo').optional(),
-  dimensions: z.object({
-    length: z.number().positive(),
-    width: z.number().positive(),
-    height: z.number().positive(),
-  }).optional(),
+  dimensions: z
+    .object({
+      length: z.number().positive(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+    })
+    .optional(),
   isActive: z.boolean().default(true),
   isDigital: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
@@ -41,7 +51,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const where: any = {
@@ -111,7 +124,10 @@ export async function POST(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const validatedData = productSchema.parse(body)
@@ -126,10 +142,7 @@ export async function POST(request: NextRequest) {
       })
 
       if (existingProduct) {
-        return NextResponse.json(
-          { error: 'El SKU ya existe' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'El SKU ya existe' }, { status: 400 })
       }
     }
 

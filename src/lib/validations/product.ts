@@ -1,12 +1,17 @@
 import { z } from 'zod'
+import { ProductCreateInputSchema } from '../../../lib/zod'
 
-// Esquema para crear un producto
-export const CreateProductSchema = z.object({
+// Esquema para crear un producto - usando tipos autogenerados con validaciones personalizadas
+export const CreateProductSchema = ProductCreateInputSchema.omit({ 
+  id: true, 
+  tenantId: true, 
+  createdAt: true, 
+  updatedAt: true 
+}).extend({
   name: z
     .string()
     .min(1, 'El nombre es requerido')
     .max(255, 'El nombre es demasiado largo'),
-  description: z.string().optional().or(z.literal('')),
   sku: z
     .string()
     .min(1, 'El SKU es requerido')
@@ -35,8 +40,6 @@ export const CreateProductSchema = z.object({
     .int()
     .min(0, 'El stock máximo debe ser mayor o igual a 0')
     .optional(),
-  category: z.string().optional().or(z.literal('')),
-  brand: z.string().optional().or(z.literal('')),
   weight: z.coerce
     .number()
     .min(0, 'El peso debe ser mayor o igual a 0')
@@ -58,9 +61,6 @@ export const CreateProductSchema = z.object({
       unit: z.enum(['cm', 'in', 'm']).default('cm'),
     })
     .optional(),
-  isActive: z.boolean().default(true),
-  isDigital: z.boolean().default(false),
-  tags: z.array(z.string()).default([]),
 })
 
 // Esquema para actualizar un producto
@@ -93,7 +93,7 @@ export const ProductQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 })
 
-// Esquema para respuesta de producto
+// Esquema para respuesta de producto - usando el esquema base autogenerado
 export const ProductResponseSchema = z.object({
   id: z.string(),
   name: z.string(),

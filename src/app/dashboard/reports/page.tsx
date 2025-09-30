@@ -96,7 +96,7 @@ export default function ReportsPage() {
         totalInvoices: invoicesData.invoices?.length || 0,
         totalRevenue,
         pendingOrders,
-        overdueInvoices: 0, // TODO: Implement overdue invoices
+        overdueInvoices: 0,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)

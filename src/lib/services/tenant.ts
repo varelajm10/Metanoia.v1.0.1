@@ -50,6 +50,12 @@ export interface TenantWithModules {
 }
 
 export class TenantService {
+  /**
+   * Crea un nuevo tenant en el sistema
+   * @param data - Datos del tenant a crear
+   * @returns Promise con el tenant creado y sus módulos habilitados
+   * @throws Error si hay problemas de validación o creación
+   */
   static async createTenant(data: CreateTenantInput) {
     const tenant = await prisma.tenant.create({
       data: {
@@ -87,6 +93,13 @@ export class TenantService {
     return await this.getTenantById(tenant.id)
   }
 
+  /**
+   * Obtiene todos los tenants con filtros y paginación
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @param filters - Filtros de búsqueda
+   * @returns Promise con lista de tenants y información de paginación
+   */
   static async getTenants(
     page: number = 1,
     limit: number = 20,
@@ -158,6 +171,11 @@ export class TenantService {
     }
   }
 
+  /**
+   * Obtiene un tenant por su ID
+   * @param id - ID del tenant
+   * @returns Promise con el tenant y sus módulos
+   */
   static async getTenantById(id: string) {
     const tenant = await prisma.tenant.findUnique({
       where: { id },
@@ -195,6 +213,11 @@ export class TenantService {
     }
   }
 
+  /**
+   * Obtiene un tenant por su slug
+   * @param slug - Slug del tenant
+   * @returns Promise con el tenant y sus módulos
+   */
   static async getTenantBySlug(slug: string) {
     const tenant = await prisma.tenant.findUnique({
       where: { slug },
@@ -225,6 +248,13 @@ export class TenantService {
     }
   }
 
+  /**
+   * Actualiza un tenant existente
+   * @param id - ID del tenant a actualizar
+   * @param data - Datos a actualizar
+   * @returns Promise con el tenant actualizado
+   * @throws Error si el tenant no existe
+   */
   static async updateTenant(id: string, data: UpdateTenantInput) {
     const updateData: any = { ...data }
 
@@ -248,6 +278,13 @@ export class TenantService {
     return await this.getTenantById(id)
   }
 
+  /**
+   * Activa o desactiva un módulo para un tenant
+   * @param tenantId - ID del tenant
+   * @param data - Datos de activación/desactivación del módulo
+   * @returns Promise con el tenant actualizado
+   * @throws Error si el módulo no existe
+   */
   static async toggleModule(tenantId: string, data: ToggleModuleInput) {
     const module = await prisma.module.findFirst({
       where: { key: data.moduleId },
@@ -292,6 +329,12 @@ export class TenantService {
     return await this.getTenantById(tenantId)
   }
 
+  /**
+   * Habilita múltiples módulos para un tenant
+   * @param tenantId - ID del tenant
+   * @param moduleIds - Lista de IDs de módulos a habilitar
+   * @returns Promise con el tenant actualizado
+   */
   static async enableModules(tenantId: string, moduleIds: string[]) {
     for (const moduleId of moduleIds) {
       await this.toggleModule(tenantId, {
@@ -302,6 +345,12 @@ export class TenantService {
     }
   }
 
+  /**
+   * Actualiza los módulos habilitados para un tenant
+   * @param tenantId - ID del tenant
+   * @param enabledModuleIds - Lista de IDs de módulos a habilitar
+   * @returns Promise con el tenant actualizado
+   */
   static async updateTenantModules(
     tenantId: string,
     enabledModuleIds: string[]
@@ -347,6 +396,11 @@ export class TenantService {
     }
   }
 
+  /**
+   * Obtiene estadísticas de un tenant
+   * @param tenantId - ID del tenant
+   * @returns Promise con estadísticas del tenant
+   */
   static async getTenantStats(tenantId: string) {
     const tenant = await prisma.tenant.findUnique({
       where: { id: tenantId },
@@ -389,6 +443,12 @@ export class TenantService {
     }
   }
 
+  /**
+   * Elimina un tenant del sistema
+   * @param id - ID del tenant a eliminar
+   * @returns Promise con resultado de la eliminación
+   * @throws Error si el tenant no existe o tiene datos asociados
+   */
   static async deleteTenant(id: string) {
     // Verificar que no tenga datos asociados
     const counts = await prisma.tenant.findUnique({
@@ -438,6 +498,11 @@ export class TenantService {
     return { success: true }
   }
 
+  /**
+   * Obtiene el historial de cambios de módulos para un tenant
+   * @param tenantId - ID del tenant
+   * @returns Promise con el historial de módulos
+   */
   static async getTenantModuleHistory(tenantId: string) {
     const history = await prisma.tenantModule.findMany({
       where: { tenantId },
@@ -459,6 +524,11 @@ export class TenantService {
     }))
   }
 
+  /**
+   * Obtiene todos los tenants que tienen habilitado un módulo específico
+   * @param moduleId - ID del módulo
+   * @returns Promise con lista de tenants que tienen el módulo habilitado
+   */
   static async getTenantsByModule(moduleId: string) {
     const tenants = await prisma.tenantModule.findMany({
       where: {
@@ -480,6 +550,10 @@ export class TenantService {
     }))
   }
 
+  /**
+   * Obtiene estadísticas del sistema completo
+   * @returns Promise con estadísticas globales del sistema
+   */
   static async getSystemStats() {
     const [totalTenants, activeTenants, tenantsByPlan, modulesUsage] =
       await Promise.all([

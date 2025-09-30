@@ -5,6 +5,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator zod {
+  provider = "zod-prisma-types"
+  output   = "../lib/zod"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -38,6 +43,12 @@ model Tenant {
   subscriptionPlan      String  @default("BASIC") // BASIC, STANDARD, PREMIUM, ENTERPRISE
   subscriptionStartDate DateTime
   subscriptionEndDate   DateTime?
+
+  // Integración con Stripe
+  stripeCustomerId      String?  @unique
+  stripeSubscriptionId  String?  @unique
+  planId               String?  // ID del plan en Stripe
+  stripeWebhookSecret  String?  // Secret para webhooks específicos del tenant
 
   // Límites del plan
   maxUsers    Int @default(5)
@@ -203,6 +214,9 @@ model User {
   quotes              Quote[]
 
   @@unique([email, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, isActive, createdAt])
+  @@index([tenantId, role, createdAt])
   @@map("users")
 }
 
@@ -236,6 +250,8 @@ model Customer {
   creditNotes CreditNote[]
   debitNotes  DebitNote[]
 
+  @@index([tenantId, createdAt])
+  @@index([tenantId, isActive, createdAt])
   @@map("customers")
 }
 
@@ -284,6 +300,9 @@ model Product {
 
   @@unique([sku, tenantId])
   @@unique([barcode, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, isActive, createdAt])
+  @@index([tenantId, category, createdAt])
   @@map("products")
 }
 
@@ -310,6 +329,8 @@ model Supplier {
   purchaseOrders PurchaseOrder[]
   products       SupplierProduct[]
 
+  @@index([tenantId, createdAt])
+  @@index([tenantId, isActive, createdAt])
   @@map("suppliers")
 }
 
@@ -342,6 +363,10 @@ model PurchaseOrder {
   purchaseOrderItems PurchaseOrderItem[]
 
   @@unique([orderNumber, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, supplierId, createdAt])
+  @@index([tenantId, userId, createdAt])
   @@map("purchase_orders")
 }
 
@@ -755,6 +780,11 @@ model Order {
   quote   Quote? @relation(fields: [quoteId], references: [id])
 
   @@unique([orderNumber, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, userId, createdAt])
+  @@index([tenantId, paymentStatus, createdAt])
   @@map("orders")
 }
 
@@ -1062,6 +1092,11 @@ model Invoice {
   debitNotes   DebitNote[]
 
   @@unique([invoiceNumber, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, userId, createdAt])
+  @@index([tenantId, dueDate, createdAt])
   @@map("invoices")
 }
 
@@ -1464,6 +1499,11 @@ model Employee {
   attendance      Attendance[]
 
   @@unique([employeeNumber, tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, department, createdAt])
+  @@index([tenantId, position, createdAt])
+  @@index([tenantId, employmentType, createdAt])
   @@map("employees")
 }
 
@@ -2033,6 +2073,12 @@ model Server {
   notifications   Notification[]
   health          ServerHealth?
   
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, type, createdAt])
+  @@index([tenantId, country, createdAt])
+  @@index([tenantId, region, createdAt])
+  @@index([tenantId, clientId, createdAt])
   @@map("servers")
 }
 
@@ -2935,6 +2981,11 @@ model Elevator {
   inspections     Inspection[]
   workOrders      WorkOrder[]
   
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, brand, createdAt])
+  @@index([tenantId, buildingType, createdAt])
+  @@index([tenantId, clientId, createdAt])
   @@map("elevators")
 }
 
@@ -3518,7 +3569,11 @@ model SchoolStudent {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
-  @@index([tenantId])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, grade, createdAt])
+  @@index([tenantId, section, createdAt])
+  @@index([tenantId, gender, createdAt])
   @@index([studentCode])
   @@index([status])
 }

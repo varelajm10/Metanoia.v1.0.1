@@ -94,7 +94,14 @@ async function validateStock(
   }
 }
 
-// Crear una nueva orden
+/**
+ * Crea una nueva orden en el sistema
+ * @param data - Datos de la orden a crear
+ * @param tenantId - ID del tenant
+ * @param userId - ID del usuario que crea la orden
+ * @returns Promise<OrderWithRelations> - Orden creada con relaciones
+ * @throws Error si el cliente no existe, hay errores de stock o problemas de validación
+ */
 export async function createOrder(
   data: CreateOrderInput,
   tenantId: string,
@@ -181,7 +188,12 @@ export async function createOrder(
   return getOrderById(result.order.id, tenantId) as Promise<OrderWithRelations>
 }
 
-// Obtener orden por ID
+/**
+ * Obtiene una orden por su ID
+ * @param id - ID de la orden
+ * @param tenantId - ID del tenant
+ * @returns Promise<OrderWithRelations | null> - Orden encontrada o null si no existe
+ */
 export async function getOrderById(
   id: string,
   tenantId: string
@@ -221,7 +233,12 @@ export async function getOrderById(
   })
 }
 
-// Obtener todas las órdenes con filtros y paginación
+/**
+ * Obtiene todas las órdenes con filtros y paginación
+ * @param query - Parámetros de consulta y filtros
+ * @param tenantId - ID del tenant
+ * @returns Promise con lista de órdenes y información de paginación
+ */
 export async function getOrders(
   query: OrderQuery,
   tenantId: string
@@ -340,7 +357,14 @@ export async function getOrders(
   }
 }
 
-// Actualizar orden
+/**
+ * Actualiza una orden existente
+ * @param id - ID de la orden a actualizar
+ * @param data - Datos a actualizar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Order> - Orden actualizada
+ * @throws Error si la orden no existe o está en estado final
+ */
 export async function updateOrder(
   id: string,
   data: UpdateOrderInput,
@@ -372,7 +396,14 @@ export async function updateOrder(
   })
 }
 
-// Actualizar estado de la orden
+/**
+ * Actualiza el estado de una orden
+ * @param id - ID de la orden
+ * @param statusUpdate - Datos de actualización de estado
+ * @param tenantId - ID del tenant
+ * @returns Promise<Order> - Orden actualizada
+ * @throws Error si la orden no existe o la transición de estado no es válida
+ */
 export async function updateOrderStatus(
   id: string,
   statusUpdate: UpdateOrderStatusInput,
@@ -423,7 +454,14 @@ export async function updateOrderStatus(
   })
 }
 
-// Actualizar estado de pago
+/**
+ * Actualiza el estado de pago de una orden
+ * @param id - ID de la orden
+ * @param paymentUpdate - Datos de actualización de pago
+ * @param tenantId - ID del tenant
+ * @returns Promise<Order> - Orden actualizada
+ * @throws Error si la orden no existe
+ */
 export async function updatePaymentStatus(
   id: string,
   paymentUpdate: UpdatePaymentStatusInput,
@@ -451,7 +489,14 @@ export async function updatePaymentStatus(
   })
 }
 
-// Cancelar orden
+/**
+ * Cancela una orden y restaura el stock
+ * @param id - ID de la orden
+ * @param tenantId - ID del tenant
+ * @param reason - Razón de cancelación (opcional)
+ * @returns Promise<Order> - Orden cancelada
+ * @throws Error si la orden no existe o ya está en estado final
+ */
 export async function cancelOrder(
   id: string,
   tenantId: string,
@@ -525,7 +570,11 @@ async function restoreStockFromOrder(
   }
 }
 
-// Obtener estadísticas de órdenes
+/**
+ * Obtiene estadísticas detalladas de órdenes
+ * @param tenantId - ID del tenant
+ * @returns Promise con estadísticas completas de órdenes
+ */
 export async function getOrderStats(tenantId: string) {
   const [
     totalOrders,
@@ -642,7 +691,13 @@ export async function getOrderStats(tenantId: string) {
   }
 }
 
-// Buscar órdenes por número o cliente
+/**
+ * Busca órdenes por número o cliente
+ * @param query - Término de búsqueda
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 10)
+ * @returns Promise<Order[]> - Lista de órdenes encontradas
+ */
 export async function searchOrders(
   query: string,
   tenantId: string,

@@ -92,7 +92,6 @@ export default function NewElevatorPage() {
       // Simular envío de datos
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      console.log('Datos del ascensor:', formData)
 
       // Redirigir al dashboard
       router.push('/dashboard/elevators')

@@ -16,15 +16,18 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate') || undefined
     const endDate = searchParams.get('endDate') || undefined
 
-    const result = await SchoolAttendancePaymentsService.getAttendance(tenantId, {
-      page,
-      limit,
-      studentId,
-      date,
-      status,
-      startDate,
-      endDate,
-    })
+    const result = await SchoolAttendancePaymentsService.getAttendance(
+      tenantId,
+      {
+        page,
+        limit,
+        studentId,
+        date,
+        status,
+        startDate,
+        endDate,
+      }
+    )
 
     return NextResponse.json({
       success: true,
@@ -64,7 +67,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating attendance:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

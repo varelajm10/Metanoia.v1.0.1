@@ -7,7 +7,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const stats = await BillingService.getDashboardStats(tenantId)

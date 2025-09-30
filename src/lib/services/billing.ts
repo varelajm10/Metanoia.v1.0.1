@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-import { 
-  PaymentMethod, 
-  Payment, 
-  CreditNote, 
+import {
+  PaymentMethod,
+  Payment,
+  CreditNote,
   DebitNote,
   InvoiceTemplate,
   TaxConfiguration,
@@ -21,7 +21,12 @@ export class BillingService {
   // MÉTODOS DE PAGO
   // ========================================
 
-  static async getPaymentMethods(tenantId: string, filters: PaymentMethodFilters = {}, page = 1, limit = 10) {
+  static async getPaymentMethods(
+    tenantId: string,
+    filters: PaymentMethodFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -56,7 +61,13 @@ export class BillingService {
       prisma.paymentMethod.count({ where }),
     ])
 
-    return { paymentMethods, total, page, limit, pages: Math.ceil(total / limit) }
+    return {
+      paymentMethods,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    }
   }
 
   static async createPaymentMethod(data: PaymentMethod, tenantId: string) {
@@ -85,14 +96,23 @@ export class BillingService {
   // PAGOS
   // ========================================
 
-  static async getPayments(tenantId: string, filters: PaymentFilters = {}, page = 1, limit = 10) {
+  static async getPayments(
+    tenantId: string,
+    filters: PaymentFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
       where.OR = [
         { reference: { contains: filters.search, mode: 'insensitive' } },
         { notes: { contains: filters.search, mode: 'insensitive' } },
-        { invoice: { invoiceNumber: { contains: filters.search, mode: 'insensitive' } } },
+        {
+          invoice: {
+            invoiceNumber: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
       ]
     }
 
@@ -222,7 +242,12 @@ export class BillingService {
   // NOTAS DE CRÉDITO
   // ========================================
 
-  static async getCreditNotes(tenantId: string, filters: CreditNoteFilters = {}, page = 1, limit = 10) {
+  static async getCreditNotes(
+    tenantId: string,
+    filters: CreditNoteFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -292,7 +317,11 @@ export class BillingService {
     return { creditNotes, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
-  static async createCreditNote(data: CreditNote, tenantId: string, userId: string) {
+  static async createCreditNote(
+    data: CreditNote,
+    tenantId: string,
+    userId: string
+  ) {
     // Verificar que la factura existe
     const invoice = await prisma.invoice.findFirst({
       where: { id: data.invoiceId, tenantId },
@@ -310,7 +339,7 @@ export class BillingService {
 
     // Calcular totales
     const subtotal = data.items.reduce((sum, item) => {
-      return sum + (item.quantity * item.unitPrice)
+      return sum + item.quantity * item.unitPrice
     }, 0)
 
     const total = subtotal
@@ -370,7 +399,12 @@ export class BillingService {
   // NOTAS DE DÉBITO
   // ========================================
 
-  static async getDebitNotes(tenantId: string, filters: DebitNoteFilters = {}, page = 1, limit = 10) {
+  static async getDebitNotes(
+    tenantId: string,
+    filters: DebitNoteFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -441,7 +475,11 @@ export class BillingService {
     return { debitNotes, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
-  static async createDebitNote(data: DebitNote, tenantId: string, userId: string) {
+  static async createDebitNote(
+    data: DebitNote,
+    tenantId: string,
+    userId: string
+  ) {
     // Verificar que el cliente existe
     const customer = await prisma.customer.findFirst({
       where: { id: data.customerId, tenantId },
@@ -459,7 +497,7 @@ export class BillingService {
 
     // Calcular totales
     const subtotal = data.items.reduce((sum, item) => {
-      return sum + (item.quantity * item.unitPrice)
+      return sum + item.quantity * item.unitPrice
     }, 0)
 
     const total = subtotal
@@ -520,7 +558,12 @@ export class BillingService {
   // PLANTILLAS DE FACTURA
   // ========================================
 
-  static async getInvoiceTemplates(tenantId: string, filters: TemplateFilters = {}, page = 1, limit = 10) {
+  static async getInvoiceTemplates(
+    tenantId: string,
+    filters: TemplateFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -578,7 +621,12 @@ export class BillingService {
   // CONFIGURACIÓN DE IMPUESTOS
   // ========================================
 
-  static async getTaxConfigurations(tenantId: string, filters: TaxConfigFilters = {}, page = 1, limit = 10) {
+  static async getTaxConfigurations(
+    tenantId: string,
+    filters: TaxConfigFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -606,10 +654,19 @@ export class BillingService {
       prisma.taxConfiguration.count({ where }),
     ])
 
-    return { configurations, total, page, limit, pages: Math.ceil(total / limit) }
+    return {
+      configurations,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    }
   }
 
-  static async createTaxConfiguration(data: TaxConfiguration, tenantId: string) {
+  static async createTaxConfiguration(
+    data: TaxConfiguration,
+    tenantId: string
+  ) {
     // Verificar nombre único
     const existingConfig = await prisma.taxConfiguration.findFirst({
       where: { name: data.name, tenantId },

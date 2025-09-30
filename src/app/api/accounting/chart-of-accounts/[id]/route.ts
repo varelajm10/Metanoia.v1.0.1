@@ -12,7 +12,10 @@ export async function GET(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const account = await AccountingService.getAccountById(params.id, tenantId)
@@ -44,11 +47,18 @@ export async function PUT(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const validatedData = updateChartOfAccountsSchema.parse(body)
-    const account = await AccountingService.updateAccount(params.id, validatedData, tenantId)
+    const account = await AccountingService.updateAccount(
+      params.id,
+      validatedData,
+      tenantId
+    )
 
     return NextResponse.json(account)
   } catch (error) {
@@ -60,10 +70,7 @@ export async function PUT(
     }
 
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error updating account:', error)
@@ -83,7 +90,10 @@ export async function DELETE(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     await AccountingService.deleteAccount(params.id, tenantId)
@@ -91,10 +101,7 @@ export async function DELETE(
     return NextResponse.json({ message: 'Cuenta eliminada exitosamente' })
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error deleting account:', error)

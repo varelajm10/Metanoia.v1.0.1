@@ -10,7 +10,10 @@ export async function POST(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const entry = await AccountingService.postJournalEntry(params.id, tenantId)
@@ -18,10 +21,7 @@ export async function POST(
     return NextResponse.json(entry)
   } catch (error) {
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error posting journal entry:', error)

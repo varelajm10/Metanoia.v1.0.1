@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const where: any = {
@@ -107,7 +110,10 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!userId) {
@@ -132,11 +138,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar stock disponible para salidas
-    if (validatedData.type === 'OUT' && product.stock < validatedData.quantity) {
-      return NextResponse.json(
-        { error: 'Stock insuficiente' },
-        { status: 400 }
-      )
+    if (
+      validatedData.type === 'OUT' &&
+      product.stock < validatedData.quantity
+    ) {
+      return NextResponse.json({ error: 'Stock insuficiente' }, { status: 400 })
     }
 
     // Crear el movimiento de stock
@@ -166,9 +172,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Actualizar el stock del producto
-    const newStock = validatedData.type === 'IN' 
-      ? product.stock + validatedData.quantity
-      : product.stock - validatedData.quantity
+    const newStock =
+      validatedData.type === 'IN'
+        ? product.stock + validatedData.quantity
+        : product.stock - validatedData.quantity
 
     await prisma.product.update({
       where: { id: validatedData.productId },
@@ -181,9 +188,10 @@ export async function POST(request: NextRequest) {
         data: {
           productId: validatedData.productId,
           type: newStock === 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
-          message: newStock === 0 
-            ? `El producto ${product.name} está agotado`
-            : `El producto ${product.name} tiene stock bajo (${newStock} unidades)`,
+          message:
+            newStock === 0
+              ? `El producto ${product.name} está agotado`
+              : `El producto ${product.name} tiene stock bajo (${newStock} unidades)`,
           tenantId,
         },
       })

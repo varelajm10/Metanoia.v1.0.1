@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "order_items" ALTER COLUMN "total" DROP DEFAULT,
+ALTER COLUMN "unitPrice" DROP DEFAULT,
+ALTER COLUMN "updatedAt" DROP DEFAULT;

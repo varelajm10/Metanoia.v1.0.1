@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CustomerCreateInputSchema } from '../../../lib/zod'
 
 // Esquema para la dirección del cliente
 export const AddressSchema = z.object({
@@ -9,8 +10,13 @@ export const AddressSchema = z.object({
   country: z.string().optional(),
 })
 
-// Esquema para crear un cliente
-export const CreateCustomerSchema = z.object({
+// Esquema para crear un cliente - usando tipos autogenerados con validaciones personalizadas
+export const CreateCustomerSchema = CustomerCreateInputSchema.omit({ 
+  id: true, 
+  tenantId: true, 
+  createdAt: true, 
+  updatedAt: true 
+}).extend({
   name: z
     .string()
     .min(1, 'El nombre es requerido')
@@ -18,7 +24,6 @@ export const CreateCustomerSchema = z.object({
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   phone: z.string().optional().or(z.literal('')),
   address: AddressSchema.optional(),
-  isActive: z.boolean().default(true),
 })
 
 // Esquema para actualizar un cliente

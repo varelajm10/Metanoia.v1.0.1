@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    console.log('🔍 [CUSTOMERS-SIMPLE] Fetching customers...')
 
     // Datos mock para que el dashboard funcione
     const mockCustomers = [
@@ -26,7 +25,6 @@ export async function GET() {
       },
     ]
 
-    console.log('✅ [CUSTOMERS-SIMPLE] Returning mock customers')
 
     return NextResponse.json({
       success: true,

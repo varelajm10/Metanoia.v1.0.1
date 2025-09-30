@@ -2,14 +2,14 @@
 
 /**
  * 🔧 Script de Configuración para Commit Automático - Metanoia V1.0.2
- * 
+ *
  * Este script configura el commit automático en el sistema
  * y proporciona opciones de configuración.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('fs')
+const path = require('path')
+const { execSync } = require('child_process')
 
 class AutoCommitSetup {
   constructor() {
@@ -19,7 +19,7 @@ class AutoCommitSetup {
       pushToGitHub: true,
       logLevel: 'INFO',
       maxLogSize: 1024 * 1024, // 1MB
-    };
+    }
   }
 
   /**
@@ -27,12 +27,12 @@ class AutoCommitSetup {
    */
   checkGitConfig() {
     try {
-      execSync('git --version', { stdio: 'pipe' });
-      console.log('✅ Git está instalado');
-      return true;
+      execSync('git --version', { stdio: 'pipe' })
+      console.log('✅ Git está instalado')
+      return true
     } catch (error) {
-      console.error('❌ Git no está instalado o no está en el PATH');
-      return false;
+      console.error('❌ Git no está instalado o no está en el PATH')
+      return false
     }
   }
 
@@ -41,12 +41,12 @@ class AutoCommitSetup {
    */
   checkGitRepository() {
     try {
-      execSync('git rev-parse --git-dir', { stdio: 'pipe' });
-      console.log('✅ Repositorio Git encontrado');
-      return true;
+      execSync('git rev-parse --git-dir', { stdio: 'pipe' })
+      console.log('✅ Repositorio Git encontrado')
+      return true
     } catch (error) {
-      console.error('❌ No se encontró un repositorio Git en este directorio');
-      return false;
+      console.error('❌ No se encontró un repositorio Git en este directorio')
+      return false
     }
   }
 
@@ -55,19 +55,21 @@ class AutoCommitSetup {
    */
   checkGitUserConfig() {
     try {
-      const name = execSync('git config user.name', { encoding: 'utf8' }).trim();
-      const email = execSync('git config user.email', { encoding: 'utf8' }).trim();
-      
+      const name = execSync('git config user.name', { encoding: 'utf8' }).trim()
+      const email = execSync('git config user.email', {
+        encoding: 'utf8',
+      }).trim()
+
       if (name && email) {
-        console.log(`✅ Git configurado: ${name} <${email}>`);
-        return true;
+        console.log(`✅ Git configurado: ${name} <${email}>`)
+        return true
       } else {
-        console.error('❌ Git no está configurado con nombre y email');
-        return false;
+        console.error('❌ Git no está configurado con nombre y email')
+        return false
       }
     } catch (error) {
-      console.error('❌ Error verificando configuración de Git');
-      return false;
+      console.error('❌ Error verificando configuración de Git')
+      return false
     }
   }
 
@@ -76,17 +78,17 @@ class AutoCommitSetup {
    */
   checkGitHubConnection() {
     try {
-      const remotes = execSync('git remote -v', { encoding: 'utf8' });
+      const remotes = execSync('git remote -v', { encoding: 'utf8' })
       if (remotes.includes('github.com')) {
-        console.log('✅ Conexión con GitHub configurada');
-        return true;
+        console.log('✅ Conexión con GitHub configurada')
+        return true
       } else {
-        console.log('⚠️ No se encontró conexión con GitHub');
-        return false;
+        console.log('⚠️ No se encontró conexión con GitHub')
+        return false
       }
     } catch (error) {
-      console.error('❌ Error verificando conexión con GitHub');
-      return false;
+      console.error('❌ Error verificando conexión con GitHub')
+      return false
     }
   }
 
@@ -94,21 +96,23 @@ class AutoCommitSetup {
    * Crear archivo de configuración
    */
   createConfigFile() {
-    const configPath = 'scripts/auto-commit-config.json';
+    const configPath = 'scripts/auto-commit-config.json'
     const config = {
       ...this.config,
       createdAt: new Date().toISOString(),
       version: '1.0.0',
-      description: 'Configuración para commit automático de Metanoia V1.0.2'
-    };
+      description: 'Configuración para commit automático de Metanoia V1.0.2',
+    }
 
     try {
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-      console.log(`✅ Archivo de configuración creado: ${configPath}`);
-      return true;
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
+      console.log(`✅ Archivo de configuración creado: ${configPath}`)
+      return true
     } catch (error) {
-      console.error(`❌ Error creando archivo de configuración: ${error.message}`);
-      return false;
+      console.error(
+        `❌ Error creando archivo de configuración: ${error.message}`
+      )
+      return false
     }
   }
 
@@ -133,16 +137,16 @@ else
     echo "⚠️ Node.js no encontrado, usando script Bash..."
     bash scripts/auto-commit.sh
 fi
-`;
+`
 
     try {
-      fs.writeFileSync('scripts/start-auto-commit.sh', startScript);
-      fs.chmodSync('scripts/start-auto-commit.sh', '755');
-      console.log('✅ Script de inicio creado: scripts/start-auto-commit.sh');
-      return true;
+      fs.writeFileSync('scripts/start-auto-commit.sh', startScript)
+      fs.chmodSync('scripts/start-auto-commit.sh', '755')
+      console.log('✅ Script de inicio creado: scripts/start-auto-commit.sh')
+      return true
     } catch (error) {
-      console.error(`❌ Error creando script de inicio: ${error.message}`);
-      return false;
+      console.error(`❌ Error creando script de inicio: ${error.message}`)
+      return false
     }
   }
 
@@ -168,15 +172,15 @@ if %errorlevel% equ 0 (
     echo ⚠️ Node.js no encontrado, usando script Batch...
     call scripts/auto-commit.bat
 )
-`;
+`
 
     try {
-      fs.writeFileSync('scripts/start-auto-commit.bat', windowsScript);
-      console.log('✅ Script de Windows creado: scripts/start-auto-commit.bat');
-      return true;
+      fs.writeFileSync('scripts/start-auto-commit.bat', windowsScript)
+      console.log('✅ Script de Windows creado: scripts/start-auto-commit.bat')
+      return true
     } catch (error) {
-      console.error(`❌ Error creando script de Windows: ${error.message}`);
-      return false;
+      console.error(`❌ Error creando script de Windows: ${error.message}`)
+      return false
     }
   }
 
@@ -272,15 +276,15 @@ Si encuentras problemas:
 ---
 
 **© 2024 Metanoia.click - Sistema ERP Modular SaaS**
-`;
+`
 
     try {
-      fs.writeFileSync('scripts/README-auto-commit.md', docs);
-      console.log('✅ Documentación creada: scripts/README-auto-commit.md');
-      return true;
+      fs.writeFileSync('scripts/README-auto-commit.md', docs)
+      console.log('✅ Documentación creada: scripts/README-auto-commit.md')
+      return true
     } catch (error) {
-      console.error(`❌ Error creando documentación: ${error.message}`);
-      return false;
+      console.error(`❌ Error creando documentación: ${error.message}`)
+      return false
     }
   }
 
@@ -288,64 +292,66 @@ Si encuentras problemas:
    * Ejecutar configuración completa
    */
   async setup() {
-    console.log('🔧 CONFIGURANDO COMMIT AUTOMÁTICO - METANOIA V1.0.2');
-    console.log('================================================');
-    console.log('');
+    console.log('🔧 CONFIGURANDO COMMIT AUTOMÁTICO - METANOIA V1.0.2')
+    console.log('================================================')
+    console.log('')
 
     // Verificaciones
-    console.log('🔍 Verificando requisitos...');
-    
+    console.log('🔍 Verificando requisitos...')
+
     if (!this.checkGitConfig()) {
-      console.error('❌ Git no está instalado. Instala Git y vuelve a intentar.');
-      return false;
+      console.error(
+        '❌ Git no está instalado. Instala Git y vuelve a intentar.'
+      )
+      return false
     }
 
     if (!this.checkGitRepository()) {
-      console.error('❌ No hay repositorio Git. Ejecuta "git init" primero.');
-      return false;
+      console.error('❌ No hay repositorio Git. Ejecuta "git init" primero.')
+      return false
     }
 
     if (!this.checkGitUserConfig()) {
-      console.error('❌ Git no está configurado. Configura tu nombre y email:');
-      console.error('   git config --global user.name "Tu Nombre"');
-      console.error('   git config --global user.email "tu-email@ejemplo.com"');
-      return false;
+      console.error('❌ Git no está configurado. Configura tu nombre y email:')
+      console.error('   git config --global user.name "Tu Nombre"')
+      console.error('   git config --global user.email "tu-email@ejemplo.com"')
+      return false
     }
 
-    this.checkGitHubConnection();
+    this.checkGitHubConnection()
 
-    console.log('');
-    console.log('📁 Creando archivos de configuración...');
+    console.log('')
+    console.log('📁 Creando archivos de configuración...')
 
     // Crear archivos
-    this.createConfigFile();
-    this.createStartScript();
-    this.createWindowsScript();
-    this.createDocumentation();
+    this.createConfigFile()
+    this.createStartScript()
+    this.createWindowsScript()
+    this.createDocumentation()
 
-    console.log('');
-    console.log('✅ CONFIGURACIÓN COMPLETADA');
-    console.log('==========================');
-    console.log('');
-    console.log('🚀 Para iniciar el commit automático:');
-    console.log('');
-    console.log('   Windows:');
-    console.log('   scripts/start-auto-commit.bat');
-    console.log('');
-    console.log('   Linux/Mac:');
-    console.log('   bash scripts/start-auto-commit.sh');
-    console.log('');
-    console.log('   Con Node.js:');
-    console.log('   node scripts/auto-commit.js');
-    console.log('');
-    console.log('📚 Documentación: scripts/README-auto-commit.md');
-    console.log('⚙️ Configuración: scripts/auto-commit-config.json');
-    console.log('');
+    console.log('')
+    console.log('✅ CONFIGURACIÓN COMPLETADA')
+    console.log('==========================')
+    console.log('')
+    console.log('🚀 Para iniciar el commit automático:')
+    console.log('')
+    console.log('   Windows:')
+    console.log('   scripts/start-auto-commit.bat')
+    console.log('')
+    console.log('   Linux/Mac:')
+    console.log('   bash scripts/start-auto-commit.sh')
+    console.log('')
+    console.log('   Con Node.js:')
+    console.log('   node scripts/auto-commit.js')
+    console.log('')
+    console.log('📚 Documentación: scripts/README-auto-commit.md')
+    console.log('⚙️ Configuración: scripts/auto-commit-config.json')
+    console.log('')
 
-    return true;
+    return true
   }
 }
 
 // Ejecutar configuración
-const setup = new AutoCommitSetup();
-setup.setup().catch(console.error);
+const setup = new AutoCommitSetup()
+setup.setup().catch(console.error)

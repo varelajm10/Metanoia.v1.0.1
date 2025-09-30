@@ -9,13 +9,21 @@ const purchaseOrderSchema = z.object({
   supplierId: z.string().min(1, 'El proveedor es requerido'),
   expectedDate: z.string().datetime().optional(),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    discount: z.number().min(0).max(100, 'El descuento debe estar entre 0 y 100').default(0),
-    notes: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        discount: z
+          .number()
+          .min(0)
+          .max(100, 'El descuento debe estar entre 0 y 100')
+          .default(0),
+        notes: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 // GET /api/inventory/purchase-orders - Obtener órdenes de compra
@@ -30,7 +38,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const where: any = {
@@ -111,7 +122,10 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!userId) {
@@ -162,8 +176,9 @@ export async function POST(request: NextRequest) {
     // Calcular totales
     let subtotal = 0
     const items = validatedData.items.map(item => {
-      const discountAmount = (item.unitPrice * item.quantity * item.discount) / 100
-      const total = (item.unitPrice * item.quantity) - discountAmount
+      const discountAmount =
+        (item.unitPrice * item.quantity * item.discount) / 100
+      const total = item.unitPrice * item.quantity - discountAmount
       subtotal += total
 
       return {
@@ -188,7 +203,9 @@ export async function POST(request: NextRequest) {
         taxRate,
         taxAmount,
         total,
-        expectedDate: validatedData.expectedDate ? new Date(validatedData.expectedDate) : null,
+        expectedDate: validatedData.expectedDate
+          ? new Date(validatedData.expectedDate)
+          : null,
         notes: validatedData.notes,
         tenantId,
         userId,

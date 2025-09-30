@@ -50,7 +50,13 @@ async function generateInvoiceNumber(tenantId: string): Promise<string> {
   return `${prefix}-${String(sequence).padStart(4, '0')}`
 }
 
-// Crear una nueva factura
+/**
+ * Crea una nueva factura en el sistema
+ * @param data - Datos de la factura a crear
+ * @param tenantId - ID del tenant
+ * @returns Promise<InvoiceWithRelations> - Factura creada con relaciones
+ * @throws Error si el cliente no existe o está inactivo
+ */
 export async function createInvoice(
   data: CreateInvoiceInput,
   tenantId: string
@@ -91,7 +97,12 @@ export async function createInvoice(
   return getInvoiceById(invoice.id, tenantId) as Promise<InvoiceWithRelations>
 }
 
-// Obtener factura por ID
+/**
+ * Obtiene una factura por su ID
+ * @param id - ID de la factura
+ * @param tenantId - ID del tenant
+ * @returns Promise<InvoiceWithRelations | null> - Factura encontrada o null si no existe
+ */
 export async function getInvoiceById(
   id: string,
   tenantId: string
@@ -114,7 +125,12 @@ export async function getInvoiceById(
   })
 }
 
-// Obtener todas las facturas con filtros y paginación
+/**
+ * Obtiene todas las facturas con filtros y paginación
+ * @param query - Parámetros de consulta y filtros
+ * @param tenantId - ID del tenant
+ * @returns Promise con lista de facturas y información de paginación
+ */
 export async function getInvoices(
   query: InvoiceQuery,
   tenantId: string
@@ -217,7 +233,14 @@ export async function getInvoices(
   }
 }
 
-// Actualizar factura
+/**
+ * Actualiza una factura existente
+ * @param id - ID de la factura a actualizar
+ * @param data - Datos a actualizar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Invoice> - Factura actualizada
+ * @throws Error si la factura no existe o está en estado final
+ */
 export async function updateInvoice(
   id: string,
   data: UpdateInvoiceInput,
@@ -249,7 +272,14 @@ export async function updateInvoice(
   })
 }
 
-// Actualizar estado de la factura
+/**
+ * Actualiza el estado de una factura
+ * @param id - ID de la factura
+ * @param statusUpdate - Datos de actualización de estado
+ * @param tenantId - ID del tenant
+ * @returns Promise<Invoice> - Factura actualizada
+ * @throws Error si la factura no existe o la transición de estado no es válida
+ */
 export async function updateInvoiceStatus(
   id: string,
   statusUpdate: UpdateInvoiceStatusInput,
@@ -298,7 +328,14 @@ export async function updateInvoiceStatus(
   })
 }
 
-// Registrar pago de factura
+/**
+ * Registra un pago para una factura
+ * @param id - ID de la factura
+ * @param paymentData - Datos del pago
+ * @param tenantId - ID del tenant
+ * @returns Promise<Invoice> - Factura actualizada
+ * @throws Error si la factura no existe, está cancelada o el monto excede el total
+ */
 export async function recordPayment(
   id: string,
   paymentData: RecordPaymentInput,
@@ -347,7 +384,14 @@ export async function recordPayment(
   })
 }
 
-// Cancelar factura
+/**
+ * Cancela una factura
+ * @param id - ID de la factura
+ * @param tenantId - ID del tenant
+ * @param reason - Razón de cancelación (opcional)
+ * @returns Promise<Invoice> - Factura cancelada
+ * @throws Error si la factura no existe o ya está en estado final
+ */
 export async function cancelInvoice(
   id: string,
   tenantId: string,
@@ -384,7 +428,11 @@ export async function cancelInvoice(
   })
 }
 
-// Obtener estadísticas de facturas
+/**
+ * Obtiene estadísticas detalladas de facturas
+ * @param tenantId - ID del tenant
+ * @returns Promise con estadísticas completas de facturas
+ */
 export async function getInvoiceStats(tenantId: string) {
   const [
     totalInvoices,
@@ -489,7 +537,13 @@ export async function getInvoiceStats(tenantId: string) {
   }
 }
 
-// Buscar facturas por número o cliente
+/**
+ * Busca facturas por número o cliente
+ * @param query - Término de búsqueda
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 10)
+ * @returns Promise<Invoice[]> - Lista de facturas encontradas
+ */
 export async function searchInvoices(
   query: string,
   tenantId: string,
@@ -524,7 +578,12 @@ export async function searchInvoices(
   })
 }
 
-// Obtener facturas vencidas
+/**
+ * Obtiene facturas vencidas
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 50)
+ * @returns Promise<Invoice[]> - Lista de facturas vencidas
+ */
 export async function getOverdueInvoices(
   tenantId: string,
   limit: number = 50

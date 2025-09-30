@@ -7,10 +7,13 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
-    const academicYear = searchParams.get('academicYear') || new Date().getFullYear().toString()
+    const academicYear =
+      searchParams.get('academicYear') || new Date().getFullYear().toString()
     const sectionId = searchParams.get('sectionId') || undefined
     const teacherId = searchParams.get('teacherId') || undefined
-    const dayOfWeek = searchParams.get('dayOfWeek') ? parseInt(searchParams.get('dayOfWeek')!) : undefined
+    const dayOfWeek = searchParams.get('dayOfWeek')
+      ? parseInt(searchParams.get('dayOfWeek')!)
+      : undefined
 
     const schedules = await SchoolAcademicService.getSchedules(tenantId, {
       academicYear,
@@ -57,7 +60,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating schedule:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

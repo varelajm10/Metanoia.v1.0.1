@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
 
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '50')
-    const academicYear = searchParams.get('academicYear') || new Date().getFullYear().toString()
+    const academicYear =
+      searchParams.get('academicYear') || new Date().getFullYear().toString()
     const studentId = searchParams.get('studentId') || undefined
     const sectionId = searchParams.get('sectionId') || undefined
     const status = searchParams.get('status') || undefined
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating enrollment:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

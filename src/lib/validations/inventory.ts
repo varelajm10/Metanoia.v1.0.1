@@ -11,16 +11,26 @@ export const productSchema = z.object({
   price: z.number().positive('El precio debe ser positivo'),
   cost: z.number().positive('El costo debe ser positivo').optional(),
   stock: z.number().int().min(0, 'El stock no puede ser negativo').default(0),
-  minStock: z.number().int().min(0, 'El stock mínimo no puede ser negativo').default(0),
-  maxStock: z.number().int().positive('El stock máximo debe ser positivo').optional(),
+  minStock: z
+    .number()
+    .int()
+    .min(0, 'El stock mínimo no puede ser negativo')
+    .default(0),
+  maxStock: z
+    .number()
+    .int()
+    .positive('El stock máximo debe ser positivo')
+    .optional(),
   category: z.string().optional(),
   brand: z.string().optional(),
   weight: z.number().positive('El peso debe ser positivo').optional(),
-  dimensions: z.object({
-    length: z.number().positive(),
-    width: z.number().positive(),
-    height: z.number().positive(),
-  }).optional(),
+  dimensions: z
+    .object({
+      length: z.number().positive(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+    })
+    .optional(),
   isActive: z.boolean().default(true),
   isDigital: z.boolean().default(false),
   tags: z.array(z.string()).default([]),
@@ -33,16 +43,22 @@ export const supplierSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Email inválido').optional(),
   phone: z.string().optional(),
-  address: z.object({
-    street: z.string(),
-    city: z.string(),
-    state: z.string(),
-    zipCode: z.string(),
-    country: z.string(),
-  }).optional(),
+  address: z
+    .object({
+      street: z.string(),
+      city: z.string(),
+      state: z.string(),
+      zipCode: z.string(),
+      country: z.string(),
+    })
+    .optional(),
   contactName: z.string().optional(),
   taxId: z.string().optional(),
-  paymentTerms: z.number().int().min(0, 'Los términos de pago no pueden ser negativos').optional(),
+  paymentTerms: z
+    .number()
+    .int()
+    .min(0, 'Los términos de pago no pueden ser negativos')
+    .optional(),
   isActive: z.boolean().default(true),
   notes: z.string().optional(),
 })
@@ -54,13 +70,21 @@ export const purchaseOrderSchema = z.object({
   supplierId: z.string().min(1, 'El proveedor es requerido'),
   expectedDate: z.string().datetime().optional(),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    discount: z.number().min(0).max(100, 'El descuento debe estar entre 0 y 100').default(0),
-    notes: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        discount: z
+          .number()
+          .min(0)
+          .max(100, 'El descuento debe estar entre 0 y 100')
+          .default(0),
+        notes: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 export const updatePurchaseOrderSchema = z.object({
@@ -106,8 +130,16 @@ export const supplierProductSchema = z.object({
   productId: z.string().min(1, 'El producto es requerido'),
   supplierSku: z.string().optional(),
   cost: z.number().positive('El costo debe ser positivo'),
-  minOrder: z.number().int().positive('La orden mínima debe ser positiva').optional(),
-  leadTime: z.number().int().min(0, 'El tiempo de entrega no puede ser negativo').optional(),
+  minOrder: z
+    .number()
+    .int()
+    .positive('La orden mínima debe ser positiva')
+    .optional(),
+  leadTime: z
+    .number()
+    .int()
+    .min(0, 'El tiempo de entrega no puede ser negativo')
+    .optional(),
   isActive: z.boolean().default(true),
 })
 
@@ -149,7 +181,9 @@ export const stockMovementFiltersSchema = z.object({
 
 // Filtros para alertas
 export const alertFiltersSchema = z.object({
-  type: z.enum(['LOW_STOCK', 'OUT_OF_STOCK', 'OVERSTOCK', 'EXPIRING', 'EXPIRED']).optional(),
+  type: z
+    .enum(['LOW_STOCK', 'OUT_OF_STOCK', 'OVERSTOCK', 'EXPIRING', 'EXPIRED'])
+    .optional(),
   isActive: z.boolean().optional(),
   productId: z.string().optional(),
 })

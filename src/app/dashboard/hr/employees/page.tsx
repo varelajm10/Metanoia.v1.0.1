@@ -41,6 +41,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'react-hot-toast'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 interface Employee {
@@ -127,11 +128,11 @@ export default function EmployeesPage() {
         setEmployeeToDelete(null)
         fetchEmployees() // Refresh the list
       } else {
-        alert('Error al eliminar empleado: ' + result.error)
+        toast.error('Error al eliminar empleado: ' + result.error)
       }
     } catch (error) {
       console.error('Error deleting employee:', error)
-      alert('Error al eliminar empleado')
+      toast.error('Error al eliminar empleado')
     }
   }
 

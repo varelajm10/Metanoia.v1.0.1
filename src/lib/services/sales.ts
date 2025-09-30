@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import { 
-  Quote, 
-  Salesperson, 
-  Sale, 
-  Commission, 
+import {
+  Quote,
+  Salesperson,
+  Sale,
+  Commission,
   Discount,
   QuoteFilters,
   SalespersonFilters,
@@ -19,15 +19,36 @@ export class SalesService {
   // COTIZACIONES
   // ========================================
 
-  static async getQuotes(tenantId: string, filters: QuoteFilters = {}, page = 1, limit = 10) {
+  /**
+   * Obtiene cotizaciones con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de cotizaciones y información de paginación
+   */
+  static async getQuotes(
+    tenantId: string,
+    filters: QuoteFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
       where.OR = [
         { quoteNumber: { contains: filters.search, mode: 'insensitive' } },
         { notes: { contains: filters.search, mode: 'insensitive' } },
-        { customer: { firstName: { contains: filters.search, mode: 'insensitive' } } },
-        { customer: { lastName: { contains: filters.search, mode: 'insensitive' } } },
+        {
+          customer: {
+            firstName: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
+        {
+          customer: {
+            lastName: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
       ]
     }
 
@@ -91,6 +112,12 @@ export class SalesService {
     return { quotes, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
+  /**
+   * Obtiene una cotización por su ID
+   * @param id - ID de la cotización
+   * @param tenantId - ID del tenant
+   * @returns Promise con la cotización y sus relaciones
+   */
   static async getQuoteById(id: string, tenantId: string) {
     return prisma.quote.findFirst({
       where: { id, tenantId },
@@ -128,6 +155,13 @@ export class SalesService {
     })
   }
 
+  /**
+   * Crea una nueva cotización
+   * @param data - Datos de la cotización a crear
+   * @param tenantId - ID del tenant
+   * @param userId - ID del usuario que crea la cotización
+   * @returns Promise con la cotización creada
+   */
   static async createQuote(data: Quote, tenantId: string, userId: string) {
     // Generar número de cotización
     const quoteCount = await prisma.quote.count({
@@ -198,6 +232,14 @@ export class SalesService {
     })
   }
 
+  /**
+   * Actualiza una cotización existente
+   * @param id - ID de la cotización a actualizar
+   * @param data - Datos a actualizar
+   * @param tenantId - ID del tenant
+   * @returns Promise con la cotización actualizada
+   * @throws Error si la cotización no existe
+   */
   static async updateQuote(id: string, data: Partial<Quote>, tenantId: string) {
     const existingQuote = await prisma.quote.findFirst({
       where: { id, tenantId },
@@ -250,7 +292,20 @@ export class SalesService {
   // VENDEDORES
   // ========================================
 
-  static async getSalespeople(tenantId: string, filters: SalespersonFilters = {}, page = 1, limit = 10) {
+  /**
+   * Obtiene vendedores con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de vendedores y información de paginación
+   */
+  static async getSalespeople(
+    tenantId: string,
+    filters: SalespersonFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -293,6 +348,13 @@ export class SalesService {
     return { salespeople, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
+  /**
+   * Crea un nuevo vendedor
+   * @param data - Datos del vendedor a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con el vendedor creado
+   * @throws Error si el email ya existe
+   */
   static async createSalesperson(data: Salesperson, tenantId: string) {
     // Verificar email único
     const existingSalesperson = await prisma.salesperson.findFirst({
@@ -320,15 +382,36 @@ export class SalesService {
   // VENTAS
   // ========================================
 
-  static async getSales(tenantId: string, filters: SaleFilters = {}, page = 1, limit = 10) {
+  /**
+   * Obtiene ventas con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de ventas y información de paginación
+   */
+  static async getSales(
+    tenantId: string,
+    filters: SaleFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
       where.OR = [
         { saleNumber: { contains: filters.search, mode: 'insensitive' } },
         { notes: { contains: filters.search, mode: 'insensitive' } },
-        { customer: { firstName: { contains: filters.search, mode: 'insensitive' } } },
-        { customer: { lastName: { contains: filters.search, mode: 'insensitive' } } },
+        {
+          customer: {
+            firstName: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
+        {
+          customer: {
+            lastName: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
       ]
     }
 
@@ -391,6 +474,13 @@ export class SalesService {
     return { sales, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
+  /**
+   * Crea una nueva venta
+   * @param data - Datos de la venta a crear
+   * @param tenantId - ID del tenant
+   * @param userId - ID del usuario que crea la venta
+   * @returns Promise con la venta creada
+   */
   static async createSale(data: Sale, tenantId: string, userId: string) {
     // Generar número de venta
     const saleCount = await prisma.sale.count({
@@ -464,13 +554,30 @@ export class SalesService {
   // COMISIONES
   // ========================================
 
-  static async getCommissions(tenantId: string, filters: CommissionFilters = {}, page = 1, limit = 10) {
+  /**
+   * Obtiene comisiones con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de comisiones y información de paginación
+   */
+  static async getCommissions(
+    tenantId: string,
+    filters: CommissionFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
       where.OR = [
         { notes: { contains: filters.search, mode: 'insensitive' } },
-        { salesperson: { name: { contains: filters.search, mode: 'insensitive' } } },
+        {
+          salesperson: {
+            name: { contains: filters.search, mode: 'insensitive' },
+          },
+        },
       ]
     }
 
@@ -526,7 +633,20 @@ export class SalesService {
   // DESCUENTOS
   // ========================================
 
-  static async getDiscounts(tenantId: string, filters: DiscountFilters = {}, page = 1, limit = 10) {
+  /**
+   * Obtiene descuentos con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda
+   * @param page - Página actual
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de descuentos y información de paginación
+   */
+  static async getDiscounts(
+    tenantId: string,
+    filters: DiscountFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -574,6 +694,13 @@ export class SalesService {
     return { discounts, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
+  /**
+   * Crea un nuevo descuento
+   * @param data - Datos del descuento a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con el descuento creado
+   * @throws Error si el nombre ya existe
+   */
   static async createDiscount(data: Discount, tenantId: string) {
     // Verificar nombre único
     const existingDiscount = await prisma.discount.findFirst({
@@ -605,6 +732,11 @@ export class SalesService {
   // DASHBOARD
   // ========================================
 
+  /**
+   * Obtiene estadísticas del dashboard de ventas
+   * @param tenantId - ID del tenant
+   * @returns Promise con estadísticas completas del módulo de ventas
+   */
   static async getDashboardStats(tenantId: string) {
     const [
       totalQuotes,
@@ -618,7 +750,9 @@ export class SalesService {
       activeDiscounts,
     ] = await Promise.all([
       prisma.quote.count({ where: { tenantId } }),
-      prisma.quote.count({ where: { tenantId, status: { in: ['DRAFT', 'SENT'] } } }),
+      prisma.quote.count({
+        where: { tenantId, status: { in: ['DRAFT', 'SENT'] } },
+      }),
       prisma.sale.count({ where: { tenantId } }),
       prisma.salesperson.count({ where: { tenantId } }),
       prisma.salesperson.count({ where: { tenantId, isActive: true } }),

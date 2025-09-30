@@ -2,15 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [NO-PRISMA] Iniciando login sin Prisma...')
 
     const body = await request.json()
-    console.log('📧 [NO-PRISMA] Datos recibidos:', { email: body.email })
 
     const { email, password } = body
 
     if (!email || !password) {
-      console.log('❌ [NO-PRISMA] Email o contraseña faltantes')
       return NextResponse.json(
         { error: 'Email y contraseña son requeridos' },
         { status: 400 }
@@ -19,7 +16,6 @@ export async function POST(request: NextRequest) {
 
     // Simulación simple de autenticación
     if (email === 'admin@metanoia.click' && password === 'metanoia123') {
-      console.log('✅ [NO-PRISMA] Credenciales correctas')
 
       const mockResponse = {
         user: {
@@ -34,7 +30,6 @@ export async function POST(request: NextRequest) {
         refreshToken: 'mock-refresh-token',
       }
 
-      console.log('🎉 [NO-PRISMA] Login exitoso')
 
       // Crear respuesta con cookies
       const response = NextResponse.json(mockResponse)
@@ -58,7 +53,6 @@ export async function POST(request: NextRequest) {
 
       return response
     } else {
-      console.log('❌ [NO-PRISMA] Credenciales incorrectas')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }

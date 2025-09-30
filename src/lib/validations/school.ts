@@ -8,7 +8,7 @@ import { z } from 'zod'
 export const SchoolStudentSchema = z.object({
   firstName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   lastName: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
-  dateOfBirth: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  dateOfBirth: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de nacimiento inválida',
   }),
   gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
@@ -28,13 +28,18 @@ export const SchoolStudentSchema = z.object({
     .min(3, 'El código de estudiante debe tener al menos 3 caracteres'),
   grade: z.string().min(1, 'El grado es requerido'),
   section: z.string().optional(),
-  enrollmentDate: z
-    .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
-      message: 'Fecha de matrícula inválida',
-    }),
+  enrollmentDate: z.string().refine(date => !isNaN(Date.parse(date)), {
+    message: 'Fecha de matrícula inválida',
+  }),
   status: z
-    .enum(['ACTIVE', 'INACTIVE', 'GRADUATED', 'TRANSFERRED', 'EXPELLED', 'WITHDRAWN'])
+    .enum([
+      'ACTIVE',
+      'INACTIVE',
+      'GRADUATED',
+      'TRANSFERRED',
+      'EXPELLED',
+      'WITHDRAWN',
+    ])
     .default('ACTIVE'),
 
   photoUrl: z.string().url('URL inválida').optional().or(z.literal('')),
@@ -47,7 +52,13 @@ export type SchoolStudentInput = z.infer<typeof SchoolStudentSchema>
 export const SchoolParentSchema = z.object({
   firstName: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   lastName: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
-  relationship: z.enum(['FATHER', 'MOTHER', 'GUARDIAN', 'GRANDPARENT', 'OTHER']),
+  relationship: z.enum([
+    'FATHER',
+    'MOTHER',
+    'GUARDIAN',
+    'GRANDPARENT',
+    'OTHER',
+  ]),
   email: z.string().email('Email inválido'),
   phone: z.string().min(8, 'El teléfono debe tener al menos 8 caracteres'),
   cellPhone: z.string().optional(),
@@ -75,7 +86,7 @@ export const SchoolTeacherSchema = z.object({
   lastName: z.string().min(2, 'El apellido debe tener al menos 2 caracteres'),
   dateOfBirth: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine(date => !isNaN(Date.parse(date)), {
       message: 'Fecha de nacimiento inválida',
     })
     .optional(),
@@ -92,7 +103,7 @@ export const SchoolTeacherSchema = z.object({
     .min(2, 'La especialización debe tener al menos 2 caracteres'),
   degree: z.string().min(2, 'El título debe tener al menos 2 caracteres'),
   certifications: z.string().optional(),
-  hireDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  hireDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de contratación inválida',
   }),
   status: z
@@ -121,13 +132,17 @@ export const SchoolGradeLevelSchema = z.object({
   level: z
     .string()
     .refine(
-      (val) => ['preschool', 'elementary', 'middle', 'high'].includes(val),
+      val => ['preschool', 'elementary', 'middle', 'high'].includes(val),
       {
         message: 'Nivel inválido',
       }
     ),
   description: z.string().optional(),
-  capacity: z.number().int().positive('La capacidad debe ser positiva').optional(),
+  capacity: z
+    .number()
+    .int()
+    .positive('La capacidad debe ser positiva')
+    .optional(),
 })
 
 export type SchoolGradeLevelInput = z.infer<typeof SchoolGradeLevelSchema>
@@ -148,7 +163,11 @@ export const SchoolSubjectSchema = z.object({
   name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   code: z.string().min(1, 'El código es requerido'),
   description: z.string().optional(),
-  credits: z.number().int().positive('Los créditos deben ser positivos').optional(),
+  credits: z
+    .number()
+    .int()
+    .positive('Los créditos deben ser positivos')
+    .optional(),
   hoursPerWeek: z
     .number()
     .int()
@@ -187,7 +206,7 @@ export const SchoolEnrollmentSchema = z.object({
   studentId: z.string().min(1, 'El estudiante es requerido'),
   sectionId: z.string().min(1, 'La sección es requerida'),
   academicYear: z.string().min(4, 'El año académico es requerido'),
-  enrollmentDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  enrollmentDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de matrícula inválida',
   }),
   status: z
@@ -220,7 +239,7 @@ export type SchoolGradeInput = z.infer<typeof SchoolGradeSchema>
 // Asistencia
 export const SchoolAttendanceSchema = z.object({
   studentId: z.string().min(1, 'El estudiante es requerido'),
-  date: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  date: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha inválida',
   }),
   status: z.enum(['PRESENT', 'ABSENT', 'LATE', 'EXCUSED', 'SICK']),
@@ -256,12 +275,12 @@ export const SchoolPaymentSchema = z.object({
     'OTHER',
   ]),
   amount: z.number().positive('El monto debe ser positivo'),
-  dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  dueDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de vencimiento inválida',
   }),
   paymentDate: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine(date => !isNaN(Date.parse(date)), {
       message: 'Fecha de pago inválida',
     })
     .optional(),
@@ -282,7 +301,7 @@ export type SchoolPaymentInput = z.infer<typeof SchoolPaymentSchema>
 // Registro Disciplinario
 export const SchoolDisciplinarySchema = z.object({
   studentId: z.string().min(1, 'El estudiante es requerido'),
-  incidentDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  incidentDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha del incidente inválida',
   }),
   incidentType: z.enum([
@@ -298,12 +317,14 @@ export const SchoolDisciplinarySchema = z.object({
   description: z
     .string()
     .min(10, 'La descripción debe tener al menos 10 caracteres'),
-  action: z.string().min(5, 'La acción tomada debe tener al menos 5 caracteres'),
+  action: z
+    .string()
+    .min(5, 'La acción tomada debe tener al menos 5 caracteres'),
   reportedBy: z.string().min(3, 'El nombre del reportero es requerido'),
   status: z.enum(['OPEN', 'IN_REVIEW', 'RESOLVED', 'CLOSED']).default('OPEN'),
   resolvedDate: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine(date => !isNaN(Date.parse(date)), {
       message: 'Fecha de resolución inválida',
     })
     .optional(),
@@ -326,14 +347,24 @@ export const SchoolLibraryBookSchema = z.object({
     .optional(),
   category: z.string().min(2, 'La categoría es requerida'),
   language: z.string().default('Español'),
-  totalCopies: z.number().int().positive('El total de copias debe ser positivo'),
+  totalCopies: z
+    .number()
+    .int()
+    .positive('El total de copias debe ser positivo'),
   availableCopies: z
     .number()
     .int()
     .min(0, 'Las copias disponibles no pueden ser negativas'),
   location: z.string().optional(),
   status: z
-    .enum(['AVAILABLE', 'CHECKED_OUT', 'RESERVED', 'MAINTENANCE', 'LOST', 'DAMAGED'])
+    .enum([
+      'AVAILABLE',
+      'CHECKED_OUT',
+      'RESERVED',
+      'MAINTENANCE',
+      'LOST',
+      'DAMAGED',
+    ])
     .default('AVAILABLE'),
   coverUrl: z.string().url('URL inválida').optional().or(z.literal('')),
   description: z.string().optional(),
@@ -348,16 +379,16 @@ export const SchoolLibraryLoanSchema = z.object({
   studentId: z.string().min(1, 'El estudiante es requerido'),
   loanDate: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine(date => !isNaN(Date.parse(date)), {
       message: 'Fecha de préstamo inválida',
     })
     .default(new Date().toISOString()),
-  dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  dueDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de devolución inválida',
   }),
   returnDate: z
     .string()
-    .refine((date) => !isNaN(Date.parse(date)), {
+    .refine(date => !isNaN(Date.parse(date)), {
       message: 'Fecha de devolución inválida',
     })
     .optional(),
@@ -390,7 +421,9 @@ export const SchoolTransportRouteSchema = z.object({
   notes: z.string().optional(),
 })
 
-export type SchoolTransportRouteInput = z.infer<typeof SchoolTransportRouteSchema>
+export type SchoolTransportRouteInput = z.infer<
+  typeof SchoolTransportRouteSchema
+>
 
 // Asignación de Transporte
 export const SchoolTransportAssignmentSchema = z.object({
@@ -417,13 +450,17 @@ export type SchoolTransportAssignmentInput = z.infer<
 
 // Menú de Comedor
 export const SchoolCafeteriaMenuSchema = z.object({
-  date: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  date: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha inválida',
   }),
   mealType: z.enum(['BREAKFAST', 'LUNCH', 'SNACK', 'DINNER']),
   menuName: z.string().min(3, 'El nombre del menú es requerido'),
   description: z.string().optional(),
-  calories: z.number().int().positive('Las calorías deben ser positivas').optional(),
+  calories: z
+    .number()
+    .int()
+    .positive('Las calorías deben ser positivas')
+    .optional(),
   proteins: z.number().positive('Las proteínas deben ser positivas').optional(),
   carbohydrates: z
     .number()
@@ -450,7 +487,7 @@ export type SchoolCafeteriaAssignmentInput = z.infer<
 // Evaluación de Docente
 export const SchoolEvaluationSchema = z.object({
   teacherId: z.string().min(1, 'El docente es requerido'),
-  evaluationDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+  evaluationDate: z.string().refine(date => !isNaN(Date.parse(date)), {
     message: 'Fecha de evaluación inválida',
   }),
   evaluationType: z.enum([

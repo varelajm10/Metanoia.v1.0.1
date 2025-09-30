@@ -270,7 +270,6 @@ export default function ServersPage() {
       // Cerrar modal
       setShowServerForm(false)
 
-      console.log('Servidor agregado:', newServer)
     } catch (error) {
       console.error('Error al agregar servidor:', error)
     } finally {

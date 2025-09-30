@@ -8,10 +8,8 @@ const JWT_SECRET = (process.env.JWT_SECRET || 'dev-secret-key') as string
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [DEBUG] Iniciando login...')
 
     const body = await request.json()
-    console.log('📧 [DEBUG] Datos recibidos:', {
       email: body.email,
       password: '***',
     })
@@ -19,14 +17,12 @@ export async function POST(request: NextRequest) {
     const { email, password } = body
 
     if (!email || !password) {
-      console.log('❌ [DEBUG] Email o contraseña faltantes')
       return NextResponse.json(
         { error: 'Email y contraseña son requeridos' },
         { status: 400 }
       )
     }
 
-    console.log('🔍 [DEBUG] Buscando usuario...')
 
     // Buscar usuario
     const user = await prisma.user.findFirst({
@@ -37,36 +33,29 @@ export async function POST(request: NextRequest) {
     })
 
     if (!user) {
-      console.log('❌ [DEBUG] Usuario no encontrado')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }
       )
     }
 
-    console.log('✅ [DEBUG] Usuario encontrado:', user.email)
 
     if (!user.isActive) {
-      console.log('❌ [DEBUG] Usuario inactivo')
       return NextResponse.json({ error: 'Usuario inactivo' }, { status: 401 })
     }
 
-    console.log('🔐 [DEBUG] Verificando contraseña...')
 
     // Verificar contraseña
     const isValidPassword = await bcrypt.compare(password, user.password)
     if (!isValidPassword) {
-      console.log('❌ [DEBUG] Contraseña incorrecta')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }
       )
     }
 
-    console.log('✅ [DEBUG] Contraseña correcta')
 
     // Generar tokens
-    console.log('🎫 [DEBUG] Generando tokens...')
 
     const accessToken = jwt.sign(
       {
@@ -88,10 +77,8 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     )
 
-    console.log('✅ [DEBUG] Tokens generados')
 
     // Crear sesión
-    console.log('💾 [DEBUG] Creando sesión...')
 
     try {
       await prisma.session.create({
@@ -101,9 +88,7 @@ export async function POST(request: NextRequest) {
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 días
         },
       })
-      console.log('✅ [DEBUG] Sesión creada')
     } catch (sessionError) {
-      console.log('❌ [DEBUG] Error creando sesión:', sessionError)
       // Continuar sin la sesión por ahora
     }
 
@@ -122,7 +107,6 @@ export async function POST(request: NextRequest) {
       refreshToken,
     }
 
-    console.log('🎉 [DEBUG] Login exitoso para:', user.email)
 
     // Crear respuesta con cookies
     const response = NextResponse.json(authResponse)
@@ -144,7 +128,6 @@ export async function POST(request: NextRequest) {
       path: '/',
     })
 
-    console.log('✅ [DEBUG] Respuesta preparada')
     return response
   } catch (error) {
     console.error('❌ [DEBUG] Error en login:', error)

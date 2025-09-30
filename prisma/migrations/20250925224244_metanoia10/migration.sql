@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "tenants" ALTER COLUMN "contactEmail" DROP DEFAULT,
+ALTER COLUMN "contactName" DROP DEFAULT,
+ALTER COLUMN "email" DROP DEFAULT,
+ALTER COLUMN "subscriptionStartDate" DROP DEFAULT;

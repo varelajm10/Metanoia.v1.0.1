@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [SIMPLE] Iniciando login simple...')
 
     const body = await request.json()
-    console.log('📧 [SIMPLE] Datos recibidos:', { email: body.email })
 
     const { email, password } = body
 
@@ -18,7 +16,6 @@ export async function POST(request: NextRequest) {
 
     // Simulación simple de autenticación
     if (email === 'admin@metanoia.click' && password === 'metanoia123') {
-      console.log('✅ [SIMPLE] Credenciales correctas')
 
       const mockResponse = {
         user: {
@@ -35,7 +32,6 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json(mockResponse)
     } else {
-      console.log('❌ [SIMPLE] Credenciales incorrectas')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }

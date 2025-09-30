@@ -7,11 +7,13 @@
 ## 🎯 Características Principales
 
 ### 🏗️ Arquitectura Multi-tenant
+
 - **Separación por tenant**: Cada cliente tiene su propio espacio de datos
 - **Configuración independiente**: Cada tenant puede personalizar sus módulos
 - **Escalabilidad**: Soporte para miles de tenants simultáneos
 
 ### 🧩 Sistema Modular
+
 - **Módulos independientes**: Cada módulo puede activarse/desactivarse
 - **Configuración flexible**: Personalización por tenant
 - **APIs RESTful**: Integración fácil con sistemas externos
@@ -19,6 +21,7 @@
 ## 📦 Módulos Disponibles
 
 ### 🎓 **Gestión de Colegios** (NUEVO)
+
 - **Gestión de Estudiantes**: Registro, matrícula, historial académico
 - **Gestión de Docentes**: Personal académico, horarios, evaluaciones
 - **Gestión Académica**: Grados, secciones, materias, horarios
@@ -31,6 +34,7 @@
 - **Portal de Padres**: Acceso a información de sus hijos
 
 ### 🏢 **Gestión de Ascensores**
+
 - **Gestión de Clientes**: Empresas que requieren servicios
 - **Instalaciones**: Proyectos de instalación de ascensores
 - **Mantenimiento**: Contratos, programación, seguimiento
@@ -40,6 +44,7 @@
 - **Órdenes de Trabajo**: Asignación, seguimiento, completado
 
 ### 🖥️ **Gestión de Servidores**
+
 - **Monitoreo**: Estado, métricas, alertas en tiempo real
 - **Mantenimiento**: Programación, seguimiento, historial
 - **Red**: Análisis de conectividad, configuración
@@ -47,16 +52,19 @@
 - **Usuarios**: Acceso y permisos del sistema
 
 ### 👥 **Recursos Humanos**
+
 - **Empleados**: Registro, nómina, vacaciones
 - **Evaluaciones**: Desempeño, objetivos, seguimiento
 - **Capacitación**: Cursos, certificaciones, desarrollo
 
 ### 📊 **CRM y Ventas**
+
 - **Clientes**: Gestión de relaciones comerciales
 - **Leads**: Prospección, seguimiento, conversión
 - **Oportunidades**: Pipeline de ventas, cierre
 
 ### 📦 **Inventario**
+
 - **Productos**: Catálogo, stock, precios
 - **Órdenes**: Pedidos, facturación, envíos
 - **Reportes**: Análisis de ventas, stock bajo
@@ -64,6 +72,7 @@
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
+
 - **Next.js 14+** con App Router para SSR/SSG
 - **React 18+** como framework principal
 - **TypeScript** para tipado estático
@@ -73,6 +82,7 @@
 - **TanStack Query** para gestión de estado
 
 ### Backend
+
 - **Node.js + Express** para API REST
 - **Prisma ORM** para base de datos
 - **PostgreSQL** como base de datos principal
@@ -81,6 +91,7 @@
 - **Bcrypt** para hashing seguro
 
 ### Infraestructura
+
 - **Docker + Docker Compose** para containerización
 - **Nginx** como proxy reverso
 - **AWS/Vercel** para hosting
@@ -88,6 +99,7 @@
 - **SendGrid/Resend** para emails
 
 ### Herramientas de Desarrollo
+
 - **ESLint + Prettier** para linting
 - **Husky + lint-staged** para Git hooks
 - **Jest + Testing Library** para testing
@@ -96,6 +108,7 @@
 ## 🚀 Instalación y Configuración
 
 ### Prerrequisitos
+
 - Node.js 18+
 - PostgreSQL 14+
 - Redis 6+
@@ -104,23 +117,27 @@
 ### Instalación Local
 
 1. **Clonar el repositorio**
+
 ```bash
 git clone https://github.com/tu-usuario/Metanoia.v1.0.2.git
 cd Metanoia.v1.0.2
 ```
 
 2. **Instalar dependencias**
+
 ```bash
 npm install
 ```
 
 3. **Configurar variables de entorno**
+
 ```bash
 cp env.example .env.local
 # Editar .env.local con tus configuraciones
 ```
 
 4. **Configurar base de datos**
+
 ```bash
 # Iniciar PostgreSQL y Redis
 docker-compose up -d postgres redis
@@ -133,6 +150,7 @@ npm run prisma:seed
 ```
 
 5. **Iniciar servidor de desarrollo**
+
 ```bash
 npm run dev
 ```
@@ -188,6 +206,7 @@ npm run format          # Formatear con Prettier
 ## 🎯 Módulo de Colegios - Funcionalidades
 
 ### 📚 Gestión Académica
+
 - **Grados y Secciones**: Organización por niveles educativos
 - **Materias**: Asignaturas por grado y sección
 - **Horarios**: Planificación de clases
@@ -195,6 +214,7 @@ npm run format          # Formatear con Prettier
 - **Calificaciones**: Sistema de evaluación
 
 ### 👨‍🎓 Gestión de Estudiantes
+
 - **Registro**: Datos personales y académicos
 - **Historial**: Seguimiento académico completo
 - **Asistencia**: Control diario de presencia
@@ -202,18 +222,21 @@ npm run format          # Formatear con Prettier
 - **Padres**: Información de contacto
 
 ### 👨‍🏫 Gestión de Docentes
+
 - **Personal**: Registro de docentes
 - **Asignaciones**: Materias y secciones
 - **Evaluaciones**: Desempeño docente
 - **Horarios**: Disponibilidad y carga
 
 ### 💰 Gestión Financiera
+
 - **Matrícula**: Pagos de inscripción
 - **Pensiones**: Pagos mensuales
 - **Servicios**: Transporte, comedor, biblioteca
 - **Reportes**: Estados de cuenta, morosidad
 
 ### 🏫 Servicios Auxiliares
+
 - **Biblioteca**: Catálogo digital, préstamos
 - **Transporte**: Rutas, asignaciones, seguimiento
 - **Comedor**: Menús, planes nutricionales
@@ -222,12 +245,14 @@ npm run format          # Formatear con Prettier
 ## 📈 Valor Comercial
 
 ### 💼 Precios Sugeridos por Módulo
+
 - **Módulo de Colegios**: $500-1000/mes
 - **Módulo de Ascensores**: $300-800/mes
 - **Módulo de Servidores**: $200-500/mes
 - **Sistema Completo**: $2000-5000/mes
 
 ### 🎯 Mercado Objetivo
+
 - **Colegios privados**: 500-2000 estudiantes
 - **Empresas de ascensores**: Mantenimiento e instalación
 - **Proveedores de hosting**: Gestión de servidores

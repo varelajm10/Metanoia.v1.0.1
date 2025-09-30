@@ -16,8 +16,14 @@ export class SchoolTeacherService {
       employmentType?: string
     } = {}
   ) {
-    const { page = 1, limit = 20, search, status, department, employmentType } =
-      options
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      status,
+      department,
+      employmentType,
+    } = options
 
     const skip = (page - 1) * limit
 
@@ -131,9 +137,7 @@ export class SchoolTeacherService {
   }
 
   // Crear un docente
-  static async createTeacher(
-    data: SchoolTeacherInput & { tenantId: string }
-  ) {
+  static async createTeacher(data: SchoolTeacherInput & { tenantId: string }) {
     return prisma.schoolTeacher.create({
       data: {
         ...data,

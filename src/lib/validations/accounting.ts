@@ -21,13 +21,20 @@ export const journalEntrySchema = z.object({
   date: z.string().datetime('Fecha inválida'),
   description: z.string().min(1, 'La descripción es requerida'),
   reference: z.string().optional(),
-  lines: z.array(z.object({
-    accountId: z.string().min(1, 'La cuenta es requerida'),
-    debit: z.number().min(0, 'El débito no puede ser negativo').default(0),
-    credit: z.number().min(0, 'El crédito no puede ser negativo').default(0),
-    description: z.string().optional(),
-    reference: z.string().optional(),
-  })).min(2, 'Debe incluir al menos 2 líneas'),
+  lines: z
+    .array(
+      z.object({
+        accountId: z.string().min(1, 'La cuenta es requerida'),
+        debit: z.number().min(0, 'El débito no puede ser negativo').default(0),
+        credit: z
+          .number()
+          .min(0, 'El crédito no puede ser negativo')
+          .default(0),
+        description: z.string().optional(),
+        reference: z.string().optional(),
+      })
+    )
+    .min(2, 'Debe incluir al menos 2 líneas'),
 })
 
 export const updateJournalEntrySchema = z.object({
@@ -91,9 +98,12 @@ export const bankReconciliationItemSchema = z.object({
 export const taxSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   rate: z.number().min(0).max(100, 'La tasa debe estar entre 0 y 100'),
-  type: z.enum(['SALES_TAX', 'INCOME_TAX', 'PAYROLL_TAX', 'PROPERTY_TAX', 'OTHER'], {
-    errorMap: () => ({ message: 'Tipo de impuesto inválido' }),
-  }),
+  type: z.enum(
+    ['SALES_TAX', 'INCOME_TAX', 'PAYROLL_TAX', 'PROPERTY_TAX', 'OTHER'],
+    {
+      errorMap: () => ({ message: 'Tipo de impuesto inválido' }),
+    }
+  ),
   isActive: z.boolean().default(true),
   description: z.string().optional(),
 })
@@ -113,7 +123,9 @@ export const taxTransactionSchema = z.object({
 // Filtros para plan de cuentas
 export const chartOfAccountsFiltersSchema = z.object({
   search: z.string().optional(),
-  type: z.enum(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE']).optional(),
+  type: z
+    .enum(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'])
+    .optional(),
   isActive: z.boolean().optional(),
   parentId: z.string().optional(),
 })
@@ -138,7 +150,9 @@ export const bankReconciliationFiltersSchema = z.object({
 // Filtros para impuestos
 export const taxFiltersSchema = z.object({
   search: z.string().optional(),
-  type: z.enum(['SALES_TAX', 'INCOME_TAX', 'PAYROLL_TAX', 'PROPERTY_TAX', 'OTHER']).optional(),
+  type: z
+    .enum(['SALES_TAX', 'INCOME_TAX', 'PAYROLL_TAX', 'PROPERTY_TAX', 'OTHER'])
+    .optional(),
   isActive: z.boolean().optional(),
 })
 
@@ -151,12 +165,20 @@ export type JournalEntryLine = z.infer<typeof journalEntryLineSchema>
 export type BalanceSheet = z.infer<typeof balanceSheetSchema>
 export type IncomeStatement = z.infer<typeof incomeStatementSchema>
 export type BankReconciliation = z.infer<typeof bankReconciliationSchema>
-export type UpdateBankReconciliation = z.infer<typeof updateBankReconciliationSchema>
-export type BankReconciliationItem = z.infer<typeof bankReconciliationItemSchema>
+export type UpdateBankReconciliation = z.infer<
+  typeof updateBankReconciliationSchema
+>
+export type BankReconciliationItem = z.infer<
+  typeof bankReconciliationItemSchema
+>
 export type Tax = z.infer<typeof taxSchema>
 export type UpdateTax = z.infer<typeof updateTaxSchema>
 export type TaxTransaction = z.infer<typeof taxTransactionSchema>
-export type ChartOfAccountsFilters = z.infer<typeof chartOfAccountsFiltersSchema>
+export type ChartOfAccountsFilters = z.infer<
+  typeof chartOfAccountsFiltersSchema
+>
 export type JournalEntryFilters = z.infer<typeof journalEntryFiltersSchema>
-export type BankReconciliationFilters = z.infer<typeof bankReconciliationFiltersSchema>
+export type BankReconciliationFilters = z.infer<
+  typeof bankReconciliationFiltersSchema
+>
 export type TaxFilters = z.infer<typeof taxFiltersSchema>

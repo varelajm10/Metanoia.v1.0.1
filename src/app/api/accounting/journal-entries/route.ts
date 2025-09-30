@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AccountingService } from '@/lib/services/accounting'
-import { journalEntrySchema, journalEntryFiltersSchema } from '@/lib/validations/accounting'
+import {
+  journalEntrySchema,
+  journalEntryFiltersSchema,
+} from '@/lib/validations/accounting'
 import { z } from 'zod'
 
 // GET /api/accounting/journal-entries - Obtener asientos contables
@@ -12,19 +15,29 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const filters = {
       search: searchParams.get('search') || '',
-      isPosted: searchParams.get('isPosted') ? searchParams.get('isPosted') === 'true' : undefined,
+      isPosted: searchParams.get('isPosted')
+        ? searchParams.get('isPosted') === 'true'
+        : undefined,
       startDate: searchParams.get('startDate') || '',
       endDate: searchParams.get('endDate') || '',
       accountId: searchParams.get('accountId') || '',
     }
 
     const validatedFilters = journalEntryFiltersSchema.parse(filters)
-    const result = await AccountingService.getJournalEntries(tenantId, validatedFilters, page, limit)
+    const result = await AccountingService.getJournalEntries(
+      tenantId,
+      validatedFilters,
+      page,
+      limit
+    )
 
     return NextResponse.json({
       entries: result.entries,
@@ -59,7 +72,10 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!userId) {
@@ -67,7 +83,11 @@ export async function POST(request: NextRequest) {
     }
 
     const validatedData = journalEntrySchema.parse(body)
-    const entry = await AccountingService.createJournalEntry(validatedData, tenantId, userId)
+    const entry = await AccountingService.createJournalEntry(
+      validatedData,
+      tenantId,
+      userId
+    )
 
     return NextResponse.json(entry, { status: 201 })
   } catch (error) {
@@ -79,10 +99,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error creating journal entry:', error)

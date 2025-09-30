@@ -13,16 +13,26 @@ const updateProductSchema = z.object({
   price: z.number().positive('El precio debe ser positivo').optional(),
   cost: z.number().positive('El costo debe ser positivo').optional(),
   stock: z.number().int().min(0, 'El stock no puede ser negativo').optional(),
-  minStock: z.number().int().min(0, 'El stock mínimo no puede ser negativo').optional(),
-  maxStock: z.number().int().positive('El stock máximo debe ser positivo').optional(),
+  minStock: z
+    .number()
+    .int()
+    .min(0, 'El stock mínimo no puede ser negativo')
+    .optional(),
+  maxStock: z
+    .number()
+    .int()
+    .positive('El stock máximo debe ser positivo')
+    .optional(),
   category: z.string().optional(),
   brand: z.string().optional(),
   weight: z.number().positive('El peso debe ser positivo').optional(),
-  dimensions: z.object({
-    length: z.number().positive(),
-    width: z.number().positive(),
-    height: z.number().positive(),
-  }).optional(),
+  dimensions: z
+    .object({
+      length: z.number().positive(),
+      width: z.number().positive(),
+      height: z.number().positive(),
+    })
+    .optional(),
   isActive: z.boolean().optional(),
   isDigital: z.boolean().optional(),
   tags: z.array(z.string()).optional(),
@@ -37,7 +47,10 @@ export async function GET(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const product = await prisma.product.findFirst({
@@ -90,7 +103,10 @@ export async function PUT(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const validatedData = updateProductSchema.parse(body)
@@ -121,15 +137,15 @@ export async function PUT(
       })
 
       if (skuExists) {
-        return NextResponse.json(
-          { error: 'El SKU ya existe' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'El SKU ya existe' }, { status: 400 })
       }
     }
 
     // Verificar si el código de barras ya existe (si se está cambiando)
-    if (validatedData.barcode && validatedData.barcode !== existingProduct.barcode) {
+    if (
+      validatedData.barcode &&
+      validatedData.barcode !== existingProduct.barcode
+    ) {
       const barcodeExists = await prisma.product.findFirst({
         where: {
           barcode: validatedData.barcode,
@@ -184,7 +200,10 @@ export async function DELETE(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     // Verificar si el producto existe
@@ -209,7 +228,10 @@ export async function DELETE(
 
     if (hasOrders) {
       return NextResponse.json(
-        { error: 'No se puede eliminar el producto porque tiene órdenes asociadas' },
+        {
+          error:
+            'No se puede eliminar el producto porque tiene órdenes asociadas',
+        },
         { status: 400 }
       )
     }

@@ -14,7 +14,13 @@ export interface ProductWithRelations extends Product {
   }
 }
 
-// Crear un nuevo producto
+/**
+ * Crea un nuevo producto en el sistema
+ * @param data - Datos del producto a crear
+ * @param tenantId - ID del tenant al que pertenece el producto
+ * @returns Promise<Product> - Producto creado
+ * @throws Error si el SKU ya existe en el tenant o si maxStock <= minStock
+ */
 export async function createProduct(
   data: CreateProductInput,
   tenantId: string
@@ -44,7 +50,12 @@ export async function createProduct(
   })
 }
 
-// Obtener producto por ID
+/**
+ * Obtiene un producto por su ID
+ * @param id - ID del producto
+ * @param tenantId - ID del tenant
+ * @returns Promise<ProductWithRelations | null> - Producto encontrado o null si no existe
+ */
 export async function getProductById(
   id: string,
   tenantId: string
@@ -64,7 +75,12 @@ export async function getProductById(
   })
 }
 
-// Obtener producto por SKU
+/**
+ * Obtiene un producto por su SKU
+ * @param sku - SKU del producto
+ * @param tenantId - ID del tenant
+ * @returns Promise<Product | null> - Producto encontrado o null si no existe
+ */
 export async function getProductBySku(
   sku: string,
   tenantId: string
@@ -77,7 +93,12 @@ export async function getProductBySku(
   })
 }
 
-// Obtener todos los productos con filtros y paginación
+/**
+ * Obtiene todos los productos con filtros y paginación
+ * @param query - Parámetros de consulta y filtros
+ * @param tenantId - ID del tenant
+ * @returns Promise con lista de productos y información de paginación
+ */
 export async function getProducts(
   query: ProductQuery,
   tenantId: string
@@ -177,7 +198,14 @@ export async function getProducts(
   }
 }
 
-// Actualizar producto
+/**
+ * Actualiza un producto existente
+ * @param id - ID del producto a actualizar
+ * @param data - Datos a actualizar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Product> - Producto actualizado
+ * @throws Error si el producto no existe o el SKU ya existe en otro producto
+ */
 export async function updateProduct(
   id: string,
   data: UpdateProductInput,
@@ -221,7 +249,13 @@ export async function updateProduct(
   })
 }
 
-// Eliminar producto
+/**
+ * Elimina un producto del sistema
+ * @param id - ID del producto a eliminar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Product> - Producto eliminado
+ * @throws Error si el producto no existe o tiene órdenes asociadas
+ */
 export async function deleteProduct(
   id: string,
   tenantId: string
@@ -257,7 +291,14 @@ export async function deleteProduct(
   })
 }
 
-// Activar/desactivar producto
+/**
+ * Activa o desactiva un producto
+ * @param id - ID del producto
+ * @param tenantId - ID del tenant
+ * @param isActive - Estado de activación
+ * @returns Promise<Product> - Producto actualizado
+ * @throws Error si el producto no existe
+ */
 export async function toggleProductStatus(
   id: string,
   tenantId: string,
@@ -281,7 +322,14 @@ export async function toggleProductStatus(
   })
 }
 
-// Actualizar stock de producto
+/**
+ * Actualiza el stock de un producto
+ * @param id - ID del producto
+ * @param stockUpdate - Datos de actualización de stock
+ * @param tenantId - ID del tenant
+ * @returns Promise<Product> - Producto actualizado
+ * @throws Error si el producto no existe o no hay suficiente stock
+ */
 export async function updateProductStock(
   id: string,
   stockUpdate: UpdateStockInput,
@@ -324,13 +372,17 @@ export async function updateProductStock(
     data: { stock: newStock },
   })
 
-  // TODO: Aquí podrías crear un registro de movimiento de stock
   // await createStockMovement(id, stockUpdate, existingProduct.stock, newStock, tenantId)
 
   return updatedProduct
 }
 
-// Obtener productos con stock bajo
+/**
+ * Obtiene productos con stock bajo
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 50)
+ * @returns Promise<Product[]> - Lista de productos con stock bajo
+ */
 export async function getLowStockProducts(
   tenantId: string,
   limit: number = 50
@@ -351,7 +403,11 @@ export async function getLowStockProducts(
   })
 }
 
-// Obtener estadísticas de stock
+/**
+ * Obtiene estadísticas de stock del inventario
+ * @param tenantId - ID del tenant
+ * @returns Promise con estadísticas detalladas del stock
+ */
 export async function getStockStats(tenantId: string) {
   const [
     totalProducts,
@@ -413,7 +469,13 @@ export async function getStockStats(tenantId: string) {
   }
 }
 
-// Buscar productos por nombre o SKU (para autocompletado)
+/**
+ * Busca productos por nombre o SKU para autocompletado
+ * @param query - Término de búsqueda
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 10)
+ * @returns Promise<Product[]> - Lista de productos encontrados
+ */
 export async function searchProducts(
   query: string,
   tenantId: string,
@@ -439,7 +501,11 @@ export async function searchProducts(
   })
 }
 
-// Obtener categorías únicas
+/**
+ * Obtiene todas las categorías únicas de productos
+ * @param tenantId - ID del tenant
+ * @returns Promise<string[]> - Lista de categorías únicas
+ */
 export async function getProductCategories(
   tenantId: string
 ): Promise<string[]> {
@@ -459,7 +525,11 @@ export async function getProductCategories(
     .sort()
 }
 
-// Obtener marcas únicas
+/**
+ * Obtiene todas las marcas únicas de productos
+ * @param tenantId - ID del tenant
+ * @returns Promise<string[]> - Lista de marcas únicas
+ */
 export async function getProductBrands(tenantId: string): Promise<string[]> {
   const brands = await prisma.product.findMany({
     where: {

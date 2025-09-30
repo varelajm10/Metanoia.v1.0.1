@@ -9,16 +9,19 @@ Este sistema de commit automático mantiene tu código respaldado constantemente
 ### Iniciar Commit Automático
 
 #### En Windows:
+
 ```bash
 scripts/start-auto-commit.bat
 ```
 
 #### En Linux/Mac:
+
 ```bash
 bash scripts/start-auto-commit.sh
 ```
 
 #### Con Node.js (recomendado):
+
 ```bash
 node scripts/auto-commit.js
 ```
@@ -58,18 +61,21 @@ Los logs se guardan en `scripts/auto-commit.log` con información detallada:
 ## 🔧 Solución de Problemas
 
 ### Error: "Git no configurado"
+
 ```bash
 git config --global user.name "Tu Nombre"
 git config --global user.email "tu-email@ejemplo.com"
 ```
 
 ### Error: "No hay repositorio Git"
+
 ```bash
 git init
 git remote add origin https://github.com/tu-usuario/Metanoia.v1.0.1.git
 ```
 
 ### Error: "Push falló"
+
 - Verifica tu conexión a internet
 - Asegúrate de tener permisos de escritura en el repositorio
 - El commit se guarda localmente y se sincronizará en el próximo push exitoso

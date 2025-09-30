@@ -9,16 +9,22 @@ const supplierSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Email inválido').optional(),
   phone: z.string().optional(),
-  address: z.object({
-    street: z.string(),
-    city: z.string(),
-    state: z.string(),
-    zipCode: z.string(),
-    country: z.string(),
-  }).optional(),
+  address: z
+    .object({
+      street: z.string(),
+      city: z.string(),
+      state: z.string(),
+      zipCode: z.string(),
+      country: z.string(),
+    })
+    .optional(),
   contactName: z.string().optional(),
   taxId: z.string().optional(),
-  paymentTerms: z.number().int().min(0, 'Los términos de pago no pueden ser negativos').optional(),
+  paymentTerms: z
+    .number()
+    .int()
+    .min(0, 'Los términos de pago no pueden ser negativos')
+    .optional(),
   isActive: z.boolean().default(true),
   notes: z.string().optional(),
 })
@@ -34,7 +40,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const where: any = {
@@ -102,7 +111,10 @@ export async function POST(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const validatedData = supplierSchema.parse(body)

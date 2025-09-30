@@ -7,7 +7,8 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
-    const academicYear = searchParams.get('academicYear') || new Date().getFullYear().toString()
+    const academicYear =
+      searchParams.get('academicYear') || new Date().getFullYear().toString()
     const gradeLevelId = searchParams.get('gradeLevelId') || undefined
 
     const sections = await SchoolAcademicService.getSections(tenantId, {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating section:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

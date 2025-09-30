@@ -357,49 +357,42 @@ export class SchoolOtherService {
       },
     }
 
-    const [
-      total,
-      open,
-      resolved,
-      byType,
-      bySeverity,
-      byStatus,
-      topStudents,
-    ] = await Promise.all([
-      prisma.schoolDisciplinary.count({ where }),
-      prisma.schoolDisciplinary.count({
-        where: { ...where, status: { in: ['OPEN', 'IN_REVIEW'] } },
-      }),
-      prisma.schoolDisciplinary.count({
-        where: { ...where, status: { in: ['RESOLVED', 'CLOSED'] } },
-      }),
-      prisma.schoolDisciplinary.groupBy({
-        by: ['incidentType'],
-        where,
-        _count: true,
-      }),
-      prisma.schoolDisciplinary.groupBy({
-        by: ['severity'],
-        where,
-        _count: true,
-      }),
-      prisma.schoolDisciplinary.groupBy({
-        by: ['status'],
-        where,
-        _count: true,
-      }),
-      prisma.schoolDisciplinary.groupBy({
-        by: ['studentId'],
-        where,
-        _count: true,
-        orderBy: {
-          _count: {
-            studentId: 'desc',
+    const [total, open, resolved, byType, bySeverity, byStatus, topStudents] =
+      await Promise.all([
+        prisma.schoolDisciplinary.count({ where }),
+        prisma.schoolDisciplinary.count({
+          where: { ...where, status: { in: ['OPEN', 'IN_REVIEW'] } },
+        }),
+        prisma.schoolDisciplinary.count({
+          where: { ...where, status: { in: ['RESOLVED', 'CLOSED'] } },
+        }),
+        prisma.schoolDisciplinary.groupBy({
+          by: ['incidentType'],
+          where,
+          _count: true,
+        }),
+        prisma.schoolDisciplinary.groupBy({
+          by: ['severity'],
+          where,
+          _count: true,
+        }),
+        prisma.schoolDisciplinary.groupBy({
+          by: ['status'],
+          where,
+          _count: true,
+        }),
+        prisma.schoolDisciplinary.groupBy({
+          by: ['studentId'],
+          where,
+          _count: true,
+          orderBy: {
+            _count: {
+              studentId: 'desc',
+            },
           },
-        },
-        take: 10,
-      }),
-    ])
+          take: 10,
+        }),
+      ])
 
     return {
       total,

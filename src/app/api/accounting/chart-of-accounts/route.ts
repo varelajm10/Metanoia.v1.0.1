@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 import { z } from 'zod'
 import { AccountingService } from '@/lib/services/accounting'
-import { chartOfAccountsSchema, chartOfAccountsFiltersSchema } from '@/lib/validations/accounting'
+import {
+  chartOfAccountsSchema,
+  chartOfAccountsFiltersSchema,
+} from '@/lib/validations/accounting'
 
 const prisma = new PrismaClient()
 
@@ -15,18 +18,28 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const filters = {
       search: searchParams.get('search') || '',
       type: searchParams.get('type') || '',
-      isActive: searchParams.get('isActive') ? searchParams.get('isActive') === 'true' : undefined,
+      isActive: searchParams.get('isActive')
+        ? searchParams.get('isActive') === 'true'
+        : undefined,
       parentId: searchParams.get('parentId') || '',
     }
 
     const validatedFilters = chartOfAccountsFiltersSchema.parse(filters)
-    const result = await AccountingService.getChartOfAccounts(tenantId, validatedFilters, page, limit)
+    const result = await AccountingService.getChartOfAccounts(
+      tenantId,
+      validatedFilters,
+      page,
+      limit
+    )
 
     return NextResponse.json({
       accounts: result.accounts,
@@ -60,11 +73,17 @@ export async function POST(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const validatedData = chartOfAccountsSchema.parse(body)
-    const account = await AccountingService.createAccount(validatedData, tenantId)
+    const account = await AccountingService.createAccount(
+      validatedData,
+      tenantId
+    )
 
     return NextResponse.json(account, { status: 201 })
   } catch (error) {
@@ -76,10 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error creating account:', error)

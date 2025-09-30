@@ -15,7 +15,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const where: any = {
@@ -81,11 +84,17 @@ export async function POST(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!alertId) {
-      return NextResponse.json({ error: 'ID de alerta requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'ID de alerta requerido' },
+        { status: 400 }
+      )
     }
 
     const alert = await prisma.inventoryAlert.findFirst({

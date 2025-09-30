@@ -143,9 +143,7 @@ export default function SalesDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalSales || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Ventas realizadas
-            </p>
+            <p className="text-xs text-muted-foreground">Ventas realizadas</p>
           </CardContent>
         </Card>
 
@@ -155,7 +153,9 @@ export default function SalesDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalSalespeople || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalSalespeople || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.activeSalespeople || 0} activos
             </p>
@@ -168,7 +168,9 @@ export default function SalesDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalCommissions || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalCommissions || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.pendingCommissions || 0} pendientes
             </p>
@@ -200,7 +202,10 @@ export default function SalesDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Activa
                 </Badge>
               </div>
@@ -215,7 +220,10 @@ export default function SalesDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Total
                 </Badge>
               </div>
@@ -251,7 +259,10 @@ export default function SalesDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Completada
                 </Badge>
               </div>
@@ -266,7 +277,10 @@ export default function SalesDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-blue-600 border-blue-200">
+                <Badge
+                  variant="outline"
+                  className="border-blue-200 text-blue-600"
+                >
                   Pipeline
                 </Badge>
               </div>
@@ -288,9 +302,7 @@ export default function SalesDashboard() {
               <Users className="mr-2 h-5 w-5" />
               Vendedores
             </CardTitle>
-            <CardDescription>
-              Gestión del equipo de ventas
-            </CardDescription>
+            <CardDescription>Gestión del equipo de ventas</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -298,10 +310,14 @@ export default function SalesDashboard() {
                 <div className="flex-1">
                   <p className="font-medium">Vendedores Activos</p>
                   <p className="text-sm text-muted-foreground">
-                    {stats?.activeSalespeople || 0} de {stats?.totalSalespeople || 0} vendedores
+                    {stats?.activeSalespeople || 0} de{' '}
+                    {stats?.totalSalespeople || 0} vendedores
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activo
                 </Badge>
               </div>
@@ -320,9 +336,7 @@ export default function SalesDashboard() {
               <DollarSign className="mr-2 h-5 w-5" />
               Comisiones
             </CardTitle>
-            <CardDescription>
-              Control de comisiones y pagos
-            </CardDescription>
+            <CardDescription>Control de comisiones y pagos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -336,7 +350,10 @@ export default function SalesDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Pendiente
                 </Badge>
               </div>
@@ -348,9 +365,7 @@ export default function SalesDashboard() {
                     {stats?.totalCommissions || 0} comisiones registradas
                   </p>
                 </div>
-                <Badge variant="outline">
-                  Total
-                </Badge>
+                <Badge variant="outline">Total</Badge>
               </div>
 
               <Button variant="outline" size="sm" className="w-full">
@@ -383,7 +398,10 @@ export default function SalesDashboard() {
                     {stats?.activeDiscounts || 0} promociones activas
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activo
                 </Badge>
               </div>
@@ -395,9 +413,7 @@ export default function SalesDashboard() {
                     {stats?.totalDiscounts || 0} descuentos creados
                   </p>
                 </div>
-                <Badge variant="outline">
-                  Total
-                </Badge>
+                <Badge variant="outline">Total</Badge>
               </div>
             </div>
 

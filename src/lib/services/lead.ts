@@ -4,6 +4,12 @@ import { CreateLeadInput, UpdateLeadInput } from '@/lib/validations/crm'
 const prisma = new PrismaClient()
 
 export class LeadService {
+  /**
+   * Crea un nuevo lead en el sistema
+   * @param data - Datos del lead a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con el lead creado y sus relaciones
+   */
   static async createLead(data: CreateLeadInput, tenantId: string) {
     return await prisma.lead.create({
       data: {
@@ -24,6 +30,12 @@ export class LeadService {
     })
   }
 
+  /**
+   * Obtiene leads con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @returns Promise con lista de leads y información de paginación
+   */
   static async getLeads(
     tenantId: string,
     options: {
@@ -102,6 +114,12 @@ export class LeadService {
     }
   }
 
+  /**
+   * Obtiene un lead por su ID
+   * @param id - ID del lead
+   * @param tenantId - ID del tenant
+   * @returns Promise con el lead y sus relaciones
+   */
   static async getLeadById(id: string, tenantId: string) {
     return await prisma.lead.findFirst({
       where: { id, tenantId },
@@ -116,6 +134,13 @@ export class LeadService {
     })
   }
 
+  /**
+   * Actualiza un lead existente
+   * @param id - ID del lead a actualizar
+   * @param data - Datos a actualizar
+   * @param tenantId - ID del tenant
+   * @returns Promise con el lead actualizado
+   */
   static async updateLead(id: string, data: UpdateLeadInput, tenantId: string) {
     return await prisma.lead.update({
       where: { id, tenantId },
@@ -138,12 +163,23 @@ export class LeadService {
     })
   }
 
+  /**
+   * Elimina un lead del sistema
+   * @param id - ID del lead a eliminar
+   * @param tenantId - ID del tenant
+   * @returns Promise con el lead eliminado
+   */
   static async deleteLead(id: string, tenantId: string) {
     return await prisma.lead.delete({
       where: { id, tenantId },
     })
   }
 
+  /**
+   * Obtiene estadísticas de leads
+   * @param tenantId - ID del tenant
+   * @returns Promise con estadísticas completas de leads
+   */
   static async getLeadStats(tenantId: string) {
     const [
       totalLeads,
@@ -216,6 +252,13 @@ export class LeadService {
     }
   }
 
+  /**
+   * Actualiza el score de un lead basado en varios factores
+   * @param id - ID del lead
+   * @param tenantId - ID del tenant
+   * @returns Promise con el lead actualizado
+   * @throws Error si el lead no existe
+   */
   static async updateLeadScore(id: string, tenantId: string) {
     const lead = await prisma.lead.findFirst({
       where: { id, tenantId },

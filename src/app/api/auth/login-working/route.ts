@@ -7,22 +7,18 @@ const prisma = new PrismaClient()
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [WORKING] Iniciando login...')
 
     const body = await request.json()
-    console.log('📧 [WORKING] Datos recibidos:', { email: body.email })
 
     const { email, password } = body
 
     if (!email || !password) {
-      console.log('❌ [WORKING] Email o contraseña faltantes')
       return NextResponse.json(
         { error: 'Email y contraseña son requeridos' },
         { status: 400 }
       )
     }
 
-    console.log('🔍 [WORKING] Buscando usuario...')
 
     // Buscar usuario usando query directo
     const user = await prisma.user.findFirst({
@@ -33,31 +29,25 @@ export async function POST(request: NextRequest) {
     })
 
     if (!user) {
-      console.log('❌ [WORKING] Usuario no encontrado o inactivo')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }
       )
     }
 
-    console.log('✅ [WORKING] Usuario encontrado:', user.email)
 
-    console.log('🔐 [WORKING] Verificando contraseña...')
 
     // Verificar contraseña
     const isValidPassword = await bcrypt.compare(password, user.password)
     if (!isValidPassword) {
-      console.log('❌ [WORKING] Contraseña incorrecta')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }
       )
     }
 
-    console.log('✅ [WORKING] Contraseña correcta')
 
     // Generar tokens
-    console.log('🎫 [WORKING] Generando tokens...')
 
     const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key'
 
@@ -81,10 +71,8 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     )
 
-    console.log('✅ [WORKING] Tokens generados')
 
     // Crear sesión
-    console.log('💾 [WORKING] Creando sesión...')
 
     try {
       await prisma.session.create({
@@ -94,9 +82,7 @@ export async function POST(request: NextRequest) {
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 días
         },
       })
-      console.log('✅ [WORKING] Sesión creada')
     } catch (sessionError) {
-      console.log('❌ [WORKING] Error creando sesión:', sessionError)
       // Continuar sin la sesión por ahora
     }
 
@@ -114,7 +100,6 @@ export async function POST(request: NextRequest) {
       refreshToken,
     }
 
-    console.log('🎉 [WORKING] Login exitoso para:', user.email)
 
     // Crear respuesta con cookies
     const response = NextResponse.json(authResponse)
@@ -136,7 +121,6 @@ export async function POST(request: NextRequest) {
       path: '/',
     })
 
-    console.log('✅ [WORKING] Respuesta preparada')
     return response
   } catch (error) {
     console.error('❌ [WORKING] Error en login:', error)

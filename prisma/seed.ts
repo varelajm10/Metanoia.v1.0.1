@@ -1,35 +1,91 @@
-import {
-  PrismaClient,
-  UserRole,
-  OrderStatus,
-  InvoiceStatus,
-} from '@prisma/client'
+// prisma/seed.ts
+
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Iniciando seed de la base de datos...')
+  console.log('🌱 Empezando el proceso de seeding...')
 
-  // Crear tenant principal
-  const tenant = await prisma.tenant.upsert({
-    where: { slug: 'metanoia-demo' },
-    update: {},
-    create: {
-      name: 'Metanoia Demo',
-      slug: 'metanoia-demo',
-      domain: 'demo.metanoia.click',
+  // 1. Limpiar la base de datos de registros antiguos
+  // La eliminación se hace en orden inverso a la creación para evitar errores de constraints
+  console.log('🧹 Borrando datos antiguos de usuarios y tenants...')
+  await prisma.user.deleteMany({})
+  await prisma.tenant.deleteMany({})
+  console.log('✅ Datos antiguos eliminados.')
+
+  // 2. Crear un Tenant especial para el SUPER_ADMIN
+  console.log('🏢 Creando Tenant para SUPER_ADMIN...')
+  const superAdminTenant = await prisma.tenant.create({
+    data: {
+      name: 'Metanoia Admin',
+      slug: 'metanoia-admin',
+      domain: 'admin.metanoia.click',
       isActive: true,
-      email: 'demo@metanoia.click',
-      phone: '+1-555-0123',
-      address: '123 Demo Street',
-      city: 'Demo City',
-      country: 'USA',
+      email: 'mentanoiaclick@gmail.com',
+      phone: '+1-555-0000',
+      address: 'Admin Headquarters',
+      city: 'Admin City',
+      country: 'Global',
       timezone: 'UTC',
       currency: 'USD',
-      contactName: 'Demo Contact',
-      contactEmail: 'demo@metanoia.click',
-      contactPhone: '+1-555-0123',
+      contactName: 'Super Admin',
+      contactEmail: 'mentanoiaclick@gmail.com',
+      contactPhone: '+1-555-0000',
+      subscriptionPlan: 'ENTERPRISE',
+      subscriptionStartDate: new Date(),
+      subscriptionEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+      maxUsers: 999,
+      maxServers: 999,
+      maxStorageGB: 9999,
+      settings: {
+        currency: 'USD',
+        timezone: 'UTC',
+        features: ['super-admin', 'tenant-management'],
+      },
+    },
+  })
+  console.log(`✅ Tenant de SUPER_ADMIN creado: "${superAdminTenant.name}"`)
+
+  // 3. Crear el usuario SUPER_ADMIN
+  console.log('👤 Creando usuario SUPER_ADMIN...')
+  const superAdminEmail = 'mentanoiaclick@gmail.com'
+  const superAdminPassword = 'Tool2225-'
+
+  const hashedPassword = await bcrypt.hash(superAdminPassword, 10)
+
+  const superAdmin = await prisma.user.create({
+    data: {
+      email: superAdminEmail,
+      firstName: 'Super',
+      lastName: 'Admin',
+      password: hashedPassword,
+      role: 'SUPER_ADMIN',
+      isActive: true,
+      tenantId: superAdminTenant.id,
+    },
+  })
+  console.log(`✅ SUPER_ADMIN creado con email: ${superAdmin.email}`)
+
+  // 4. Crear un Tenant de prueba
+  console.log('🏢 Creando un Tenant de prueba...')
+  const testTenant = await prisma.tenant.create({
+    data: {
+      name: 'Empresa de Prueba',
+      slug: 'empresa-de-prueba',
+      domain: 'empresa-de-prueba.metanoia.click',
+      isActive: true,
+      email: 'contacto@empresa-de-prueba.com',
+      phone: '+1-555-1234',
+      address: '123 Calle de Prueba',
+      city: 'Ciudad de Prueba',
+      country: 'México',
+      timezone: 'America/Mexico_City',
+      currency: 'MXN',
+      contactName: 'Contacto de Prueba',
+      contactEmail: 'contacto@empresa-de-prueba.com',
+      contactPhone: '+1-555-1234',
       subscriptionPlan: 'BASIC',
       subscriptionStartDate: new Date(),
       subscriptionEndDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
@@ -37,246 +93,20 @@ async function main() {
       maxServers: 5,
       maxStorageGB: 100,
       settings: {
-        currency: 'USD',
+        currency: 'MXN',
         timezone: 'America/Mexico_City',
-        features: ['crm', 'inventory', 'accounting'],
+        features: ['crm', 'inventory'],
       },
-    },
+    }
   })
+  console.log(`✅ Tenant de prueba creado: "${testTenant.name}"`)
 
-  console.log('✅ Tenant creado:', tenant.name)
-
-  // Crear usuario super administrador
-  const superAdminPassword = await bcrypt.hash('admin1234', 12)
-
-  const superAdminUser = await prisma.user.upsert({
-    where: {
-      email_tenantId: {
-        email: 'metanoia@gmail.com',
-        tenantId: tenant.id,
-      },
-    },
-    update: {},
-    create: {
-      email: 'metanoia@gmail.com',
-      password: superAdminPassword,
-      firstName: 'Super',
-      lastName: 'Admin',
-      role: UserRole.SUPER_ADMIN,
-      isActive: true,
-      tenantId: tenant.id,
-    },
-  })
-
-  console.log('✅ Usuario super administrador creado:', superAdminUser.email)
-
-  // Crear usuario administrador
-  const hashedPassword = await bcrypt.hash('admin123', 12)
-
-  const adminUser = await prisma.user.upsert({
-    where: {
-      email_tenantId: {
-        email: 'admin@metanoia.click',
-        tenantId: tenant.id,
-      },
-    },
-    update: {},
-    create: {
-      email: 'admin@metanoia.click',
-      password: hashedPassword,
-      firstName: 'Admin',
-      lastName: 'Sistema',
-      role: UserRole.ADMIN,
-      isActive: true,
-      tenantId: tenant.id,
-    },
-  })
-
-  console.log('✅ Usuario administrador creado:', adminUser.email)
-
-  // Crear cliente de ejemplo
-  const customer = await prisma.customer.create({
-    data: {
-      name: 'Cliente Demo',
-      email: 'cliente@demo.com',
-      phone: '+52 55 1234 5678',
-      address: {
-        street: 'Av. Reforma 123',
-        city: 'Ciudad de México',
-        state: 'CDMX',
-        zipCode: '06000',
-        country: 'México',
-      },
-      isActive: true,
-      tenantId: tenant.id,
-    },
-  })
-
-  console.log('✅ Cliente creado:', customer.name)
-
-  // Crear productos de ejemplo
-  const products = [
-    {
-      name: 'Producto A',
-      description: 'Descripción del producto A',
-      sku: 'PROD-A-001',
-      price: 100.0,
-      cost: 60.0,
-      stock: 50,
-    },
-    {
-      name: 'Producto B',
-      description: 'Descripción del producto B',
-      sku: 'PROD-B-002',
-      price: 150.0,
-      cost: 90.0,
-      stock: 30,
-    },
-    {
-      name: 'Producto C',
-      description: 'Descripción del producto C',
-      sku: 'PROD-C-003',
-      price: 200.0,
-      cost: 120.0,
-      stock: 20,
-    },
-  ]
-
-  const createdProducts = []
-  for (const productData of products) {
-    const product = await prisma.product.upsert({
-      where: {
-        sku_tenantId: {
-          sku: productData.sku,
-          tenantId: tenant.id,
-        },
-      },
-      update: {
-        ...productData,
-        tenantId: tenant.id,
-      },
-      create: {
-        ...productData,
-        tenantId: tenant.id,
-      },
-    })
-    createdProducts.push(product)
-    console.log('✅ Producto creado/actualizado:', product.name)
-  }
-
-  // Crear orden de ejemplo
-  const order = await prisma.order.upsert({
-    where: {
-      orderNumber_tenantId: {
-        orderNumber: 'ORD-001',
-        tenantId: tenant.id,
-      },
-    },
-    update: {
-      status: OrderStatus.PENDING,
-      subtotal: 350.0,
-      taxRate: 16.0,
-      taxAmount: 56.0,
-      discountAmount: 0.0,
-      total: 406.0,
-      paymentMethod: 'CASH',
-      paymentStatus: 'PENDING',
-      notes: 'Orden de ejemplo para demostración',
-      tenantId: tenant.id,
-      customerId: customer.id,
-      userId: adminUser.id,
-    },
-    create: {
-      orderNumber: 'ORD-001',
-      status: OrderStatus.PENDING,
-      subtotal: 350.0,
-      taxRate: 16.0,
-      taxAmount: 56.0,
-      discountAmount: 0.0,
-      total: 406.0,
-      paymentMethod: 'CASH',
-      paymentStatus: 'PENDING',
-      notes: 'Orden de ejemplo para demostración',
-      tenantId: tenant.id,
-      customerId: customer.id,
-      userId: adminUser.id,
-    },
-  })
-
-  console.log('✅ Orden creada:', order.orderNumber)
-
-  // Crear items de la orden
-  const orderItems = [
-    {
-      quantity: 2,
-      unitPrice: 100.0,
-      discount: 0.0,
-      total: 200.0,
-      productId: createdProducts[0].id,
-    },
-    {
-      quantity: 1,
-      unitPrice: 150.0,
-      discount: 0.0,
-      total: 150.0,
-      productId: createdProducts[1].id,
-    },
-  ]
-
-  for (const itemData of orderItems) {
-    await prisma.orderItem.create({
-      data: {
-        ...itemData,
-        orderId: order.id,
-      },
-    })
-  }
-
-  console.log('✅ Items de orden creados')
-
-  // Crear factura de ejemplo
-  const invoice = await prisma.invoice.upsert({
-    where: {
-      invoiceNumber_tenantId: {
-        invoiceNumber: 'INV-001',
-        tenantId: tenant.id,
-      },
-    },
-    update: {
-      status: InvoiceStatus.DRAFT,
-      subtotal: 350.0,
-      tax: 56.0,
-      total: 406.0,
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
-      notes: 'Factura de ejemplo para demostración',
-      tenantId: tenant.id,
-      customerId: customer.id,
-      userId: adminUser.id,
-      orderId: order.id,
-    },
-    create: {
-      invoiceNumber: 'INV-001',
-      status: InvoiceStatus.DRAFT,
-      subtotal: 350.0,
-      tax: 56.0,
-      total: 406.0,
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
-      notes: 'Factura de ejemplo para demostración',
-      tenantId: tenant.id,
-      customerId: customer.id,
-      userId: adminUser.id,
-      orderId: order.id,
-    },
-  })
-
-  console.log('✅ Factura creada:', invoice.invoiceNumber)
-
-  console.log('🎉 Seed completado exitosamente!')
+  console.log('🎉 Seeding completado exitosamente!')
 }
 
 main()
-  .catch(e => {
-    console.error('❌ Error durante el seed:', e)
+  .catch((e) => {
+    console.error('❌ Error durante el seeding:', e)
     process.exit(1)
   })
   .finally(async () => {

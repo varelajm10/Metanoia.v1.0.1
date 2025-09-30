@@ -160,7 +160,6 @@ export default function PhotoUpload({
 
   const updatePhoto = (photoId: string, updates: Partial<Photo>) => {
     // This would typically update the photo in the parent component
-    console.log('Updating photo:', photoId, updates)
   }
 
   const downloadPhoto = (photo: Photo) => {

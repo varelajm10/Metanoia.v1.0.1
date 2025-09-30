@@ -134,9 +134,7 @@ export class SchoolAcademicService {
     })
   }
 
-  static async createSection(
-    data: SchoolSectionInput & { tenantId: string }
-  ) {
+  static async createSection(data: SchoolSectionInput & { tenantId: string }) {
     return prisma.schoolSection.create({
       data: {
         ...data,
@@ -245,9 +243,7 @@ export class SchoolAcademicService {
     })
   }
 
-  static async createSubject(
-    data: SchoolSubjectInput & { tenantId: string }
-  ) {
+  static async createSubject(data: SchoolSubjectInput & { tenantId: string }) {
     return prisma.schoolSubject.create({
       data: {
         ...data,
@@ -407,8 +403,14 @@ export class SchoolAcademicService {
       status?: string
     } = {}
   ) {
-    const { page = 1, limit = 50, academicYear, studentId, sectionId, status } =
-      options
+    const {
+      page = 1,
+      limit = 50,
+      academicYear,
+      studentId,
+      sectionId,
+      status,
+    } = options
     const skip = (page - 1) * limit
 
     const where: any = { tenantId }
@@ -525,8 +527,14 @@ export class SchoolAcademicService {
       term?: string
     } = {}
   ) {
-    const { page = 1, limit = 100, studentId, subjectId, academicYear, term } =
-      options
+    const {
+      page = 1,
+      limit = 100,
+      studentId,
+      subjectId,
+      academicYear,
+      term,
+    } = options
     const skip = (page - 1) * limit
 
     const where: any = { tenantId }

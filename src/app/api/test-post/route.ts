@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [TEST-POST] API POST de prueba...')
 
     const body = await request.json()
-    console.log('📧 [TEST-POST] Datos recibidos:', body)
 
     return NextResponse.json({
       message: 'API POST de prueba funcionando correctamente',

@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     // Estadísticas generales
@@ -32,25 +35,25 @@ export async function GET(request: NextRequest) {
       prisma.purchaseOrder.count({ where: { tenantId } }),
       prisma.purchaseOrder.count({ where: { tenantId, status: 'PENDING' } }),
       prisma.stockMovement.count({ where: { tenantId } }),
-      prisma.product.count({ 
-        where: { 
-          tenantId, 
+      prisma.product.count({
+        where: {
+          tenantId,
           isActive: true,
           stock: { lte: prisma.product.fields.minStock },
-        } 
+        },
       }),
-      prisma.product.count({ 
-        where: { 
-          tenantId, 
+      prisma.product.count({
+        where: {
+          tenantId,
           isActive: true,
           stock: 0,
-        } 
+        },
       }),
-      prisma.inventoryAlert.count({ 
-        where: { 
-          tenantId, 
-          isActive: true 
-        } 
+      prisma.inventoryAlert.count({
+        where: {
+          tenantId,
+          isActive: true,
+        },
       }),
     ])
 

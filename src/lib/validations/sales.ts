@@ -8,17 +8,27 @@ export const quoteSchema = z.object({
   validUntil: z.string().datetime('Fecha de vencimiento inválida'),
   notes: z.string().optional(),
   terms: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    discount: z.number().min(0).max(100, 'El descuento debe estar entre 0 y 100').default(0),
-    notes: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        discount: z
+          .number()
+          .min(0)
+          .max(100, 'El descuento debe estar entre 0 y 100')
+          .default(0),
+        notes: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 export const updateQuoteSchema = z.object({
-  status: z.enum(['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'CONVERTED']).optional(),
+  status: z
+    .enum(['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'CONVERTED'])
+    .optional(),
   validUntil: z.string().datetime().optional(),
   notes: z.string().optional(),
   terms: z.string().optional(),
@@ -29,7 +39,11 @@ export const salespersonSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   email: z.string().email('Email inválido'),
   phone: z.string().optional(),
-  commission: z.number().min(0).max(100, 'La comisión debe estar entre 0 y 100').default(0),
+  commission: z
+    .number()
+    .min(0)
+    .max(100, 'La comisión debe estar entre 0 y 100')
+    .default(0),
   isActive: z.boolean().default(true),
 })
 
@@ -41,13 +55,21 @@ export const saleSchema = z.object({
   salespersonId: z.string().min(1, 'El vendedor es requerido'),
   date: z.string().datetime('Fecha inválida'),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    discount: z.number().min(0).max(100, 'El descuento debe estar entre 0 y 100').default(0),
-    notes: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        discount: z
+          .number()
+          .min(0)
+          .max(100, 'El descuento debe estar entre 0 y 100')
+          .default(0),
+        notes: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 export const updateSaleSchema = z.object({
@@ -78,13 +100,27 @@ export const discountSchema = z.object({
     errorMap: () => ({ message: 'Tipo de descuento inválido' }),
   }),
   value: z.number().positive('El valor debe ser positivo'),
-  percentage: z.number().min(0).max(100, 'El porcentaje debe estar entre 0 y 100').optional(),
-  minAmount: z.number().positive('El monto mínimo debe ser positivo').optional(),
-  maxAmount: z.number().positive('El monto máximo debe ser positivo').optional(),
+  percentage: z
+    .number()
+    .min(0)
+    .max(100, 'El porcentaje debe estar entre 0 y 100')
+    .optional(),
+  minAmount: z
+    .number()
+    .positive('El monto mínimo debe ser positivo')
+    .optional(),
+  maxAmount: z
+    .number()
+    .positive('El monto máximo debe ser positivo')
+    .optional(),
   startDate: z.string().datetime('Fecha de inicio inválida'),
   endDate: z.string().datetime('Fecha de fin inválida').optional(),
   isActive: z.boolean().default(true),
-  usageLimit: z.number().int().positive('El límite de uso debe ser positivo').optional(),
+  usageLimit: z
+    .number()
+    .int()
+    .positive('El límite de uso debe ser positivo')
+    .optional(),
   description: z.string().optional(),
 })
 
@@ -93,7 +129,9 @@ export const updateDiscountSchema = discountSchema.partial()
 // Filtros para cotizaciones
 export const quoteFiltersSchema = z.object({
   search: z.string().optional(),
-  status: z.enum(['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'CONVERTED']).optional(),
+  status: z
+    .enum(['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED', 'CONVERTED'])
+    .optional(),
   customerId: z.string().optional(),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),

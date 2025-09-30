@@ -5,9 +5,12 @@ import { z } from 'zod'
 // Método de pago
 export const paymentMethodSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
-  type: z.enum(['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER'], {
-    errorMap: () => ({ message: 'Tipo de pago inválido' }),
-  }),
+  type: z.enum(
+    ['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER'],
+    {
+      errorMap: () => ({ message: 'Tipo de pago inválido' }),
+    }
+  ),
   isActive: z.boolean().default(true),
   description: z.string().optional(),
   fees: z.number().min(0, 'Las comisiones no pueden ser negativas').default(0),
@@ -38,12 +41,16 @@ export const creditNoteSchema = z.object({
   reason: z.string().min(1, 'La razón es requerida'),
   date: z.string().datetime('Fecha inválida'),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    reason: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        reason: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 export const updateCreditNoteSchema = z.object({
@@ -58,12 +65,16 @@ export const debitNoteSchema = z.object({
   reason: z.string().min(1, 'La razón es requerida'),
   date: z.string().datetime('Fecha inválida'),
   notes: z.string().optional(),
-  items: z.array(z.object({
-    productId: z.string().min(1, 'El producto es requerido'),
-    quantity: z.number().int().positive('La cantidad debe ser positiva'),
-    unitPrice: z.number().positive('El precio unitario debe ser positivo'),
-    reason: z.string().optional(),
-  })).min(1, 'Debe incluir al menos un producto'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1, 'El producto es requerido'),
+        quantity: z.number().int().positive('La cantidad debe ser positiva'),
+        unitPrice: z.number().positive('El precio unitario debe ser positivo'),
+        reason: z.string().optional(),
+      })
+    )
+    .min(1, 'Debe incluir al menos un producto'),
 })
 
 export const updateDebitNoteSchema = z.object({
@@ -99,7 +110,16 @@ export const updateTaxConfigurationSchema = taxConfigurationSchema.partial()
 // Filtros para métodos de pago
 export const paymentMethodFiltersSchema = z.object({
   search: z.string().optional(),
-  type: z.enum(['CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER']).optional(),
+  type: z
+    .enum([
+      'CASH',
+      'CREDIT_CARD',
+      'DEBIT_CARD',
+      'BANK_TRANSFER',
+      'CHECK',
+      'OTHER',
+    ])
+    .optional(),
   isActive: z.boolean().optional(),
 })
 
@@ -156,7 +176,9 @@ export type UpdateDebitNote = z.infer<typeof updateDebitNoteSchema>
 export type InvoiceTemplate = z.infer<typeof invoiceTemplateSchema>
 export type UpdateInvoiceTemplate = z.infer<typeof updateInvoiceTemplateSchema>
 export type TaxConfiguration = z.infer<typeof taxConfigurationSchema>
-export type UpdateTaxConfiguration = z.infer<typeof updateTaxConfigurationSchema>
+export type UpdateTaxConfiguration = z.infer<
+  typeof updateTaxConfigurationSchema
+>
 export type PaymentMethodFilters = z.infer<typeof paymentMethodFiltersSchema>
 export type PaymentFilters = z.infer<typeof paymentFiltersSchema>
 export type CreditNoteFilters = z.infer<typeof creditNoteFiltersSchema>

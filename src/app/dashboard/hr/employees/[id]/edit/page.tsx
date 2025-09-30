@@ -26,6 +26,7 @@ import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'react-hot-toast'
 import {
   UpdateEmployeeSchema,
   UpdateEmployeeInput,
@@ -173,13 +174,14 @@ export default function EditEmployeePage() {
       const result = await response.json()
 
       if (result.success) {
+        toast.success('Empleado actualizado correctamente.')
         router.push(`/dashboard/hr/employees/${employeeId}`)
       } else {
-        alert('Error al actualizar empleado: ' + result.error)
+        toast.error('No se pudo actualizar el empleado.')
       }
     } catch (error) {
       console.error('Error updating employee:', error)
-      alert('Error al actualizar empleado')
+      toast.error('Error al actualizar el empleado.')
     } finally {
       setIsSubmitting(false)
     }

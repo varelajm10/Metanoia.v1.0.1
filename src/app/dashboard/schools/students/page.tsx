@@ -46,7 +46,13 @@ interface Student {
   phone?: string
   grade: string
   section?: string
-  status: 'ACTIVE' | 'INACTIVE' | 'GRADUATED' | 'TRANSFERRED' | 'EXPELLED' | 'WITHDRAWN'
+  status:
+    | 'ACTIVE'
+    | 'INACTIVE'
+    | 'GRADUATED'
+    | 'TRANSFERRED'
+    | 'EXPELLED'
+    | 'WITHDRAWN'
   enrollmentDate: string
   address: string
   city: string
@@ -243,13 +249,13 @@ export default function StudentsPage() {
     }
   }
 
-  const filteredStudents = students.filter((student) => {
-    const matchesSearch = 
+  const filteredStudents = students.filter(student => {
+    const matchesSearch =
       student.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.studentCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const matchesGrade = !filterGrade || student.grade === filterGrade
     const matchesStatus = !filterStatus || student.status === filterStatus
 
@@ -300,7 +306,7 @@ export default function StudentsPage() {
                   id="search"
                   placeholder="Nombre, código, email..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                   className="pl-9"
                 />
               </div>
@@ -359,12 +365,12 @@ export default function StudentsPage() {
 
       {/* Students List */}
       <div className="grid gap-4">
-        {filteredStudents.map((student) => (
+        {filteredStudents.map(student => (
           <Card key={student.id}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                     {student.photoUrl ? (
                       <img
                         src={student.photoUrl}
@@ -394,7 +400,9 @@ export default function StudentsPage() {
                       </div>
                       <div className="flex items-center space-x-1">
                         <UserCheck className="h-4 w-4" />
-                        <span>{student.grade} {student.section}</span>
+                        <span>
+                          {student.grade} {student.section}
+                        </span>
                       </div>
                       {student.email && (
                         <div className="flex items-center space-x-1">
@@ -412,17 +420,29 @@ export default function StudentsPage() {
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
                         <MapPin className="h-4 w-4" />
-                        <span>{student.address}, {student.city}</span>
+                        <span>
+                          {student.address}, {student.city}
+                        </span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
-                        <span>Matriculado: {new Date(student.enrollmentDate).toLocaleDateString()}</span>
+                        <span>
+                          Matriculado:{' '}
+                          {new Date(
+                            student.enrollmentDate
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
                     {student.parents.length > 0 && (
                       <div className="text-sm text-muted-foreground">
-                        <strong>Contacto Principal:</strong> {student.parents[0].firstName} {student.parents[0].lastName} 
-                        ({student.parents[0].relationship === 'FATHER' ? 'Padre' : 'Madre'})
+                        <strong>Contacto Principal:</strong>{' '}
+                        {student.parents[0].firstName}{' '}
+                        {student.parents[0].lastName}(
+                        {student.parents[0].relationship === 'FATHER'
+                          ? 'Padre'
+                          : 'Madre'}
+                        )
                       </div>
                     )}
                   </div>
@@ -431,14 +451,20 @@ export default function StudentsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/dashboard/schools/students/${student.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/schools/students/${student.id}`)
+                    }
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => router.push(`/dashboard/schools/students/${student.id}/edit`)}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/schools/students/${student.id}/edit`
+                      )
+                    }
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -446,9 +472,13 @@ export default function StudentsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      if (confirm('¿Estás seguro de que quieres eliminar este estudiante?')) {
+                      if (
+                        confirm(
+                          '¿Estás seguro de que quieres eliminar este estudiante?'
+                        )
+                      ) {
                         // Lógica para eliminar estudiante
-                        console.log('Eliminar estudiante:', student.id)
+                        // TODO: Implementar eliminación de estudiante
                       }
                     }}
                   >
@@ -464,12 +494,16 @@ export default function StudentsPage() {
       {filteredStudents.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No se encontraron estudiantes</h3>
-            <p className="text-muted-foreground text-center mb-4">
+            <Users className="mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-semibold">
+              No se encontraron estudiantes
+            </h3>
+            <p className="mb-4 text-center text-muted-foreground">
               No hay estudiantes que coincidan con los filtros aplicados.
             </p>
-            <Button onClick={() => router.push('/dashboard/schools/students/new')}>
+            <Button
+              onClick={() => router.push('/dashboard/schools/students/new')}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Agregar Primer Estudiante
             </Button>

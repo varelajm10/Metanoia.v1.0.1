@@ -13,7 +13,8 @@ async function enableSchoolsModule() {
         key: 'schools',
         name: 'Schools',
         displayName: 'Gestión de Colegios',
-        description: 'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
+        description:
+          'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
         version: '1.0.0',
         category: 'BUSINESS',
         isCore: false,
@@ -153,7 +154,8 @@ async function enableSchoolsModule() {
         key: 'schools',
         name: 'Schools',
         displayName: 'Gestión de Colegios',
-        description: 'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
+        description:
+          'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
         version: '1.0.0',
         category: 'BUSINESS',
         isCore: false,
@@ -345,7 +347,6 @@ async function enableSchoolsModule() {
     console.log(`   - Categoría: ${module.category}`)
     console.log(`   - Tenants habilitados: ${tenants.length}`)
     console.log(`   - Funcionalidades: ${module.features?.length || 0}`)
-
   } catch (error) {
     console.error('❌ Error habilitando módulo de Colegios:', error)
     throw error
@@ -360,7 +361,7 @@ enableSchoolsModule()
     console.log('✅ Script completado exitosamente')
     process.exit(0)
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('❌ Error ejecutando script:', error)
     process.exit(1)
   })

@@ -10,10 +10,16 @@ export async function GET(
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
-    const entry = await AccountingService.getJournalEntryById(params.id, tenantId)
+    const entry = await AccountingService.getJournalEntryById(
+      params.id,
+      tenantId
+    )
 
     if (!entry) {
       return NextResponse.json(

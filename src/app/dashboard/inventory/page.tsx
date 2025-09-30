@@ -175,11 +175,15 @@ export default function InventoryDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Productos</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Productos
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalProducts || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalProducts || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.activeProducts || 0} activos
             </p>
@@ -192,7 +196,9 @@ export default function InventoryDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalSuppliers || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalSuppliers || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.activeSuppliers || 0} activos
             </p>
@@ -216,16 +222,16 @@ export default function InventoryDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Alertas Activas</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Alertas Activas
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               {stats?.activeAlerts || 0}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Requieren atención
-            </p>
+            <p className="text-xs text-muted-foreground">Requieren atención</p>
           </CardContent>
         </Card>
       </div>
@@ -249,7 +255,7 @@ export default function InventoryDashboard() {
               </p>
             ) : (
               <div className="space-y-3">
-                {lowStockProducts.slice(0, 5).map((product) => (
+                {lowStockProducts.slice(0, 5).map(product => (
                   <div
                     key={product.id}
                     className="flex items-center justify-between rounded-lg border p-3"
@@ -257,10 +263,14 @@ export default function InventoryDashboard() {
                     <div className="flex-1">
                       <p className="font-medium">{product.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        SKU: {product.sku} • Stock: {product.stock} / Mín: {product.minStock}
+                        SKU: {product.sku} • Stock: {product.stock} / Mín:{' '}
+                        {product.minStock}
                       </p>
                     </div>
-                    <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                    <Badge
+                      variant="outline"
+                      className="border-yellow-200 text-yellow-600"
+                    >
                       Stock Bajo
                     </Badge>
                   </div>
@@ -282,9 +292,7 @@ export default function InventoryDashboard() {
               <AlertTriangle className="mr-2 h-5 w-5 text-red-500" />
               Productos Agotados
             </CardTitle>
-            <CardDescription>
-              Productos sin stock disponible
-            </CardDescription>
+            <CardDescription>Productos sin stock disponible</CardDescription>
           </CardHeader>
           <CardContent>
             {outOfStockProducts.length === 0 ? (
@@ -293,7 +301,7 @@ export default function InventoryDashboard() {
               </p>
             ) : (
               <div className="space-y-3">
-                {outOfStockProducts.slice(0, 5).map((product) => (
+                {outOfStockProducts.slice(0, 5).map(product => (
                   <div
                     key={product.id}
                     className="flex items-center justify-between rounded-lg border p-3"
@@ -304,7 +312,10 @@ export default function InventoryDashboard() {
                         SKU: {product.sku} • Categoría: {product.category}
                       </p>
                     </div>
-                    <Badge variant="outline" className="text-red-600 border-red-200">
+                    <Badge
+                      variant="outline"
+                      className="border-red-200 text-red-600"
+                    >
                       Agotado
                     </Badge>
                   </div>
@@ -338,7 +349,7 @@ export default function InventoryDashboard() {
             </p>
           ) : (
             <div className="space-y-3">
-              {activeAlerts.slice(0, 10).map((alert) => (
+              {activeAlerts.slice(0, 10).map(alert => (
                 <div
                   key={alert.id}
                   className="flex items-center justify-between rounded-lg border p-3"
@@ -350,7 +361,8 @@ export default function InventoryDashboard() {
                     <div className="flex-1">
                       <p className="font-medium">{alert.message}</p>
                       <p className="text-sm text-muted-foreground">
-                        Producto: {alert.product.name} (SKU: {alert.product.sku})
+                        Producto: {alert.product.name} (SKU: {alert.product.sku}
+                        )
                       </p>
                     </div>
                   </div>

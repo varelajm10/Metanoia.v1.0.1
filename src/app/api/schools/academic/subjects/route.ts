@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating subject:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

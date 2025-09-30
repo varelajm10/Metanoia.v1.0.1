@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🔍 [TEST] API de prueba funcionando...')
 
     return NextResponse.json({
       message: 'API de prueba funcionando correctamente',

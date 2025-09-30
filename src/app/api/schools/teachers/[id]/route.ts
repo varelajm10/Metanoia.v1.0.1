@@ -76,7 +76,7 @@ export async function PUT(
     })
   } catch (error: any) {
     console.error('Error updating teacher:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

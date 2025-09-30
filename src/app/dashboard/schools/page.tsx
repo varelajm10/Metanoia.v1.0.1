@@ -48,7 +48,13 @@ interface SchoolStats {
 
 interface RecentActivity {
   id: string
-  type: 'enrollment' | 'payment' | 'attendance' | 'grade' | 'disciplinary' | 'library'
+  type:
+    | 'enrollment'
+    | 'payment'
+    | 'attendance'
+    | 'grade'
+    | 'disciplinary'
+    | 'library'
   title: string
   description: string
   date: string
@@ -291,16 +297,12 @@ export default function SchoolsDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Asistencia
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Asistencia</CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.attendanceRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              Promedio diario
-            </p>
+            <p className="text-xs text-muted-foreground">Promedio diario</p>
           </CardContent>
         </Card>
 
@@ -343,8 +345,11 @@ export default function SchoolsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center space-x-4">
+                  {recentActivity.map(activity => (
+                    <div
+                      key={activity.id}
+                      className="flex items-center space-x-4"
+                    >
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                         {getActivityIcon(activity.type)}
                       </div>
@@ -377,9 +382,7 @@ export default function SchoolsDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Estadísticas Rápidas</CardTitle>
-                <CardDescription>
-                  Resumen de datos importantes
-                </CardDescription>
+                <CardDescription>Resumen de datos importantes</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -450,10 +453,10 @@ export default function SchoolsDashboard() {
                 <CheckCircle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.attendanceRate}%</div>
-                <p className="text-xs text-muted-foreground">
-                  Últimos 30 días
-                </p>
+                <div className="text-2xl font-bold">
+                  {stats.attendanceRate}%
+                </div>
+                <p className="text-xs text-muted-foreground">Últimos 30 días</p>
               </CardContent>
             </Card>
 
@@ -513,9 +516,7 @@ export default function SchoolsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">24</div>
-                <p className="text-xs text-muted-foreground">
-                  Este mes
-                </p>
+                <p className="text-xs text-muted-foreground">Este mes</p>
               </CardContent>
             </Card>
 
@@ -560,54 +561,40 @@ export default function SchoolsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground">
-                  Configurados
-                </p>
+                <p className="text-xs text-muted-foreground">Configurados</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Secciones
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Secciones</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">45</div>
-                <p className="text-xs text-muted-foreground">
-                  Activas
-                </p>
+                <p className="text-xs text-muted-foreground">Activas</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Materias
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Materias</CardTitle>
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">156</div>
-                <p className="text-xs text-muted-foreground">
-                  Registradas
-                </p>
+                <p className="text-xs text-muted-foreground">Registradas</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Horarios
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Horarios</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">234</div>
-                <p className="text-xs text-muted-foreground">
-                  Programados
-                </p>
+                <p className="text-xs text-muted-foreground">Programados</p>
               </CardContent>
             </Card>
           </div>
@@ -624,9 +611,7 @@ export default function SchoolsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalPayments}</div>
-                <p className="text-xs text-muted-foreground">
-                  Este mes
-                </p>
+                <p className="text-xs text-muted-foreground">Este mes</p>
               </CardContent>
             </Card>
 
@@ -638,18 +623,16 @@ export default function SchoolsDashboard() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.pendingPayments}</div>
-                <p className="text-xs text-muted-foreground">
-                  Por procesar
-                </p>
+                <div className="text-2xl font-bold">
+                  {stats.pendingPayments}
+                </div>
+                <p className="text-xs text-muted-foreground">Por procesar</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Vencidos
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Vencidos</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -683,16 +666,12 @@ export default function SchoolsDashboard() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Préstamos
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Préstamos</CardTitle>
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.activeLoans}</div>
-                <p className="text-xs text-muted-foreground">
-                  Activos
-                </p>
+                <p className="text-xs text-muted-foreground">Activos</p>
               </CardContent>
             </Card>
 
@@ -705,17 +684,13 @@ export default function SchoolsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">8</div>
-                <p className="text-xs text-muted-foreground">
-                  Rutas activas
-                </p>
+                <p className="text-xs text-muted-foreground">Rutas activas</p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Comedor
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Comedor</CardTitle>
                 <Utensils className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>

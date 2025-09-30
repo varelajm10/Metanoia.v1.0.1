@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-import { 
-  Product, 
-  Supplier, 
-  PurchaseOrder, 
+import {
+  Product,
+  Supplier,
+  PurchaseOrder,
   StockMovement,
   ProductFilters,
   SupplierFilters,
@@ -10,14 +10,144 @@ import {
   StockMovementFilters,
 } from '@/lib/validations/inventory'
 
-const prisma = new PrismaClient()
+// Instancia por defecto para compatibilidad hacia atrás
+const defaultPrisma = new PrismaClient()
 
 export class InventoryService {
+  constructor(private prisma: PrismaClient = defaultPrisma) {}
+
   // ========================================
-  // PRODUCTOS
+  // MÉTODOS ESTÁTICOS PARA COMPATIBILIDAD HACIA ATRÁS
   // ========================================
 
-  static async getProducts(tenantId: string, filters: ProductFilters = {}, page = 1, limit = 10) {
+  static async getProducts(
+    tenantId: string,
+    filters: ProductFilters = {},
+    page = 1,
+    limit = 10
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getProducts(tenantId, filters, page, limit)
+  }
+
+  static async getProductById(id: string, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getProductById(id, tenantId)
+  }
+
+  static async createProduct(data: Product, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.createProduct(data, tenantId)
+  }
+
+  static async updateProduct(
+    id: string,
+    data: Partial<Product>,
+    tenantId: string
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.updateProduct(id, data, tenantId)
+  }
+
+  static async deleteProduct(id: string, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.deleteProduct(id, tenantId)
+  }
+
+  static async getSuppliers(
+    tenantId: string,
+    filters: SupplierFilters = {},
+    page = 1,
+    limit = 10
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getSuppliers(tenantId, filters, page, limit)
+  }
+
+  static async getSupplierById(id: string, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getSupplierById(id, tenantId)
+  }
+
+  static async createSupplier(data: Supplier, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.createSupplier(data, tenantId)
+  }
+
+  static async updateSupplier(
+    id: string,
+    data: Partial<Supplier>,
+    tenantId: string
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.updateSupplier(id, data, tenantId)
+  }
+
+  static async deleteSupplier(id: string, tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.deleteSupplier(id, tenantId)
+  }
+
+  static async createStockMovement(
+    data: StockMovement,
+    tenantId: string,
+    userId: string
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.createStockMovement(data, tenantId, userId)
+  }
+
+  static async getStockMovements(
+    tenantId: string,
+    filters: StockMovementFilters = {},
+    page = 1,
+    limit = 10
+  ) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getStockMovements(tenantId, filters, page, limit)
+  }
+
+  static async getDashboardStats(tenantId: string) {
+    const service = new InventoryService(
+      new (require('@prisma/client').PrismaClient)()
+    )
+    return service.getDashboardStats(tenantId)
+  }
+
+  // ========================================
+  // MÉTODOS DE INSTANCIA
+  // ========================================
+
+  async getProducts(
+    tenantId: string,
+    filters: ProductFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -58,7 +188,7 @@ export class InventoryService {
     }
 
     const [products, total] = await Promise.all([
-      prisma.product.findMany({
+      this.prisma.product.findMany({
         where,
         include: {
           productImages: true,
@@ -71,14 +201,14 @@ export class InventoryService {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.product.count({ where }),
+      this.prisma.product.count({ where }),
     ])
 
     return { products, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
-  static async getProductById(id: string, tenantId: string) {
-    return prisma.product.findFirst({
+  async getProductById(id: string, tenantId: string) {
+    return this.prisma.product.findFirst({
       where: { id, tenantId },
       include: {
         productImages: true,
@@ -99,10 +229,10 @@ export class InventoryService {
     })
   }
 
-  static async createProduct(data: Product, tenantId: string) {
+  async createProduct(data: Product, tenantId: string) {
     // Verificar SKU único
     if (data.sku) {
-      const existingProduct = await prisma.product.findFirst({
+      const existingProduct = await this.prisma.product.findFirst({
         where: { sku: data.sku, tenantId },
       })
       if (existingProduct) {
@@ -112,7 +242,7 @@ export class InventoryService {
 
     // Verificar código de barras único
     if (data.barcode) {
-      const existingProduct = await prisma.product.findFirst({
+      const existingProduct = await this.prisma.product.findFirst({
         where: { barcode: data.barcode, tenantId },
       })
       if (existingProduct) {
@@ -120,7 +250,7 @@ export class InventoryService {
       }
     }
 
-    return prisma.product.create({
+    return this.prisma.product.create({
       data: { ...data, tenantId },
       include: {
         productImages: true,
@@ -129,8 +259,8 @@ export class InventoryService {
     })
   }
 
-  static async updateProduct(id: string, data: Partial<Product>, tenantId: string) {
-    const existingProduct = await prisma.product.findFirst({
+  async updateProduct(id: string, data: Partial<Product>, tenantId: string) {
+    const existingProduct = await this.prisma.product.findFirst({
       where: { id, tenantId },
     })
 
@@ -140,7 +270,7 @@ export class InventoryService {
 
     // Verificar SKU único si se está cambiando
     if (data.sku && data.sku !== existingProduct.sku) {
-      const skuExists = await prisma.product.findFirst({
+      const skuExists = await this.prisma.product.findFirst({
         where: { sku: data.sku, tenantId, id: { not: id } },
       })
       if (skuExists) {
@@ -150,7 +280,7 @@ export class InventoryService {
 
     // Verificar código de barras único si se está cambiando
     if (data.barcode && data.barcode !== existingProduct.barcode) {
-      const barcodeExists = await prisma.product.findFirst({
+      const barcodeExists = await this.prisma.product.findFirst({
         where: { barcode: data.barcode, tenantId, id: { not: id } },
       })
       if (barcodeExists) {
@@ -158,7 +288,7 @@ export class InventoryService {
       }
     }
 
-    return prisma.product.update({
+    return this.prisma.product.update({
       where: { id },
       data,
       include: {
@@ -168,8 +298,8 @@ export class InventoryService {
     })
   }
 
-  static async deleteProduct(id: string, tenantId: string) {
-    const existingProduct = await prisma.product.findFirst({
+  async deleteProduct(id: string, tenantId: string) {
+    const existingProduct = await this.prisma.product.findFirst({
       where: { id, tenantId },
     })
 
@@ -178,22 +308,29 @@ export class InventoryService {
     }
 
     // Verificar si tiene órdenes asociadas
-    const hasOrders = await prisma.orderItem.findFirst({
+    const hasOrders = await this.prisma.orderItem.findFirst({
       where: { productId: id },
     })
 
     if (hasOrders) {
-      throw new Error('No se puede eliminar el producto porque tiene órdenes asociadas')
+      throw new Error(
+        'No se puede eliminar el producto porque tiene órdenes asociadas'
+      )
     }
 
-    return prisma.product.delete({ where: { id } })
+    return this.prisma.product.delete({ where: { id } })
   }
 
   // ========================================
   // PROVEEDORES
   // ========================================
 
-  static async getSuppliers(tenantId: string, filters: SupplierFilters = {}, page = 1, limit = 10) {
+  async getSuppliers(
+    tenantId: string,
+    filters: SupplierFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.search) {
@@ -214,7 +351,7 @@ export class InventoryService {
     }
 
     const [suppliers, total] = await Promise.all([
-      prisma.supplier.findMany({
+      this.prisma.supplier.findMany({
         where,
         include: {
           products: {
@@ -233,14 +370,14 @@ export class InventoryService {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.supplier.count({ where }),
+      this.prisma.supplier.count({ where }),
     ])
 
     return { suppliers, total, page, limit, pages: Math.ceil(total / limit) }
   }
 
-  static async getSupplierById(id: string, tenantId: string) {
-    return prisma.supplier.findFirst({
+  async getSupplierById(id: string, tenantId: string) {
+    return this.prisma.supplier.findFirst({
       where: { id, tenantId },
       include: {
         products: {
@@ -262,9 +399,9 @@ export class InventoryService {
     })
   }
 
-  static async createSupplier(data: Supplier, tenantId: string) {
+  async createSupplier(data: Supplier, tenantId: string) {
     // Verificar nombre único
-    const existingSupplier = await prisma.supplier.findFirst({
+    const existingSupplier = await this.prisma.supplier.findFirst({
       where: { name: data.name, tenantId },
     })
 
@@ -272,7 +409,7 @@ export class InventoryService {
       throw new Error('Ya existe un proveedor con ese nombre')
     }
 
-    return prisma.supplier.create({
+    return this.prisma.supplier.create({
       data: { ...data, tenantId },
       include: {
         _count: {
@@ -285,8 +422,8 @@ export class InventoryService {
     })
   }
 
-  static async updateSupplier(id: string, data: Partial<Supplier>, tenantId: string) {
-    const existingSupplier = await prisma.supplier.findFirst({
+  async updateSupplier(id: string, data: Partial<Supplier>, tenantId: string) {
+    const existingSupplier = await this.prisma.supplier.findFirst({
       where: { id, tenantId },
     })
 
@@ -296,7 +433,7 @@ export class InventoryService {
 
     // Verificar nombre único si se está cambiando
     if (data.name && data.name !== existingSupplier.name) {
-      const nameExists = await prisma.supplier.findFirst({
+      const nameExists = await this.prisma.supplier.findFirst({
         where: { name: data.name, tenantId, id: { not: id } },
       })
       if (nameExists) {
@@ -304,7 +441,7 @@ export class InventoryService {
       }
     }
 
-    return prisma.supplier.update({
+    return this.prisma.supplier.update({
       where: { id },
       data,
       include: {
@@ -318,8 +455,8 @@ export class InventoryService {
     })
   }
 
-  static async deleteSupplier(id: string, tenantId: string) {
-    const existingSupplier = await prisma.supplier.findFirst({
+  async deleteSupplier(id: string, tenantId: string) {
+    const existingSupplier = await this.prisma.supplier.findFirst({
       where: { id, tenantId },
     })
 
@@ -328,24 +465,30 @@ export class InventoryService {
     }
 
     // Verificar si tiene órdenes de compra asociadas
-    const hasPurchaseOrders = await prisma.purchaseOrder.findFirst({
+    const hasPurchaseOrders = await this.prisma.purchaseOrder.findFirst({
       where: { supplierId: id },
     })
 
     if (hasPurchaseOrders) {
-      throw new Error('No se puede eliminar el proveedor porque tiene órdenes de compra asociadas')
+      throw new Error(
+        'No se puede eliminar el proveedor porque tiene órdenes de compra asociadas'
+      )
     }
 
-    return prisma.supplier.delete({ where: { id } })
+    return this.prisma.supplier.delete({ where: { id } })
   }
 
   // ========================================
   // MOVIMIENTOS DE STOCK
   // ========================================
 
-  static async createStockMovement(data: StockMovement, tenantId: string, userId: string) {
+  async createStockMovement(
+    data: StockMovement,
+    tenantId: string,
+    userId: string
+  ) {
     // Verificar que el producto existe
-    const product = await prisma.product.findFirst({
+    const product = await this.prisma.product.findFirst({
       where: { id: data.productId, tenantId },
     })
 
@@ -359,7 +502,7 @@ export class InventoryService {
     }
 
     // Crear el movimiento de stock
-    const stockMovement = await prisma.stockMovement.create({
+    const stockMovement = await this.prisma.stockMovement.create({
       data: {
         ...data,
         tenantId,
@@ -385,24 +528,26 @@ export class InventoryService {
     })
 
     // Actualizar el stock del producto
-    const newStock = data.type === 'IN' 
-      ? product.stock + data.quantity
-      : product.stock - data.quantity
+    const newStock =
+      data.type === 'IN'
+        ? product.stock + data.quantity
+        : product.stock - data.quantity
 
-    await prisma.product.update({
+    await this.prisma.product.update({
       where: { id: data.productId },
       data: { stock: newStock },
     })
 
     // Verificar alertas de stock bajo
     if (newStock <= product.minStock) {
-      await prisma.inventoryAlert.create({
+      await this.prisma.inventoryAlert.create({
         data: {
           productId: data.productId,
           type: newStock === 0 ? 'OUT_OF_STOCK' : 'LOW_STOCK',
-          message: newStock === 0 
-            ? `El producto ${product.name} está agotado`
-            : `El producto ${product.name} tiene stock bajo (${newStock} unidades)`,
+          message:
+            newStock === 0
+              ? `El producto ${product.name} está agotado`
+              : `El producto ${product.name} tiene stock bajo (${newStock} unidades)`,
           tenantId,
         },
       })
@@ -411,7 +556,12 @@ export class InventoryService {
     return stockMovement
   }
 
-  static async getStockMovements(tenantId: string, filters: StockMovementFilters = {}, page = 1, limit = 10) {
+  async getStockMovements(
+    tenantId: string,
+    filters: StockMovementFilters = {},
+    page = 1,
+    limit = 10
+  ) {
     const where: any = { tenantId }
 
     if (filters.productId) {
@@ -433,7 +583,7 @@ export class InventoryService {
     }
 
     const [stockMovements, total] = await Promise.all([
-      prisma.stockMovement.findMany({
+      this.prisma.stockMovement.findMany({
         where,
         include: {
           product: {
@@ -456,17 +606,23 @@ export class InventoryService {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      prisma.stockMovement.count({ where }),
+      this.prisma.stockMovement.count({ where }),
     ])
 
-    return { stockMovements, total, page, limit, pages: Math.ceil(total / limit) }
+    return {
+      stockMovements,
+      total,
+      page,
+      limit,
+      pages: Math.ceil(total / limit),
+    }
   }
 
   // ========================================
   // DASHBOARD
   // ========================================
 
-  static async getDashboardStats(tenantId: string) {
+  async getDashboardStats(tenantId: string) {
     const [
       totalProducts,
       activeProducts,
@@ -479,32 +635,34 @@ export class InventoryService {
       outOfStockProducts,
       activeAlerts,
     ] = await Promise.all([
-      prisma.product.count({ where: { tenantId } }),
-      prisma.product.count({ where: { tenantId, isActive: true } }),
-      prisma.supplier.count({ where: { tenantId } }),
-      prisma.supplier.count({ where: { tenantId, isActive: true } }),
-      prisma.purchaseOrder.count({ where: { tenantId } }),
-      prisma.purchaseOrder.count({ where: { tenantId, status: 'PENDING' } }),
-      prisma.stockMovement.count({ where: { tenantId } }),
-      prisma.product.count({ 
-        where: { 
-          tenantId, 
-          isActive: true,
-          stock: { lte: prisma.product.fields.minStock },
-        } 
+      this.prisma.product.count({ where: { tenantId } }),
+      this.prisma.product.count({ where: { tenantId, isActive: true } }),
+      this.prisma.supplier.count({ where: { tenantId } }),
+      this.prisma.supplier.count({ where: { tenantId, isActive: true } }),
+      this.prisma.purchaseOrder.count({ where: { tenantId } }),
+      this.prisma.purchaseOrder.count({
+        where: { tenantId, status: 'PENDING' },
       }),
-      prisma.product.count({ 
-        where: { 
-          tenantId, 
+      this.prisma.stockMovement.count({ where: { tenantId } }),
+      this.prisma.product.count({
+        where: {
+          tenantId,
+          isActive: true,
+          stock: { lte: this.prisma.product.fields.minStock },
+        },
+      }),
+      this.prisma.product.count({
+        where: {
+          tenantId,
           isActive: true,
           stock: 0,
-        } 
+        },
       }),
-      prisma.inventoryAlert.count({ 
-        where: { 
-          tenantId, 
-          isActive: true 
-        } 
+      this.prisma.inventoryAlert.count({
+        where: {
+          tenantId,
+          isActive: true,
+        },
       }),
     ])
 

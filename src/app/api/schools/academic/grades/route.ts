@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '100')
     const studentId = searchParams.get('studentId') || undefined
     const subjectId = searchParams.get('subjectId') || undefined
-    const academicYear = searchParams.get('academicYear') || new Date().getFullYear().toString()
+    const academicYear =
+      searchParams.get('academicYear') || new Date().getFullYear().toString()
     const term = searchParams.get('term') || undefined
 
     const result = await SchoolAcademicService.getGrades(tenantId, {
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating grade:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

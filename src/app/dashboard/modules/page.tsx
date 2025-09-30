@@ -27,6 +27,8 @@ import {
   Calculator,
   ShoppingCart,
   BarChart3,
+  Building2,
+  Users2,
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -201,7 +203,13 @@ export default function ModulesPage() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
+            <Button asChild className="btn-primary-gradient hover:scale-105 transition-transform duration-200">
+              <Link href="/dashboard/modules/management">
+                <Users2 className="mr-2 h-4 w-4" />
+                Gestión por Cliente
+              </Link>
+            </Button>
             <Badge
               variant="outline"
               className="border-green-300 text-green-600"

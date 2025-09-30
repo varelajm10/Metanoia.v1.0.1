@@ -121,11 +121,15 @@ export default function AccountingDashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Plan de Cuentas</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Plan de Cuentas
+            </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalAccounts || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalAccounts || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.activeAccounts || 0} activas
             </p>
@@ -134,11 +138,15 @@ export default function AccountingDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Asientos Contables</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Asientos Contables
+            </CardTitle>
             <Calculator className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalJournalEntries || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalJournalEntries || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.postedJournalEntries || 0} contabilizados
             </p>
@@ -147,11 +155,15 @@ export default function AccountingDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conciliaciones</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Conciliaciones
+            </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalReconciliations || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.totalReconciliations || 0}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats?.reconciledReconciliations || 0} conciliadas
             </p>
@@ -193,11 +205,14 @@ export default function AccountingDashboard() {
                     Cuentas de activo del balance
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Activo
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div className="flex-1">
                   <p className="font-medium">Pasivos</p>
@@ -205,7 +220,10 @@ export default function AccountingDashboard() {
                     Cuentas de pasivo del balance
                   </p>
                 </div>
-                <Badge variant="outline" className="text-red-600 border-red-200">
+                <Badge
+                  variant="outline"
+                  className="border-red-200 text-red-600"
+                >
                   Pasivo
                 </Badge>
               </div>
@@ -217,7 +235,10 @@ export default function AccountingDashboard() {
                     Cuentas de patrimonio neto
                   </p>
                 </div>
-                <Badge variant="outline" className="text-blue-600 border-blue-200">
+                <Badge
+                  variant="outline"
+                  className="border-blue-200 text-blue-600"
+                >
                   Patrimonio
                 </Badge>
               </div>
@@ -253,7 +274,10 @@ export default function AccountingDashboard() {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Contabilizado
                 </Badge>
               </div>
@@ -264,11 +288,16 @@ export default function AccountingDashboard() {
                   <div className="flex-1">
                     <p className="font-medium">Asientos Pendientes</p>
                     <p className="text-sm text-muted-foreground">
-                      {(stats?.totalJournalEntries || 0) - (stats?.postedJournalEntries || 0)} asientos
+                      {(stats?.totalJournalEntries || 0) -
+                        (stats?.postedJournalEntries || 0)}{' '}
+                      asientos
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Pendiente
                 </Badge>
               </div>
@@ -303,19 +332,22 @@ export default function AccountingDashboard() {
                     {stats?.totalReconciliations || 0} conciliaciones
                   </p>
                 </div>
-                <Badge variant="outline">
-                  Total
-                </Badge>
+                <Badge variant="outline">Total</Badge>
               </div>
 
               <div className="flex items-center justify-between rounded-lg border p-3">
                 <div className="flex-1">
                   <p className="font-medium">Conciliaciones Pendientes</p>
                   <p className="text-sm text-muted-foreground">
-                    {(stats?.totalReconciliations || 0) - (stats?.reconciledReconciliations || 0)} pendientes
+                    {(stats?.totalReconciliations || 0) -
+                      (stats?.reconciledReconciliations || 0)}{' '}
+                    pendientes
                   </p>
                 </div>
-                <Badge variant="outline" className="text-yellow-600 border-yellow-200">
+                <Badge
+                  variant="outline"
+                  className="border-yellow-200 text-yellow-600"
+                >
                   Pendiente
                 </Badge>
               </div>
@@ -329,7 +361,10 @@ export default function AccountingDashboard() {
                     {stats?.reconciledReconciliations || 0} conciliadas
                   </p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200">
+                <Badge
+                  variant="outline"
+                  className="border-green-200 text-green-600"
+                >
                   Completada
                 </Badge>
               </div>

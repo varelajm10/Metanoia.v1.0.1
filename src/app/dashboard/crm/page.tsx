@@ -53,11 +53,13 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'react-hot-toast'
 import {
   CreateCustomerSchema,
   CreateCustomerInput,
 } from '@/lib/validations/customer'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { CustomerTableSkeleton } from '@/components/ui/customer-table-skeleton'
 
 interface Customer {
   id: string
@@ -155,16 +157,16 @@ export default function CRMPage() {
       const result = await response.json()
 
       if (result.success) {
-        alert('Cliente creado exitosamente')
+        toast.success('Cliente creado exitosamente')
         setShowCustomerForm(false)
         reset()
         fetchCustomers()
       } else {
-        alert('Error al crear cliente: ' + result.error)
+        toast.error('Error al crear cliente: ' + result.error)
       }
     } catch (error) {
       console.error('Error creating customer:', error)
-      alert('Error al crear cliente')
+      toast.error('Error al crear cliente')
     }
   }
 
@@ -197,14 +199,14 @@ export default function CRMPage() {
         })
 
         if (response.ok) {
-          alert('Cliente eliminado exitosamente')
+          toast.success('Cliente eliminado exitosamente')
           fetchCustomers()
         } else {
-          alert('Error al eliminar cliente')
+          toast.error('Error al eliminar cliente')
         }
       } catch (error) {
         console.error('Error deleting customer:', error)
-        alert('Error al eliminar cliente')
+        toast.error('Error al eliminar cliente')
       }
     }
   }
@@ -220,16 +222,16 @@ export default function CRMPage() {
       })
 
       if (response.ok) {
-        alert(
+        toast.success(
           `Cliente ${!customer.isActive ? 'activado' : 'desactivado'} exitosamente`
         )
         fetchCustomers()
       } else {
-        alert('Error al cambiar estado del cliente')
+        toast.error('Error al cambiar estado del cliente')
       }
     } catch (error) {
       console.error('Error toggling customer status:', error)
-      alert('Error al cambiar estado del cliente')
+      toast.error('Error al cambiar estado del cliente')
     }
   }
 
@@ -283,79 +285,103 @@ export default function CRMPage() {
                   Nuevo Cliente
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
+              <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+                <DialogHeader className="pb-6">
+                  <DialogTitle className="flex items-center text-2xl font-bold">
+                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
                     {selectedCustomer ? 'Editar Cliente' : 'Nuevo Cliente'}
                   </DialogTitle>
-                  <DialogDescription>
-                    Complete la información del cliente
+                  <DialogDescription className="text-base text-muted-foreground">
+                    Complete la información del cliente para agregarlo a tu base de datos
                   </DialogDescription>
                 </DialogHeader>
 
                 <form
                   onSubmit={handleSubmit(onSubmitCustomer)}
-                  className="space-y-6"
+                  className="space-y-8"
                 >
                   {/* Información Básica */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">
-                      Información Básica
-                    </h3>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Nombre *</Label>
+                  <div className="space-y-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-1 rounded-full bg-primary"></div>
+                      <h3 className="text-xl font-semibold">
+                        Información Básica
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <div className="space-y-3">
+                        <Label htmlFor="name" className="text-sm font-semibold text-foreground">
+                          Nombre Completo *
+                        </Label>
                         <Input
                           id="name"
                           {...register('name')}
                           placeholder="ej: Juan Pérez"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                         {errors.name && (
-                          <p className="text-sm text-red-500">
+                          <p className="text-sm text-destructive flex items-center">
+                            <div className="mr-1 h-1 w-1 rounded-full bg-destructive"></div>
                             {errors.name.message}
                           </p>
                         )}
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="email" className="text-sm font-semibold text-foreground">
+                          Correo Electrónico
+                        </Label>
                         <Input
                           id="email"
                           type="email"
                           {...register('email')}
                           placeholder="ej: juan@empresa.com"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                         {errors.email && (
-                          <p className="text-sm text-red-500">
+                          <p className="text-sm text-destructive flex items-center">
+                            <div className="mr-1 h-1 w-1 rounded-full bg-destructive"></div>
                             {errors.email.message}
                           </p>
                         )}
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Teléfono</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="phone" className="text-sm font-semibold text-foreground">
+                          Teléfono
+                        </Label>
                         <Input
                           id="phone"
                           {...register('phone')}
                           placeholder="ej: +57 300 123 4567"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="isActive">Estado</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="isActive" className="text-sm font-semibold text-foreground">
+                          Estado del Cliente
+                        </Label>
                         <Select
                           value={watch('isActive') ? 'active' : 'inactive'}
                           onValueChange={value =>
                             setValue('isActive', value === 'active')
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200">
                             <SelectValue placeholder="Seleccionar estado" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="active">Activo</SelectItem>
-                            <SelectItem value="inactive">Inactivo</SelectItem>
+                            <SelectItem value="active" className="flex items-center">
+                              <div className="mr-2 h-2 w-2 rounded-full bg-success"></div>
+                              Activo
+                            </SelectItem>
+                            <SelectItem value="inactive" className="flex items-center">
+                              <div className="mr-2 h-2 w-2 rounded-full bg-muted-foreground"></div>
+                              Inactivo
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -363,59 +389,75 @@ export default function CRMPage() {
                   </div>
 
                   {/* Dirección */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Dirección</h3>
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="address.street">Calle</Label>
+                  <div className="space-y-6">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-8 w-1 rounded-full bg-accent"></div>
+                      <h3 className="text-xl font-semibold">Información de Dirección</h3>
+                    </div>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                      <div className="space-y-3">
+                        <Label htmlFor="address.street" className="text-sm font-semibold text-foreground">
+                          Dirección
+                        </Label>
                         <Input
                           id="address.street"
                           {...register('address.street')}
                           placeholder="ej: Calle 123 #45-67"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="address.city">Ciudad</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="address.city" className="text-sm font-semibold text-foreground">
+                          Ciudad
+                        </Label>
                         <Input
                           id="address.city"
                           {...register('address.city')}
                           placeholder="ej: Bogotá"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="address.state">
+                      <div className="space-y-3">
+                        <Label htmlFor="address.state" className="text-sm font-semibold text-foreground">
                           Estado/Departamento
                         </Label>
                         <Input
                           id="address.state"
                           {...register('address.state')}
                           placeholder="ej: Cundinamarca"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label htmlFor="address.zipCode">Código Postal</Label>
+                      <div className="space-y-3">
+                        <Label htmlFor="address.zipCode" className="text-sm font-semibold text-foreground">
+                          Código Postal
+                        </Label>
                         <Input
                           id="address.zipCode"
                           {...register('address.zipCode')}
                           placeholder="ej: 110111"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
 
-                      <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="address.country">País</Label>
+                      <div className="space-y-3 md:col-span-2">
+                        <Label htmlFor="address.country" className="text-sm font-semibold text-foreground">
+                          País
+                        </Label>
                         <Input
                           id="address.country"
                           {...register('address.country')}
                           placeholder="ej: Colombia"
+                          className="h-12 rounded-xl border-2 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <DialogFooter className="flex justify-end space-x-2">
+                  <DialogFooter className="flex justify-end space-x-4 pt-6 border-t border-border/50">
                     <Button
                       type="button"
                       variant="outline"
@@ -424,23 +466,24 @@ export default function CRMPage() {
                         setSelectedCustomer(null)
                         reset()
                       }}
+                      className="h-12 px-6 rounded-xl border-2 border-border/50 hover:border-destructive/50 hover:text-destructive transition-all duration-200"
                     >
-                      <X className="mr-2 h-4 w-4" />
+                      <X className="mr-2 h-5 w-5" />
                       Cancelar
                     </Button>
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="btn-primary-gradient"
+                      className="btn-primary-gradient h-12 px-8 rounded-xl hover:scale-105 transition-all duration-200"
                     >
                       {isSubmitting ? (
                         <>
-                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-b-2 border-white"></div>
+                          <div className="mr-2 h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
                           Guardando...
                         </>
                       ) : (
                         <>
-                          <Save className="mr-2 h-4 w-4" />
+                          <Save className="mr-2 h-5 w-5" />
                           {selectedCustomer ? 'Actualizar' : 'Crear'} Cliente
                         </>
                       )}
@@ -587,20 +630,7 @@ export default function CRMPage() {
           </CardHeader>
           <CardContent>
             {customersLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map(i => (
-                  <div
-                    key={i}
-                    className="flex animate-pulse items-center space-x-4"
-                  >
-                    <div className="h-12 w-12 rounded-full bg-muted"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 w-1/4 rounded bg-muted"></div>
-                      <div className="h-3 w-1/3 rounded bg-muted"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <CustomerTableSkeleton />
             ) : customers.length > 0 ? (
               <div className="space-y-4">
                 {customers.map(customer => (

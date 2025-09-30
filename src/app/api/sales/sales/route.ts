@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const filters = {
@@ -24,7 +27,12 @@ export async function GET(request: NextRequest) {
     }
 
     const validatedFilters = saleFiltersSchema.parse(filters)
-    const result = await SalesService.getSales(tenantId, validatedFilters, page, limit)
+    const result = await SalesService.getSales(
+      tenantId,
+      validatedFilters,
+      page,
+      limit
+    )
 
     return NextResponse.json({
       sales: result.sales,
@@ -59,7 +67,10 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!userId) {
@@ -79,10 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error creating sale:', error)

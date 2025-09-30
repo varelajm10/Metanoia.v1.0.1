@@ -20,7 +20,13 @@ export interface PaginationOptions {
   total: number
 }
 
-// Crear un nuevo cliente
+/**
+ * Crea un nuevo cliente en el sistema
+ * @param data - Datos del cliente a crear
+ * @param tenantId - ID del tenant al que pertenece el cliente
+ * @returns Promise<Customer> - Cliente creado
+ * @throws Error si el email ya existe en el tenant
+ */
 export async function createCustomer(
   data: CreateCustomerInput,
   tenantId: string
@@ -47,7 +53,12 @@ export async function createCustomer(
   })
 }
 
-// Obtener cliente por ID
+/**
+ * Obtiene un cliente por su ID
+ * @param id - ID del cliente
+ * @param tenantId - ID del tenant
+ * @returns Promise<CustomerWithRelations | null> - Cliente encontrado o null si no existe
+ */
 export async function getCustomerById(
   id: string,
   tenantId: string
@@ -68,7 +79,12 @@ export async function getCustomerById(
   })
 }
 
-// Obtener todos los clientes con filtros y paginación
+/**
+ * Obtiene todos los clientes con filtros y paginación
+ * @param query - Parámetros de consulta y filtros
+ * @param tenantId - ID del tenant
+ * @returns Promise con lista de clientes y información de paginación
+ */
 export async function getCustomers(
   query: CustomerQuery,
   tenantId: string
@@ -139,7 +155,14 @@ export async function getCustomers(
   }
 }
 
-// Actualizar cliente
+/**
+ * Actualiza un cliente existente
+ * @param id - ID del cliente a actualizar
+ * @param data - Datos a actualizar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Customer> - Cliente actualizado
+ * @throws Error si el cliente no existe o el email ya existe en otro cliente
+ */
 export async function updateCustomer(
   id: string,
   data: UpdateCustomerInput,
@@ -178,7 +201,13 @@ export async function updateCustomer(
   })
 }
 
-// Eliminar cliente (soft delete)
+/**
+ * Elimina un cliente del sistema
+ * @param id - ID del cliente a eliminar
+ * @param tenantId - ID del tenant
+ * @returns Promise<Customer> - Cliente eliminado
+ * @throws Error si el cliente no existe o tiene órdenes/facturas asociadas
+ */
 export async function deleteCustomer(
   id: string,
   tenantId: string
@@ -220,7 +249,14 @@ export async function deleteCustomer(
   })
 }
 
-// Activar/desactivar cliente
+/**
+ * Activa o desactiva un cliente
+ * @param id - ID del cliente
+ * @param tenantId - ID del tenant
+ * @param isActive - Estado de activación
+ * @returns Promise<Customer> - Cliente actualizado
+ * @throws Error si el cliente no existe
+ */
 export async function toggleCustomerStatus(
   id: string,
   tenantId: string,
@@ -244,7 +280,13 @@ export async function toggleCustomerStatus(
   })
 }
 
-// Buscar clientes por nombre o email (para autocompletado)
+/**
+ * Busca clientes por nombre o email para autocompletado
+ * @param query - Término de búsqueda
+ * @param tenantId - ID del tenant
+ * @param limit - Límite de resultados (por defecto 10)
+ * @returns Promise<Customer[]> - Lista de clientes encontrados
+ */
 export async function searchCustomers(
   query: string,
   tenantId: string,
@@ -268,4 +310,133 @@ export async function searchCustomers(
     },
     take: limit,
   })
+}
+
+/**
+ * Obtiene estadísticas detalladas de clientes
+ * @param tenantId - ID del tenant
+ * @returns Promise con estadísticas completas de clientes
+ */
+export async function getCustomerStats(tenantId: string) {
+  const [
+    totalCustomers,
+    activeCustomers,
+    inactiveCustomers,
+    newThisMonth,
+    newThisWeek,
+    customersByMonth,
+    topCustomersByOrders,
+    customersWithOrders,
+    customersWithInvoices,
+  ] = await Promise.all([
+    // Total de clientes
+    prisma.customer.count({ where: { tenantId } }),
+
+    // Clientes activos
+    prisma.customer.count({ where: { tenantId, isActive: true } }),
+
+    // Clientes inactivos
+    prisma.customer.count({ where: { tenantId, isActive: false } }),
+
+    // Nuevos este mes
+    prisma.customer.count({
+      where: {
+        tenantId,
+        createdAt: {
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+        },
+      },
+    }),
+
+    // Nuevos esta semana
+    prisma.customer.count({
+      where: {
+        tenantId,
+        createdAt: {
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+    }),
+
+    // Clientes por mes (últimos 12 meses)
+    prisma.customer.groupBy({
+      by: ['createdAt'],
+      where: {
+        tenantId,
+        createdAt: {
+          gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+        },
+      },
+      _count: { createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    }),
+
+    // Top clientes por órdenes
+    prisma.customer.findMany({
+      where: { tenantId },
+      include: {
+        _count: {
+          select: { orders: true },
+        },
+      },
+      orderBy: {
+        orders: { _count: 'desc' },
+      },
+      take: 5,
+    }),
+
+    // Clientes con órdenes
+    prisma.customer.count({
+      where: {
+        tenantId,
+        orders: { some: {} },
+      },
+    }),
+
+    // Clientes con facturas
+    prisma.customer.count({
+      where: {
+        tenantId,
+        invoices: { some: {} },
+      },
+    }),
+  ])
+
+  // Calcular tasa de actividad
+  const activityRate =
+    totalCustomers > 0
+      ? Math.round((activeCustomers / totalCustomers) * 100)
+      : 0
+
+  // Calcular tasa de conversión (clientes con órdenes)
+  const conversionRate =
+    totalCustomers > 0
+      ? Math.round((customersWithOrders / totalCustomers) * 100)
+      : 0
+
+  // Procesar datos mensuales
+  const monthlyData = customersByMonth.map(item => ({
+    month: item.createdAt.toISOString().substring(0, 7),
+    count: item._count.createdAt,
+  }))
+
+  return {
+    totalCustomers,
+    activeCustomers,
+    inactiveCustomers,
+    newThisMonth,
+    newThisWeek,
+    activityRate,
+    conversionRate,
+    customersWithOrders,
+    customersWithInvoices,
+    monthlyData,
+    topCustomersByOrders: topCustomersByOrders.map(customer => ({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      ordersCount: customer._count.orders,
+      isActive: customer.isActive,
+    })),
+  }
 }

@@ -7,6 +7,12 @@ import {
 const prisma = new PrismaClient()
 
 export class OpportunityService {
+  /**
+   * Crea una nueva oportunidad en el sistema
+   * @param data - Datos de la oportunidad a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con la oportunidad creada y sus relaciones
+   */
   static async createOpportunity(
     data: CreateOpportunityInput,
     tenantId: string
@@ -30,6 +36,12 @@ export class OpportunityService {
     })
   }
 
+  /**
+   * Obtiene oportunidades con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @returns Promise con lista de oportunidades y información de paginación
+   */
   static async getOpportunities(
     tenantId: string,
     options: {
@@ -102,6 +114,12 @@ export class OpportunityService {
     }
   }
 
+  /**
+   * Obtiene una oportunidad por su ID
+   * @param id - ID de la oportunidad
+   * @param tenantId - ID del tenant
+   * @returns Promise con la oportunidad y sus relaciones
+   */
   static async getOpportunityById(id: string, tenantId: string) {
     return await prisma.opportunity.findFirst({
       where: { id, tenantId },
@@ -117,6 +135,13 @@ export class OpportunityService {
     })
   }
 
+  /**
+   * Actualiza una oportunidad existente
+   * @param id - ID de la oportunidad a actualizar
+   * @param data - Datos a actualizar
+   * @param tenantId - ID del tenant
+   * @returns Promise con la oportunidad actualizada
+   */
   static async updateOpportunity(
     id: string,
     data: UpdateOpportunityInput,
@@ -141,12 +166,23 @@ export class OpportunityService {
     })
   }
 
+  /**
+   * Elimina una oportunidad del sistema
+   * @param id - ID de la oportunidad a eliminar
+   * @param tenantId - ID del tenant
+   * @returns Promise con la oportunidad eliminada
+   */
   static async deleteOpportunity(id: string, tenantId: string) {
     return await prisma.opportunity.delete({
       where: { id, tenantId },
     })
   }
 
+  /**
+   * Obtiene estadísticas de oportunidades
+   * @param tenantId - ID del tenant
+   * @returns Promise con estadísticas completas de oportunidades
+   */
   static async getOpportunityStats(tenantId: string) {
     const [
       totalOpportunities,
@@ -223,6 +259,13 @@ export class OpportunityService {
     }
   }
 
+  /**
+   * Mueve una oportunidad a una nueva etapa
+   * @param id - ID de la oportunidad
+   * @param stage - Nueva etapa
+   * @param tenantId - ID del tenant
+   * @returns Promise con la oportunidad actualizada
+   */
   static async moveOpportunityToStage(
     id: string,
     stage: string,

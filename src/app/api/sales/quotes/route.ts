@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
     const tenantId = request.headers.get('x-tenant-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     const filters = {
@@ -24,7 +27,12 @@ export async function GET(request: NextRequest) {
     }
 
     const validatedFilters = quoteFiltersSchema.parse(filters)
-    const result = await SalesService.getQuotes(tenantId, validatedFilters, page, limit)
+    const result = await SalesService.getQuotes(
+      tenantId,
+      validatedFilters,
+      page,
+      limit
+    )
 
     return NextResponse.json({
       quotes: result.quotes,
@@ -59,7 +67,10 @@ export async function POST(request: NextRequest) {
     const userId = request.headers.get('x-user-id')
 
     if (!tenantId) {
-      return NextResponse.json({ error: 'Tenant ID requerido' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Tenant ID requerido' },
+        { status: 400 }
+      )
     }
 
     if (!userId) {
@@ -67,7 +78,11 @@ export async function POST(request: NextRequest) {
     }
 
     const validatedData = quoteSchema.parse(body)
-    const quote = await SalesService.createQuote(validatedData, tenantId, userId)
+    const quote = await SalesService.createQuote(
+      validatedData,
+      tenantId,
+      userId
+    )
 
     return NextResponse.json(quote, { status: 201 })
   } catch (error) {
@@ -79,10 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
     console.error('Error creating quote:', error)

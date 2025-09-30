@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metanoia
+  labels:
+    name: metanoia
+    app: metanoia-erp

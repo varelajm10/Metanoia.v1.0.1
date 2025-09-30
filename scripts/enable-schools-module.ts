@@ -13,7 +13,8 @@ async function enableSchoolsModule() {
         key: 'schools',
         name: 'Schools',
         displayName: 'Gestión de Colegios',
-        description: 'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
+        description:
+          'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
         version: '1.0.0',
         category: 'BUSINESS',
         isCore: false,
@@ -419,27 +420,58 @@ async function enableSchoolsModule() {
         ],
         components: [
           { name: 'SchoolDashboard', path: '@/app/dashboard/schools/page' },
-          { name: 'StudentList', path: '@/app/dashboard/schools/students/page' },
+          {
+            name: 'StudentList',
+            path: '@/app/dashboard/schools/students/page',
+          },
           { name: 'StudentForm', path: '@/components/schools/StudentForm' },
           { name: 'StudentDetail', path: '@/components/schools/StudentDetail' },
-          { name: 'TeacherList', path: '@/app/dashboard/schools/teachers/page' },
+          {
+            name: 'TeacherList',
+            path: '@/app/dashboard/schools/teachers/page',
+          },
           { name: 'TeacherForm', path: '@/components/schools/TeacherForm' },
           { name: 'TeacherDetail', path: '@/components/schools/TeacherDetail' },
-          { name: 'AcademicManagement', path: '@/app/dashboard/schools/academic/page' },
-          { name: 'AttendanceManagement', path: '@/app/dashboard/schools/attendance/page' },
-          { name: 'PaymentManagement', path: '@/app/dashboard/schools/payments/page' },
-          { name: 'LibraryManagement', path: '@/app/dashboard/schools/library/page' },
-          { name: 'TransportManagement', path: '@/app/dashboard/schools/transport/page' },
-          { name: 'CafeteriaManagement', path: '@/app/dashboard/schools/cafeteria/page' },
-          { name: 'DisciplinaryManagement', path: '@/app/dashboard/schools/discipline/page' },
-          { name: 'SchoolReports', path: '@/app/dashboard/schools/reports/page' },
+          {
+            name: 'AcademicManagement',
+            path: '@/app/dashboard/schools/academic/page',
+          },
+          {
+            name: 'AttendanceManagement',
+            path: '@/app/dashboard/schools/attendance/page',
+          },
+          {
+            name: 'PaymentManagement',
+            path: '@/app/dashboard/schools/payments/page',
+          },
+          {
+            name: 'LibraryManagement',
+            path: '@/app/dashboard/schools/library/page',
+          },
+          {
+            name: 'TransportManagement',
+            path: '@/app/dashboard/schools/transport/page',
+          },
+          {
+            name: 'CafeteriaManagement',
+            path: '@/app/dashboard/schools/cafeteria/page',
+          },
+          {
+            name: 'DisciplinaryManagement',
+            path: '@/app/dashboard/schools/discipline/page',
+          },
+          {
+            name: 'SchoolReports',
+            path: '@/app/dashboard/schools/reports/page',
+          },
         ],
       },
       create: {
         key: 'schools',
         name: 'Schools',
         displayName: 'Gestión de Colegios',
-        description: 'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
+        description:
+          'Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas',
         version: '1.0.0',
         category: 'BUSINESS',
         isCore: false,
@@ -845,20 +877,50 @@ async function enableSchoolsModule() {
         ],
         components: [
           { name: 'SchoolDashboard', path: '@/app/dashboard/schools/page' },
-          { name: 'StudentList', path: '@/app/dashboard/schools/students/page' },
+          {
+            name: 'StudentList',
+            path: '@/app/dashboard/schools/students/page',
+          },
           { name: 'StudentForm', path: '@/components/schools/StudentForm' },
           { name: 'StudentDetail', path: '@/components/schools/StudentDetail' },
-          { name: 'TeacherList', path: '@/app/dashboard/schools/teachers/page' },
+          {
+            name: 'TeacherList',
+            path: '@/app/dashboard/schools/teachers/page',
+          },
           { name: 'TeacherForm', path: '@/components/schools/TeacherForm' },
           { name: 'TeacherDetail', path: '@/components/schools/TeacherDetail' },
-          { name: 'AcademicManagement', path: '@/app/dashboard/schools/academic/page' },
-          { name: 'AttendanceManagement', path: '@/app/dashboard/schools/attendance/page' },
-          { name: 'PaymentManagement', path: '@/app/dashboard/schools/payments/page' },
-          { name: 'LibraryManagement', path: '@/app/dashboard/schools/library/page' },
-          { name: 'TransportManagement', path: '@/app/dashboard/schools/transport/page' },
-          { name: 'CafeteriaManagement', path: '@/app/dashboard/schools/cafeteria/page' },
-          { name: 'DisciplinaryManagement', path: '@/app/dashboard/schools/discipline/page' },
-          { name: 'SchoolReports', path: '@/app/dashboard/schools/reports/page' },
+          {
+            name: 'AcademicManagement',
+            path: '@/app/dashboard/schools/academic/page',
+          },
+          {
+            name: 'AttendanceManagement',
+            path: '@/app/dashboard/schools/attendance/page',
+          },
+          {
+            name: 'PaymentManagement',
+            path: '@/app/dashboard/schools/payments/page',
+          },
+          {
+            name: 'LibraryManagement',
+            path: '@/app/dashboard/schools/library/page',
+          },
+          {
+            name: 'TransportManagement',
+            path: '@/app/dashboard/schools/transport/page',
+          },
+          {
+            name: 'CafeteriaManagement',
+            path: '@/app/dashboard/schools/cafeteria/page',
+          },
+          {
+            name: 'DisciplinaryManagement',
+            path: '@/app/dashboard/schools/discipline/page',
+          },
+          {
+            name: 'SchoolReports',
+            path: '@/app/dashboard/schools/reports/page',
+          },
         ],
       },
     })
@@ -920,7 +982,6 @@ async function enableSchoolsModule() {
     console.log(`   - Funcionalidades: ${module.features.length}`)
     console.log(`   - Rutas: ${module.routes.length}`)
     console.log(`   - Componentes: ${module.components.length}`)
-
   } catch (error) {
     console.error('❌ Error habilitando módulo de Colegios:', error)
     throw error
@@ -935,7 +996,7 @@ enableSchoolsModule()
     console.log('✅ Script completado exitosamente')
     process.exit(0)
   })
-  .catch((error) => {
+  .catch(error => {
     console.error('❌ Error ejecutando script:', error)
     process.exit(1)
   })

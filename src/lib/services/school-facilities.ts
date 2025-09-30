@@ -306,9 +306,7 @@ export class SchoolFacilitiesService {
         data: {
           availableCopies: { increment: 1 },
           status:
-            loan.book.availableCopies + 1 > 0
-              ? 'AVAILABLE'
-              : loan.book.status,
+            loan.book.availableCopies + 1 > 0 ? 'AVAILABLE' : loan.book.status,
         },
       }),
     ])

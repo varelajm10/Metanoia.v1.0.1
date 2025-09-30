@@ -11,13 +11,14 @@ const modules = [
   // ========================================
   // MÓDULOS DE FASE 1 - CRÍTICOS
   // ========================================
-  
+
   // 1. Módulo de Inventario/Stock
   {
     id: 'inventory',
     name: 'Inventory',
     displayName: 'Inventario y Stock',
-    description: 'Gestión completa de inventario, productos, proveedores y stock',
+    description:
+      'Gestión completa de inventario, productos, proveedores y stock',
     version: '1.0.0',
     category: 'BUSINESS' as any,
     isCore: true,
@@ -42,7 +43,8 @@ const modules = [
       {
         id: 'product_management',
         name: 'Gestión de Productos',
-        description: 'Registro y gestión completa de productos con códigos de barras',
+        description:
+          'Registro y gestión completa de productos con códigos de barras',
         isEnabled: true,
         config: {},
       },
@@ -80,7 +82,8 @@ const modules = [
     id: 'accounting',
     name: 'Accounting',
     displayName: 'Contabilidad',
-    description: 'Sistema contable completo con plan de cuentas y reportes fiscales',
+    description:
+      'Sistema contable completo con plan de cuentas y reportes fiscales',
     version: '1.0.0',
     category: 'FINANCIAL' as any,
     isCore: true,
@@ -119,14 +122,16 @@ const modules = [
       {
         id: 'bank_reconciliation',
         name: 'Conciliación Bancaria',
-        description: 'Conciliación de cuentas bancarias y control de movimientos',
+        description:
+          'Conciliación de cuentas bancarias y control de movimientos',
         isEnabled: true,
         config: {},
       },
       {
         id: 'financial_reports',
         name: 'Reportes Financieros',
-        description: 'Balance general, estado de resultados y reportes fiscales',
+        description:
+          'Balance general, estado de resultados y reportes fiscales',
         isEnabled: true,
         config: {},
       },
@@ -267,13 +272,14 @@ const modules = [
   // ========================================
   // MÓDULOS EXISTENTES
   // ========================================
-  
+
   // Módulo de RRHH (existente)
   {
     id: 'hr',
     name: 'HR',
     displayName: 'Recursos Humanos',
-    description: 'Módulo completo de gestión de recursos humanos, nómina y talento',
+    description:
+      'Módulo completo de gestión de recursos humanos, nómina y talento',
     version: '1.0.0',
     category: 'BUSINESS' as any,
     isCore: false,

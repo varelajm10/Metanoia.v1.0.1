@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    console.log('🔍 [ORDERS-SIMPLE] Fetching orders...')
 
     // Datos mock para que el dashboard funcione
     const mockOrders = [
@@ -38,7 +37,6 @@ export async function GET() {
       },
     ]
 
-    console.log('✅ [ORDERS-SIMPLE] Returning mock orders')
 
     return NextResponse.json({
       success: true,

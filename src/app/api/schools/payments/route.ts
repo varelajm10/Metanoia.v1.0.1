@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
     const studentId = searchParams.get('studentId') || undefined
     const paymentType = searchParams.get('paymentType') || undefined
     const status = searchParams.get('status') || undefined
-    const academicYear = searchParams.get('academicYear') || new Date().getFullYear().toString()
+    const academicYear =
+      searchParams.get('academicYear') || new Date().getFullYear().toString()
     const month = searchParams.get('month') || undefined
     const startDate = searchParams.get('startDate') || undefined
     const endDate = searchParams.get('endDate') || undefined
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating payment:', error)
-    
+
     if (error.name === 'ZodError') {
       return NextResponse.json(
         {

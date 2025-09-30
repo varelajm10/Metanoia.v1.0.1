@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    console.log('🔍 [MODULES-SIMPLE] Fetching modules...')
 
     // Datos mock para que el dashboard funcione
     const mockModules = [
@@ -34,8 +33,8 @@ export async function GET() {
         isActive: true,
       },
       {
-        id: 'reports',
-        name: 'reports',
+        id: 'analytics',
+        name: 'analytics',
         displayName: 'Reportes',
         description: 'Análisis y estadísticas',
         icon: 'BarChart3',
@@ -64,7 +63,6 @@ export async function GET() {
       },
     ]
 
-    console.log('✅ [MODULES-SIMPLE] Returning mock modules')
 
     return NextResponse.json({
       success: true,

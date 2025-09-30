@@ -2,25 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🔍 [FIXED] Iniciando login...')
 
     // Intentar parsear el JSON con mejor manejo de errores
     let body: any
     try {
       const rawBody = await request.text()
-      console.log('📧 [FIXED] Raw body recibido:', rawBody)
 
       if (!rawBody || rawBody.trim() === '') {
-        console.log('❌ [FIXED] Body vacío')
         return NextResponse.json({ error: 'Body vacío' }, { status: 400 })
       }
 
       body = JSON.parse(rawBody)
-      console.log('✅ [FIXED] JSON parseado correctamente:', {
         email: body.email,
       })
     } catch (parseError) {
-      console.log('❌ [FIXED] Error parseando JSON:', parseError)
       return NextResponse.json(
         {
           error: 'Error parseando JSON',
@@ -36,7 +31,6 @@ export async function POST(request: NextRequest) {
     const { email, password } = body
 
     if (!email || !password) {
-      console.log('❌ [FIXED] Email o contraseña faltantes')
       return NextResponse.json(
         { error: 'Email y contraseña son requeridos' },
         { status: 400 }
@@ -45,7 +39,6 @@ export async function POST(request: NextRequest) {
 
     // Simulación simple de autenticación
     if (email === 'admin@metanoia.click' && password === 'metanoia123') {
-      console.log('✅ [FIXED] Credenciales correctas')
 
       const mockResponse = {
         user: {
@@ -60,7 +53,6 @@ export async function POST(request: NextRequest) {
         refreshToken: 'mock-refresh-token',
       }
 
-      console.log('🎉 [FIXED] Login exitoso')
 
       // Crear respuesta con cookies
       const response = NextResponse.json(mockResponse)
@@ -84,7 +76,6 @@ export async function POST(request: NextRequest) {
 
       return response
     } else {
-      console.log('❌ [FIXED] Credenciales incorrectas')
       return NextResponse.json(
         { error: 'Credenciales inválidas' },
         { status: 401 }

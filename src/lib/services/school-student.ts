@@ -150,9 +150,7 @@ export class SchoolStudentService {
   }
 
   // Crear un estudiante
-  static async createStudent(
-    data: SchoolStudentInput & { tenantId: string }
-  ) {
+  static async createStudent(data: SchoolStudentInput & { tenantId: string }) {
     return prisma.schoolStudent.create({
       data: {
         ...data,
