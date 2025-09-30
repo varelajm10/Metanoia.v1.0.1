@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
+import bcryptjs from 'bcryptjs'
 import { PrismaClient, User } from '@prisma/client'
 import { JWTPayload, RefreshTokenPayload } from '@/types/auth'
 
@@ -8,14 +8,14 @@ const prisma = new PrismaClient()
 const JWT_SECRET = (process.env.JWT_SECRET || 'dev-secret-key') as string
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12)
+  return bcryptjs.hash(password, 12)
 }
 
 export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword)
+  return bcryptjs.compare(password, hashedPassword)
 }
 
 export function generateAccessToken(

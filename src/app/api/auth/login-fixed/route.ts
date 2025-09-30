@@ -13,8 +13,7 @@ export async function POST(request: NextRequest) {
       }
 
       body = JSON.parse(rawBody)
-        email: body.email,
-      })
+      console.log('📧 [FIXED] Email recibido:', body.email)
     } catch (parseError) {
       return NextResponse.json(
         {

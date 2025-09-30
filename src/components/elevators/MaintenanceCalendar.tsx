@@ -87,7 +87,7 @@ export default function MaintenanceCalendar({
     'Diciembre',
   ]
 
-  const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear()

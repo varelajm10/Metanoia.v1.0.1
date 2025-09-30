@@ -4,7 +4,18 @@ import type { ElevatorInput } from '../validations/elevator'
 const prisma = new PrismaClient()
 
 export class ElevatorService {
-  // Obtener ascensores con filtros y paginación
+  /**
+   * Obtiene ascensores con filtros avanzados y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @param options.page - Número de página
+   * @param options.limit - Límite de resultados por página
+   * @param options.search - Término de búsqueda (número de serie, modelo, marca, edificio)
+   * @param options.status - Filtro por estado del ascensor
+   * @param options.clientId - Filtro por cliente específico
+   * @param options.brand - Filtro por marca del ascensor
+   * @returns Promise con lista paginada de ascensores y metadatos
+   */
   static async getElevators(
     tenantId: string,
     options: {
@@ -80,7 +91,12 @@ export class ElevatorService {
     }
   }
 
-  // Obtener un ascensor por ID
+  /**
+   * Obtiene un ascensor por su ID con todas sus relaciones
+   * @param id - ID del ascensor
+   * @param tenantId - ID del tenant
+   * @returns Promise con el ascensor encontrado y sus relaciones (cliente, instalaciones, mantenimientos)
+   */
   static async getElevatorById(id: string, tenantId: string) {
     return prisma.elevator.findFirst({
       where: {

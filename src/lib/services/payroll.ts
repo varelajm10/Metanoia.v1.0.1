@@ -1,15 +1,21 @@
-import { PrismaClient } from '@prisma/client'
 import {
   CreatePayrollInput,
   UpdatePayrollInput,
 } from '@/lib/validations/employee'
+import { prisma } from '@/lib/db'
 
 export class PayrollService {
-  constructor(private prisma: PrismaClient) {}
+  constructor() {}
 
+  /**
+   * Crea una nueva nómina para un empleado
+   * @param data - Datos de la nómina a crear, incluyendo tenantId
+   * @returns Promise con la nómina creada y cálculos automáticos
+   * @throws Error si el empleado no existe o ya existe nómina para el período
+   */
   async createPayroll(data: CreatePayrollInput & { tenantId: string }) {
     // Verificar que el empleado existe
-    const employee = await this.prisma.employee.findFirst({
+    const employee = await prisma.employee.findFirst({
       where: { id: data.employeeId, tenantId: data.tenantId },
     })
 
@@ -18,7 +24,7 @@ export class PayrollService {
     }
 
     // Verificar que no exista nómina para este período
-    const existingPayroll = await this.prisma.payroll.findFirst({
+    const existingPayroll = await prisma.payroll.findFirst({
       where: {
         employeeId: data.employeeId,
         period: data.period,
@@ -43,7 +49,7 @@ export class PayrollService {
     // Parsear año y mes del período
     const [year, month] = data.period.split('-').map(Number)
 
-    return await this.prisma.payroll.create({
+    return await prisma.payroll.create({
       data: {
         ...data,
         year,
@@ -113,7 +119,7 @@ export class PayrollService {
     }
 
     const [payrolls, total] = await Promise.all([
-      this.prisma.payroll.findMany({
+      prisma.payroll.findMany({
         where,
         include: {
           employee: {
@@ -131,7 +137,7 @@ export class PayrollService {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      this.prisma.payroll.count({ where }),
+      prisma.payroll.count({ where }),
     ])
 
     return {
@@ -146,7 +152,7 @@ export class PayrollService {
   }
 
   async getPayrollById(id: string, tenantId: string) {
-    return await this.prisma.payroll.findFirst({
+    return await prisma.payroll.findFirst({
       where: { id, tenantId },
       include: {
         employee: {
@@ -167,7 +173,7 @@ export class PayrollService {
 
   async updatePayroll(id: string, data: UpdatePayrollInput, tenantId: string) {
     // Verificar que la nómina existe
-    const existingPayroll = await this.prisma.payroll.findFirst({
+    const existingPayroll = await prisma.payroll.findFirst({
       where: { id, tenantId },
     })
 
@@ -222,7 +228,7 @@ export class PayrollService {
         Number(updateData.grossSalary) - Number(updateData.totalDeductions)
     }
 
-    return await this.prisma.payroll.update({
+    return await prisma.payroll.update({
       where: { id },
       data: updateData,
       include: {
@@ -242,7 +248,7 @@ export class PayrollService {
   }
 
   async processPayroll(id: string, processedBy: string, tenantId: string) {
-    const payroll = await this.prisma.payroll.findFirst({
+    const payroll = await prisma.payroll.findFirst({
       where: { id, tenantId },
     })
 
@@ -254,7 +260,7 @@ export class PayrollService {
       throw new Error('Solo se pueden procesar nóminas pendientes')
     }
 
-    return await this.prisma.payroll.update({
+    return await prisma.payroll.update({
       where: { id },
       data: {
         status: 'PROCESSED',
@@ -285,25 +291,25 @@ export class PayrollService {
       payrollsByStatus,
       payrollsByDepartment,
     ] = await Promise.all([
-      this.prisma.payroll.count({ where }),
-      this.prisma.payroll.aggregate({
+      prisma.payroll.count({ where }),
+      prisma.payroll.aggregate({
         where,
         _sum: { grossSalary: true },
       }),
-      this.prisma.payroll.aggregate({
+      prisma.payroll.aggregate({
         where,
         _sum: { netSalary: true },
       }),
-      this.prisma.payroll.aggregate({
+      prisma.payroll.aggregate({
         where,
         _sum: { totalDeductions: true },
       }),
-      this.prisma.payroll.groupBy({
+      prisma.payroll.groupBy({
         by: ['status'],
         where,
         _count: true,
       }),
-      this.prisma.payroll.groupBy({
+      prisma.payroll.groupBy({
         by: ['employeeId', 'department'] as any,
         where,
         _sum: {
@@ -329,7 +335,7 @@ export class PayrollService {
     const [year, month] = period.split('-').map(Number)
 
     // Obtener empleados activos
-    const employees = await this.prisma.employee.findMany({
+    const employees = await prisma.employee.findMany({
       where: {
         tenantId,
         status: 'ACTIVE',
@@ -347,7 +353,7 @@ export class PayrollService {
 
     for (const employee of employees) {
       // Verificar si ya existe nómina para este período
-      const existingPayroll = await this.prisma.payroll.findFirst({
+      const existingPayroll = await prisma.payroll.findFirst({
         where: {
           employeeId: employee.id,
           period,
@@ -368,7 +374,7 @@ export class PayrollService {
       const totalDeductions = taxes + socialSecurity + healthInsurance
       const netSalary = grossSalary - totalDeductions
 
-      const payroll = await this.prisma.payroll.create({
+      const payroll = await prisma.payroll.create({
         data: {
           employeeId: employee.id,
           period,

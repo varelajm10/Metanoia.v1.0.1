@@ -4,7 +4,18 @@ import type { SchoolStudentInput } from '../validations/school'
 const prisma = new PrismaClient()
 
 export class SchoolStudentService {
-  // Obtener estudiantes con filtros y paginación
+  /**
+   * Obtiene estudiantes con filtros avanzados y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @param options.page - Número de página
+   * @param options.limit - Límite de resultados por página
+   * @param options.search - Término de búsqueda (nombre, código, email)
+   * @param options.status - Filtro por estado del estudiante
+   * @param options.grade - Filtro por grado académico
+   * @param options.section - Filtro por sección
+   * @returns Promise con lista paginada de estudiantes y metadatos
+   */
   static async getStudents(
     tenantId: string,
     options: {

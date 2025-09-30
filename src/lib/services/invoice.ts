@@ -6,8 +6,7 @@ import {
   RecordPaymentInput,
   InvoiceQuery,
 } from '@/lib/validations/invoice'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/db'
 
 export interface InvoiceWithRelations extends Invoice {
   customer?: {

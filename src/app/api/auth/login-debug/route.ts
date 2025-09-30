@@ -8,11 +8,11 @@ const JWT_SECRET = (process.env.JWT_SECRET || 'dev-secret-key') as string
 
 export async function POST(request: NextRequest) {
   try {
-
+    console.log('🔍 [DEBUG] Iniciando login debug...')
+    
     const body = await request.json()
-      email: body.email,
-      password: '***',
-    })
+    console.log('📧 [DEBUG] Email recibido:', body.email)
+    console.log('🔐 [DEBUG] Password recibido:', '***')
 
     const { email, password } = body
 

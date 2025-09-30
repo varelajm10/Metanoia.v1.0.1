@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         role: user.role,
         tenantId: user.tenantId,
         tenant: (user as any).tenant,
+        enabledModules: (user as any).tenant?.settings?.enabledModules || [],
       },
     })
   } catch (error) {

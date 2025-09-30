@@ -1,5 +1,4 @@
 import {
-  PrismaClient,
   Order,
   OrderItem,
   OrderStatus,
@@ -12,8 +11,7 @@ import {
   UpdatePaymentStatusInput,
   OrderQuery,
 } from '@/lib/validations/order'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/db'
 
 export interface OrderWithRelations extends Order {
   orderItems?: OrderItem[]
@@ -60,21 +58,40 @@ async function generateOrderNumber(tenantId: string): Promise<string> {
   return `${prefix}-${String(sequence).padStart(4, '0')}`
 }
 
-// Validar stock disponible
+// Validar stock disponible - OPTIMIZADO: Una sola consulta en lugar de N consultas
 async function validateStock(
   items: any[],
   tenantId: string
 ): Promise<{ valid: boolean; errors: string[] }> {
   const errors: string[] = []
+  
+  if (items.length === 0) {
+    return { valid: true, errors: [] }
+  }
 
+  // Obtener todos los IDs de productos de una sola vez
+  const productIds = items.map(item => item.productId)
+  
+  // Una sola consulta para obtener todos los productos necesarios
+  const products = await prisma.product.findMany({
+    where: {
+      id: { in: productIds },
+      tenantId,
+      isActive: true,
+    },
+    select: {
+      id: true,
+      name: true,
+      stock: true,
+    },
+  })
+
+  // Crear un mapa para acceso O(1) a los productos
+  const productMap = new Map(products.map(p => [p.id, p]))
+
+  // Validar cada item usando el mapa
   for (const item of items) {
-    const product = await prisma.product.findFirst({
-      where: {
-        id: item.productId,
-        tenantId,
-        isActive: true,
-      },
-    })
+    const product = productMap.get(item.productId)
 
     if (!product) {
       errors.push(`Producto con ID ${item.productId} no encontrado o inactivo`)
@@ -544,7 +561,7 @@ export async function cancelOrder(
   return result
 }
 
-// Restaurar stock de una orden
+// Restaurar stock de una orden - OPTIMIZADO: Updates en lote en lugar de N updates
 async function restoreStockFromOrder(
   orderId: string,
   tenantId: string,
@@ -556,18 +573,37 @@ async function restoreStockFromOrder(
     where: {
       orderId,
     },
+    select: {
+      productId: true,
+      quantity: true,
+    },
   })
 
-  for (const item of orderItems) {
-    await prismaClient.product.update({
-      where: { id: item.productId },
-      data: {
-        stock: {
-          increment: item.quantity,
-        },
-      },
-    })
+  if (orderItems.length === 0) {
+    return
   }
+
+  // Agrupar items por producto para sumar cantidades
+  const stockRestoreMap = new Map<string, number>()
+  for (const item of orderItems) {
+    const current = stockRestoreMap.get(item.productId) || 0
+    stockRestoreMap.set(item.productId, current + item.quantity)
+  }
+
+  // Ejecutar updates en paralelo usando Promise.all
+  const updatePromises = Array.from(stockRestoreMap.entries()).map(
+    ([productId, totalQuantity]) =>
+      prismaClient.product.update({
+        where: { id: productId },
+        data: {
+          stock: {
+            increment: totalQuantity,
+          },
+        },
+      })
+  )
+
+  await Promise.all(updatePromises)
 }
 
 /**
@@ -644,15 +680,18 @@ export async function getOrderStats(tenantId: string) {
   const averageOrderValue =
     totalOrders > 0 ? Number(totalRevenue._sum.total || 0) / totalOrders : 0
 
-  // Obtener nombres de clientes y productos
+  // OPTIMIZADO: Obtener nombres de clientes y productos en paralelo
+  // En lugar de hacer consultas N+1, obtenemos todos los datos necesarios de una vez
   const customerIds = topCustomers.map(c => c.customerId)
   const productIds = topProducts.map(p => p.productId)
 
   const [customers, products] = await Promise.all([
+    // Una sola consulta para todos los clientes necesarios
     prisma.customer.findMany({
       where: { id: { in: customerIds } },
       select: { id: true, name: true },
     }),
+    // Una sola consulta para todos los productos necesarios
     prisma.product.findMany({
       where: { id: { in: productIds } },
       select: { id: true, name: true },

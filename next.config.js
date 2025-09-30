@@ -2,7 +2,7 @@
 const nextConfig = {
   typescript: {
     // Temporalmente deshabilitar verificación de tipos para desarrollo
-    ignoreBuildErrors: true,
+    // ignoreBuildErrors: true, // COMENTADO: Riesgo crítico eliminado
   },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],

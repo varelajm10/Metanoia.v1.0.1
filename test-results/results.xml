@@ -1,0 +1,62 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="56.537054000000005">
+<testsuite name="onboarding.spec.ts" timestamp="2025-09-30T16:45:53.843Z" hostname="chromium" tests="1" failures="1" skipped="0" time="27.01" errors="0">
+<testcase name="Flujo de Onboarding Crítico › Flujo completo: Login → Dashboard → Crear Cliente" classname="onboarding.spec.ts" time="27.01">
+<failure message="onboarding.spec.ts:27:7 Flujo completo: Login → Dashboard → Crear Cliente" type="FAILURE">
+<![CDATA[  [chromium] › onboarding.spec.ts:27:7 › Flujo de Onboarding Crítico › Flujo completo: Login → Dashboard → Crear Cliente 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  locator('form').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for locator('form').first()
+
+
+      154 |     // Verificar que el formulario está presente
+      155 |     const form = page.locator('form').first();
+    > 156 |     await expect(form).toBeVisible();
+          |                        ^
+      157 |     
+      158 |     console.log('✅ Modal de creación verificado');
+      159 |
+        at C:\Users\Juan\Desktop\Metanoia_v1.0.1\tests\e2e\onboarding.spec.ts:156:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🔐 Paso 1: Iniciando sesión...
+📝 Formulario de login llenado
+🔄 Enviando formulario de login...
+✅ Login exitoso - redirigido al dashboard
+📊 Paso 2: Verificando dashboard...
+⚠️ No se encontraron tarjetas de estadísticas específicas, pero el dashboard está cargado
+✅ Dashboard cargado correctamente
+👥 Paso 3: Navegando a la sección de clientes...
+✅ Navegación a clientes exitosa
+➕ Paso 4: Creando nuevo cliente...
+✅ Modal de creación abierto
+📝 Paso 5: Verificando modal de creación...
+
+[[ATTACHMENT|onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\video.webm]]
+
+[[ATTACHMENT|onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

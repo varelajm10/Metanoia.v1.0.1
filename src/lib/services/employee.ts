@@ -7,6 +7,12 @@ import {
 export class EmployeeService {
   constructor(private prisma: PrismaClient) {}
 
+  /**
+   * Crea un nuevo empleado en el sistema
+   * @param data - Datos del empleado a crear, incluyendo tenantId
+   * @returns Promise con el empleado creado y sus relaciones
+   * @throws Error si el email ya existe o hay problemas de validación
+   */
   async createEmployee(data: CreateEmployeeInput & { tenantId: string }) {
     // Generar número de empleado si no se proporciona
     if (!data.employeeNumber) {
@@ -53,6 +59,17 @@ export class EmployeeService {
     })
   }
 
+  /**
+   * Obtiene empleados con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @param options.page - Número de página
+   * @param options.limit - Límite de resultados por página
+   * @param options.search - Término de búsqueda (nombre, email, número de empleado)
+   * @param options.department - Filtro por departamento
+   * @param options.status - Filtro por estado del empleado
+   * @returns Promise con lista paginada de empleados y metadatos
+   */
   async getEmployees(
     tenantId: string,
     options: {

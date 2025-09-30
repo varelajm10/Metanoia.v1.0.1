@@ -13,7 +13,34 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    // Verificar que el request tiene body
+    const contentType = request.headers.get('content-type')
+    if (!contentType || !contentType.includes('application/json')) {
+      return NextResponse.json(
+        { error: 'Content-Type debe ser application/json' },
+        { status: 400 }
+      )
+    }
+
+    // Obtener el body de forma segura
+    let body
+    try {
+      body = await request.json()
+    } catch (jsonError) {
+      console.error('Error parsing JSON:', jsonError)
+      return NextResponse.json(
+        { error: 'JSON inválido en el body de la request' },
+        { status: 400 }
+      )
+    }
+
+    // Verificar que el body no esté vacío
+    if (!body || Object.keys(body).length === 0) {
+      return NextResponse.json(
+        { error: 'Body de la request vacío' },
+        { status: 400 }
+      )
+    }
 
     // Validar datos de entrada
     const validation = loginSchema.safeParse(body)

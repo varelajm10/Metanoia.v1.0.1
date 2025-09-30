@@ -1,0 +1,249 @@
+groups:
+  # Alertas del sistema Metanoia ERP
+  - name: metanoia-system
+    rules:
+      # Alertas de CPU
+      - alert: HighCPUUsage
+        expr: rate(metanoia_process_cpu_user_seconds_total[5m]) > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 2 minutes"
+          value: "{{ $value }}"
+          threshold: "0.8"
+
+      # Alertas de memoria
+      - alert: HighMemoryUsage
+        expr: (metanoia_process_resident_memory_bytes / 1024 / 1024 / 1024) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 2GB for more than 5 minutes"
+          value: "{{ $value }}GB"
+          threshold: "2GB"
+
+      # Alertas de heap
+      - alert: HighHeapUsage
+        expr: (metanoia_process_heap_bytes / 1024 / 1024) > 512
+        for: 3m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High heap usage detected"
+          description: "Heap usage is above 512MB for more than 3 minutes"
+          value: "{{ $value }}MB"
+          threshold: "512MB"
+
+      # Alertas de event loop
+      - alert: HighEventLoopLag
+        expr: metanoia_nodejs_eventloop_lag_seconds > 0.1
+        for: 1m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High event loop lag detected"
+          description: "Event loop lag is above 100ms for more than 1 minute"
+          value: "{{ $value }}s"
+          threshold: "0.1s"
+
+  # Alertas de HTTP y API
+  - name: metanoia-http
+    rules:
+      # Alta latencia de respuesta
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(metanoia_http_request_duration_seconds_bucket[5m])) > 2
+        for: 3m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "High response time detected"
+          description: "95th percentile response time is above 2 seconds"
+          value: "{{ $value }}s"
+          threshold: "2s"
+
+      # Muchos errores HTTP
+      - alert: HighErrorRate
+        expr: rate(metanoia_http_request_errors_total[5m]) / rate(metanoia_http_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "High error rate detected"
+          description: "HTTP error rate is above 5% for more than 2 minutes"
+          value: "{{ $value }}%"
+          threshold: "5%"
+
+      # Bajo throughput
+      - alert: LowThroughput
+        expr: rate(metanoia_http_requests_total[5m]) < 1
+        for: 10m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "Low throughput detected"
+          description: "Request rate is below 1 req/s for more than 10 minutes"
+          value: "{{ $value }} req/s"
+          threshold: "1 req/s"
+
+  # Alertas de base de datos
+  - name: metanoia-database
+    rules:
+      # Conexiones de BD agotadas
+      - alert: DatabaseConnectionsExhausted
+        expr: metanoia_database_connections > 15
+        for: 2m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "Database connections exhausted"
+          description: "Database connections are above 15 for more than 2 minutes"
+          value: "{{ $value }}"
+          threshold: "15"
+
+      # Conexiones activas muy altas
+      - alert: HighActiveConnections
+        expr: metanoia_active_connections > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "High active connections"
+          description: "Active connections are above 80 for more than 5 minutes"
+          value: "{{ $value }}"
+          threshold: "80"
+
+  # Alertas de negocio
+  - name: metanoia-business
+    rules:
+      # Pocos usuarios activos
+      - alert: LowActiveUsers
+        expr: metanoia_active_users < 1
+        for: 30m
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Low active users"
+          description: "Active users are below 1 for more than 30 minutes"
+          value: "{{ $value }}"
+          expected: "> 1"
+
+      # Sin tenants
+      - alert: NoTenants
+        expr: metanoia_tenants_total < 1
+        for: 1m
+        labels:
+          severity: critical
+          service: business
+        annotations:
+          summary: "No tenants found"
+          description: "System has no tenants configured"
+          value: "{{ $value }}"
+          expected: "> 0"
+
+      # Revenue bajo
+      - alert: LowRevenue
+        expr: sum(metanoia_revenue_total) < 1000
+        for: 1h
+        labels:
+          severity: warning
+          service: business
+        annotations:
+          summary: "Low revenue detected"
+          description: "Total revenue is below $1000 for more than 1 hour"
+          value: "${{ $value }}"
+          expected: "> $1000"
+
+  # Alertas de disponibilidad del servicio
+  - name: metanoia-availability
+    rules:
+      # Servicio down
+      - alert: ServiceDown
+        expr: up{job="metanoia-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: availability
+        annotations:
+          summary: "Metanoia service is down"
+          description: "Metanoia application is not responding"
+          instance: "{{ $labels.instance }}"
+
+      # Prometheus down
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: monitoring
+        annotations:
+          summary: "Prometheus is down"
+          description: "Prometheus monitoring is not responding"
+          instance: "{{ $labels.instance }}"
+
+      # Grafana down
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          service: monitoring
+        annotations:
+          summary: "Grafana is down"
+          description: "Grafana dashboard is not responding"
+          instance: "{{ $labels.instance }}"
+
+  # Alertas de SLA/SLO
+  - name: metanoia-sla
+    rules:
+      # SLA de disponibilidad (99.9%)
+      - alert: SLAAvailabilityBreach
+        expr: (rate(metanoia_http_requests_total{status_code!~"5.."}[1h]) / rate(metanoia_http_requests_total[1h])) < 0.999
+        for: 5m
+        labels:
+          severity: critical
+          service: sla
+        annotations:
+          summary: "SLA availability breach"
+          description: "Availability is below 99.9% SLA"
+          value: "{{ $value }}%"
+          threshold: "99.9%"
+
+      # SLO de latencia (95th percentile < 1s)
+      - alert: SLOLatencyBreach
+        expr: histogram_quantile(0.95, rate(metanoia_http_request_duration_seconds_bucket[1h])) > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: slo
+        annotations:
+          summary: "SLO latency breach"
+          description: "95th percentile latency is above 1 second"
+          value: "{{ $value }}s"
+          threshold: "1s"
+
+      # SLO de error rate (< 0.1%)
+      - alert: SLOErrorRateBreach
+        expr: rate(metanoia_http_request_errors_total[1h]) / rate(metanoia_http_requests_total[1h]) > 0.001
+        for: 5m
+        labels:
+          severity: warning
+          service: slo
+        annotations:
+          summary: "SLO error rate breach"
+          description: "Error rate is above 0.1%"
+          value: "{{ $value }}%"
+          threshold: "0.1%"

@@ -1,15 +1,21 @@
-import { PrismaClient } from '@prisma/client'
 import {
   CreateVacationInput,
   UpdateVacationInput,
 } from '@/lib/validations/employee'
+import { prisma } from '@/lib/db'
 
 export class VacationService {
-  constructor(private prisma: PrismaClient) {}
+  constructor() {}
 
+  /**
+   * Crea una nueva solicitud de vacaciones para un empleado
+   * @param data - Datos de la solicitud de vacaciones, incluyendo tenantId
+   * @returns Promise con la solicitud de vacaciones creada y cálculos automáticos
+   * @throws Error si el empleado no existe, no está activo, o hay conflictos de fechas
+   */
   async createVacation(data: CreateVacationInput & { tenantId: string }) {
     // Verificar que el empleado existe
-    const employee = await this.prisma.employee.findFirst({
+    const employee = await prisma.employee.findFirst({
       where: { id: data.employeeId, tenantId: data.tenantId },
     })
 
@@ -29,7 +35,7 @@ export class VacationService {
     const days = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1 // +1 para incluir el día final
 
     // Verificar que no haya conflictos con otras vacaciones
-    const conflictingVacations = await this.prisma.vacation.findMany({
+    const conflictingVacations = await prisma.vacation.findMany({
       where: {
         employeeId: data.employeeId,
         tenantId: data.tenantId,
@@ -49,7 +55,7 @@ export class VacationService {
       )
     }
 
-    return await this.prisma.vacation.create({
+    return await prisma.vacation.create({
       data: {
         ...data,
         days,
@@ -122,7 +128,7 @@ export class VacationService {
     }
 
     const [vacations, total] = await Promise.all([
-      this.prisma.vacation.findMany({
+      prisma.vacation.findMany({
         where,
         include: {
           employee: {
@@ -140,7 +146,7 @@ export class VacationService {
         skip: (page - 1) * limit,
         take: limit,
       }),
-      this.prisma.vacation.count({ where }),
+      prisma.vacation.count({ where }),
     ])
 
     return {
@@ -155,7 +161,7 @@ export class VacationService {
   }
 
   async getVacationById(id: string, tenantId: string) {
-    return await this.prisma.vacation.findFirst({
+    return await prisma.vacation.findFirst({
       where: { id, tenantId },
       include: {
         employee: {
@@ -179,7 +185,7 @@ export class VacationService {
     tenantId: string
   ) {
     // Verificar que la vacación existe
-    const existingVacation = await this.prisma.vacation.findFirst({
+    const existingVacation = await prisma.vacation.findFirst({
       where: { id, tenantId },
     })
 
@@ -192,7 +198,7 @@ export class VacationService {
       throw new Error('Solo se pueden modificar solicitudes pendientes')
     }
 
-    return await this.prisma.vacation.update({
+    return await prisma.vacation.update({
       where: { id },
       data: {
         ...data,
@@ -216,7 +222,7 @@ export class VacationService {
   }
 
   async approveVacation(id: string, approvedBy: string, tenantId: string) {
-    const vacation = await this.prisma.vacation.findFirst({
+    const vacation = await prisma.vacation.findFirst({
       where: { id, tenantId },
     })
 
@@ -228,7 +234,7 @@ export class VacationService {
       throw new Error('Solo se pueden aprobar solicitudes pendientes')
     }
 
-    return await this.prisma.vacation.update({
+    return await prisma.vacation.update({
       where: { id },
       data: {
         status: 'APPROVED',
@@ -244,7 +250,7 @@ export class VacationService {
     rejectionReason: string,
     tenantId: string
   ) {
-    const vacation = await this.prisma.vacation.findFirst({
+    const vacation = await prisma.vacation.findFirst({
       where: { id, tenantId },
     })
 
@@ -256,7 +262,7 @@ export class VacationService {
       throw new Error('Solo se pueden rechazar solicitudes pendientes')
     }
 
-    return await this.prisma.vacation.update({
+    return await prisma.vacation.update({
       where: { id },
       data: {
         status: 'REJECTED',
@@ -288,22 +294,22 @@ export class VacationService {
       vacationsByStatus,
       totalVacationDays,
     ] = await Promise.all([
-      this.prisma.vacation.count({ where }),
-      this.prisma.vacation.count({ where: { ...where, status: 'APPROVED' } }),
-      this.prisma.vacation.count({ where: { ...where, status: 'PENDING' } }),
-      this.prisma.vacation.count({ where: { ...where, status: 'REJECTED' } }),
-      this.prisma.vacation.groupBy({
+      prisma.vacation.count({ where }),
+      prisma.vacation.count({ where: { ...where, status: 'APPROVED' } }),
+      prisma.vacation.count({ where: { ...where, status: 'PENDING' } }),
+      prisma.vacation.count({ where: { ...where, status: 'REJECTED' } }),
+      prisma.vacation.groupBy({
         by: ['type'],
         where,
         _count: true,
         _sum: { days: true },
       }),
-      this.prisma.vacation.groupBy({
+      prisma.vacation.groupBy({
         by: ['status'],
         where,
         _count: true,
       }),
-      this.prisma.vacation.aggregate({
+      prisma.vacation.aggregate({
         where: { ...where, status: 'APPROVED' },
         _sum: { days: true },
       }),
@@ -324,7 +330,7 @@ export class VacationService {
     const startDate = new Date()
     const endDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000)
 
-    return await this.prisma.vacation.findMany({
+    return await prisma.vacation.findMany({
       where: {
         tenantId,
         status: 'APPROVED',
@@ -357,7 +363,7 @@ export class VacationService {
     const endOfYear = new Date(currentYear, 11, 31)
 
     // Obtener empleado
-    const employee = await this.prisma.employee.findFirst({
+    const employee = await prisma.employee.findFirst({
       where: { id: employeeId, tenantId },
     })
 
@@ -366,7 +372,7 @@ export class VacationService {
     }
 
     // Calcular días de vacación utilizados
-    const usedVacations = await this.prisma.vacation.aggregate({
+    const usedVacations = await prisma.vacation.aggregate({
       where: {
         employeeId,
         tenantId,
@@ -395,7 +401,7 @@ export class VacationService {
       annualVacationDays,
       usedDays,
       remainingDays,
-      usedVacations: await this.prisma.vacation.findMany({
+      usedVacations: await prisma.vacation.findMany({
         where: {
           employeeId,
           tenantId,

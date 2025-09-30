@@ -1,0 +1,444 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic:
+    - banner:
+      - generic:
+        - generic:
+          - generic:
+            - generic: M
+          - generic:
+            - heading [level=1]: Metanoia
+            - paragraph: Sistema ERP Modular • Visión AI
+        - generic:
+          - button:
+            - img
+            - generic: Buscar
+            - generic:
+              - generic: ⌘
+              - text: K
+          - button:
+            - img
+            - generic: Cambiar tema
+          - generic:
+            - paragraph: Hola, Admin!
+            - generic: Administrador
+          - button:
+            - img
+            - text: Salir
+    - main:
+      - generic:
+        - heading [level=2]: ¡Bienvenido de vuelta!
+        - paragraph: Tu centro de control empresarial con inteligencia artificial
+      - generic:
+        - generic:
+          - generic:
+            - heading [level=3]: 🤖 Insights Inteligentes
+            - paragraph: Análisis automático de tu negocio
+          - button:
+            - img
+            - text: Preguntar a la IA
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - heading [level=3]: Insights de la Semana
+                  - paragraph: Análisis inteligente de tu negocio
+              - generic:
+                - generic:
+                  - img
+                  - text: IA Activa
+                - button:
+                  - img
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - generic:
+                    - heading [level=4]: Crecimiento en Ventas
+                    - generic: Alto
+                  - paragraph: Las ventas han aumentado un 23% esta semana comparado con la anterior
+                  - button: Ver detalles →
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - generic:
+                    - heading [level=4]: Optimización de Stock
+                    - generic: Medio
+                  - paragraph: Se recomienda aumentar el stock del producto "Laptop Pro" por alta demanda
+                  - button: Revisar inventario →
+              - generic:
+                - generic:
+                  - img
+                - generic:
+                  - generic:
+                    - heading [level=4]: Análisis de Clientes
+                    - generic: Medio
+                  - paragraph: Se detectaron 5 nuevos clientes potenciales en la región norte
+                  - button: Contactar clientes →
+            - generic:
+              - generic:
+                - paragraph: "Última actualización: hace 2 horas"
+                - button:
+                  - text: Ver todos los insights
+                  - img
+      - generic:
+        - generic:
+          - heading [level=2]: Resumen del Negocio
+          - paragraph: Vista general de tu rendimiento empresarial
+        - generic:
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - generic:
+                  - img
+                - generic:
+                  - generic: Total Clientes
+                  - generic: Clientes registrados
+              - generic:
+                - generic: "2"
+                - generic: Activos
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - generic:
+                  - img
+                - generic:
+                  - generic: Total Productos
+                  - generic: Productos en inventario
+              - generic:
+                - generic: "3"
+                - generic: En stock
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - generic:
+                  - img
+                - generic:
+                  - generic: Total Órdenes
+                  - generic: Órdenes procesadas
+              - generic:
+                - generic: "3"
+                - generic: Procesadas
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - generic:
+                  - img
+                - generic:
+                  - generic: Ingresos Totales
+                  - generic: Ingresos generados
+              - generic:
+                - generic: $2,600
+                - generic: Generados
+      - generic:
+        - generic:
+          - heading [level=2]: Alertas
+          - paragraph: Requieren tu atención inmediata
+        - generic:
+          - generic:
+            - generic:
+              - heading [level=3]: Órdenes Pendientes
+              - generic:
+                - generic: "1"
+                - paragraph: Órdenes que requieren atención
+          - generic:
+            - generic:
+              - heading [level=3]: Stock Bajo
+              - generic:
+                - generic: "1"
+                - paragraph: Productos que necesitan reposición
+      - generic:
+        - generic:
+          - generic:
+            - heading [level=2]: Módulos Activos
+            - paragraph: Accede a los módulos habilitados para tu organización
+          - generic:
+            - button:
+              - img
+              - text: Preguntar a la IA
+            - link:
+              - /url: /dashboard/test-navigation
+              - text: 🧪 Prueba Navegación
+            - link:
+              - /url: /dashboard/debug-navigation
+              - text: 🔍 Diagnóstico
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Gestión de Clientes
+              - paragraph: Gestiona clientes y contactos
+              - generic: Acceder al módulo
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Gestión de Servidores
+              - paragraph: Administra servidores y infraestructura
+              - generic: Acceder al módulo
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Inventario
+              - paragraph: Control de productos y stock
+              - generic: Acceder al módulo
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Reportes
+              - paragraph: Análisis y estadísticas
+              - generic: Acceder al módulo
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Gestión de Ascensores
+              - paragraph: Módulo especializado para gestión de ascensores, mantenimiento e inspecciones
+              - generic: Acceder al módulo
+          - generic:
+            - generic:
+              - generic:
+                - img
+              - heading [level=3]: Gestión de Colegios
+              - paragraph: Módulo completo para gestión integral de colegios, estudiantes, docentes, académico y finanzas
+              - generic: Acceder al módulo
+      - generic:
+        - generic:
+          - heading [level=2]: Información del Sistema
+          - paragraph: Detalles de tu cuenta y organización
+        - generic:
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - img
+                - text: Información del Tenant
+            - generic:
+              - generic:
+                - generic:
+                  - paragraph: Nombre
+                  - paragraph: Metanoia Admin
+                - generic:
+                  - paragraph: Slug
+                  - paragraph: metanoia-admin
+                - generic:
+                  - paragraph: Dominio
+                  - paragraph: admin.metanoia.click
+          - generic:
+            - generic:
+              - heading [level=3]:
+                - img
+                - text: Información del Usuario
+            - generic:
+              - generic:
+                - generic:
+                  - paragraph: Email
+                  - paragraph: admin@metanoia.com
+                - generic:
+                  - paragraph: Rol
+                  - generic: Administrador
+                - generic:
+                  - paragraph: Nombre Completo
+                  - paragraph: Admin Test
+                - generic:
+                  - paragraph: Tenant ID
+                  - paragraph: cmg6kkqtb0000tnor7s5qej4u
+    - contentinfo:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic: M
+            - generic: Metanoia Visión AI
+          - generic:
+            - generic:
+              - text: © 2025 Metanoia
+              - link:
+                - /url: https://metanoia.click
+                - text: metanoia.click
+              - text: v1.0.1 • Visión AI
+  - generic:
+    - generic:
+      - img
+    - button:
+      - img
+  - alert
+  - dialog:
+    - generic:
+      - generic:
+        - img
+        - combobox [expanded]
+      - listbox:
+        - generic:
+          - generic: 🤖 Asistencia con IA
+          - group:
+            - option [selected]:
+              - img
+              - generic: Analizar rendimiento del negocio
+              - generic: Próximamente
+            - option:
+              - img
+              - generic: Obtener sugerencias inteligentes
+              - generic: Próximamente
+            - option:
+              - img
+              - generic: Generar reporte automático
+              - generic: Próximamente
+          - separator
+          - generic: ⚡ Acciones Rápidas
+          - group:
+            - option:
+              - img
+              - generic: Agregar Cliente
+            - option:
+              - img
+              - generic: Agregar Producto
+            - option:
+              - img
+              - generic: Crear Orden
+            - option:
+              - img
+              - generic: Crear Factura
+          - separator
+          - generic: 🧭 Navegación
+          - group:
+            - option:
+              - img
+              - generic: Dashboard Principal
+            - option:
+              - img
+              - generic: Gestión de Clientes
+            - option:
+              - img
+              - generic: Inventario
+            - option:
+              - img
+              - generic: Órdenes
+            - option:
+              - img
+              - generic: Contabilidad
+            - option:
+              - img
+              - generic: Reportes y Analytics
+          - separator
+          - generic: 🔧 Módulos Especializados
+          - group:
+            - option:
+              - img
+              - generic: Gestión de Ascensores
+            - option:
+              - img
+              - generic: Gestión de Servidores
+            - option:
+              - img
+              - generic: Gestión Escolar
+            - option:
+              - img
+              - generic: Comercio Exterior
+          - separator
+          - generic: ⚙️ Configuración
+          - group:
+            - option:
+              - img
+              - generic: Configuración del Sistema
+            - option:
+              - img
+              - generic: Gestionar Módulos
+    - button:
+      - img
+      - generic: Close
+  - dialog [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - img [ref=e7]
+        - combobox [expanded] [active] [ref=e10]
+      - listbox "Suggestions" [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]: 🤖 Asistencia con IA
+          - group "🤖 Asistencia con IA" [ref=e14]:
+            - option "Analizar rendimiento del negocio Próximamente" [selected]:
+              - img
+              - generic: Analizar rendimiento del negocio
+              - generic: Próximamente
+            - option "Obtener sugerencias inteligentes Próximamente":
+              - img
+              - generic: Obtener sugerencias inteligentes
+              - generic: Próximamente
+            - option "Generar reporte automático Próximamente":
+              - img
+              - generic: Generar reporte automático
+              - generic: Próximamente
+          - separator [ref=e15]
+          - generic [ref=e16]: ⚡ Acciones Rápidas
+          - group "⚡ Acciones Rápidas" [ref=e17]:
+            - option "Agregar Cliente":
+              - img
+              - generic: Agregar Cliente
+            - option "Agregar Producto":
+              - img
+              - generic: Agregar Producto
+            - option "Crear Orden":
+              - img
+              - generic: Crear Orden
+            - option "Crear Factura":
+              - img
+              - generic: Crear Factura
+          - separator [ref=e18]
+          - generic [ref=e19]: 🧭 Navegación
+          - group "🧭 Navegación" [ref=e20]:
+            - option "Dashboard Principal":
+              - img
+              - generic: Dashboard Principal
+            - option "Gestión de Clientes":
+              - img
+              - generic: Gestión de Clientes
+            - option "Inventario":
+              - img
+              - generic: Inventario
+            - option "Órdenes":
+              - img
+              - generic: Órdenes
+            - option "Contabilidad":
+              - img
+              - generic: Contabilidad
+            - option "Reportes y Analytics":
+              - img
+              - generic: Reportes y Analytics
+          - separator [ref=e21]
+          - generic [ref=e22]: 🔧 Módulos Especializados
+          - group "🔧 Módulos Especializados" [ref=e23]:
+            - option "Gestión de Ascensores":
+              - img
+              - generic: Gestión de Ascensores
+            - option "Gestión de Servidores":
+              - img
+              - generic: Gestión de Servidores
+            - option "Gestión Escolar":
+              - img
+              - generic: Gestión Escolar
+            - option "Comercio Exterior":
+              - img
+              - generic: Comercio Exterior
+          - separator [ref=e24]
+          - generic [ref=e25]: ⚙️ Configuración
+          - group "⚙️ Configuración" [ref=e26]:
+            - option "Configuración del Sistema":
+              - img
+              - generic: Configuración del Sistema
+            - option "Gestionar Módulos":
+              - img
+              - generic: Gestionar Módulos
+    - button "Close" [ref=e27] [cursor=pointer]:
+      - img [ref=e28] [cursor=pointer]
+      - generic [ref=e31] [cursor=pointer]: Close
+```

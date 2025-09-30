@@ -1,9 +1,13 @@
-import { PrismaClient } from '@prisma/client'
 import { CreateServerInput, UpdateServerInput } from '@/lib/validations/server'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/db'
 
 export class ServerService {
+  /**
+   * Crea un nuevo servidor en el sistema
+   * @param data - Datos del servidor a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con el servidor creado y sus relaciones (cliente, alertas, métricas)
+   */
   static async createServer(data: CreateServerInput, tenantId: string) {
     return await prisma.server.create({
       data: {
@@ -33,6 +37,17 @@ export class ServerService {
     })
   }
 
+  /**
+   * Obtiene servidores con filtros y paginación
+   * @param tenantId - ID del tenant
+   * @param options - Opciones de filtrado y paginación
+   * @param options.page - Número de página
+   * @param options.limit - Límite de resultados por página
+   * @param options.search - Término de búsqueda (nombre, IP, modelo)
+   * @param options.status - Filtro por estado del servidor
+   * @param options.clientId - Filtro por cliente específico
+   * @returns Promise con lista paginada de servidores y metadatos
+   */
   static async getServers(
     tenantId: string,
     options: {

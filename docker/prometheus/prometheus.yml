@@ -1,0 +1,78 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'metanoia-erp'
+    environment: 'production'
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  # Prometheus se monitorea a sí mismo
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 5s
+    metrics_path: /metrics
+
+  # Aplicación Next.js de Metanoia
+  - job_name: 'metanoia-app'
+    static_configs:
+      - targets: ['app:3000']
+    scrape_interval: 10s
+    metrics_path: /api/metrics
+    scrape_timeout: 5s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+
+  # Redis Exporter
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+
+  # Node Exporter para métricas del sistema
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+    scrape_timeout: 5s
+    metrics_path: /metrics
+
+  # cAdvisor para métricas de contenedores Docker
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    metrics_path: /metrics
+
+  # Nginx (si tienes un exporter)
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    # Descomenta si instalas nginx_exporter
+    # metrics_path: /metrics
+
+# Configuración de alertas
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+      timeout: 10s
+      api_version: v2

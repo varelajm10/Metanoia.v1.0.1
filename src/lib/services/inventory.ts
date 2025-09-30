@@ -20,6 +20,14 @@ export class InventoryService {
   // MÉTODOS ESTÁTICOS PARA COMPATIBILIDAD HACIA ATRÁS
   // ========================================
 
+  /**
+   * Obtiene productos con filtros y paginación (método estático)
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda para productos
+   * @param page - Número de página para paginación
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista de productos y metadatos de paginación
+   */
   static async getProducts(
     tenantId: string,
     filters: ProductFilters = {},
@@ -32,6 +40,12 @@ export class InventoryService {
     return service.getProducts(tenantId, filters, page, limit)
   }
 
+  /**
+   * Obtiene un producto por su ID (método estático)
+   * @param id - ID del producto
+   * @param tenantId - ID del tenant
+   * @returns Promise con el producto encontrado o null si no existe
+   */
   static async getProductById(id: string, tenantId: string) {
     const service = new InventoryService(
       new (require('@prisma/client').PrismaClient)()
@@ -39,6 +53,13 @@ export class InventoryService {
     return service.getProductById(id, tenantId)
   }
 
+  /**
+   * Crea un nuevo producto (método estático)
+   * @param data - Datos del producto a crear
+   * @param tenantId - ID del tenant
+   * @returns Promise con el producto creado
+   * @throws Error si el SKU ya existe o hay errores de validación
+   */
   static async createProduct(data: Product, tenantId: string) {
     const service = new InventoryService(
       new (require('@prisma/client').PrismaClient)()
@@ -108,6 +129,14 @@ export class InventoryService {
     return service.deleteSupplier(id, tenantId)
   }
 
+  /**
+   * Crea un movimiento de stock (método estático)
+   * @param data - Datos del movimiento de stock
+   * @param tenantId - ID del tenant
+   * @param userId - ID del usuario que realiza el movimiento
+   * @returns Promise con el movimiento de stock creado
+   * @throws Error si no hay suficiente stock o hay errores de validación
+   */
   static async createStockMovement(
     data: StockMovement,
     tenantId: string,
@@ -131,6 +160,11 @@ export class InventoryService {
     return service.getStockMovements(tenantId, filters, page, limit)
   }
 
+  /**
+   * Obtiene estadísticas del dashboard de inventario (método estático)
+   * @param tenantId - ID del tenant
+   * @returns Promise con estadísticas completas del inventario
+   */
   static async getDashboardStats(tenantId: string) {
     const service = new InventoryService(
       new (require('@prisma/client').PrismaClient)()
@@ -142,6 +176,14 @@ export class InventoryService {
   // MÉTODOS DE INSTANCIA
   // ========================================
 
+  /**
+   * Obtiene productos con filtros avanzados y paginación
+   * @param tenantId - ID del tenant
+   * @param filters - Filtros de búsqueda (nombre, SKU, categoría, marca, stock, precio)
+   * @param page - Número de página para paginación
+   * @param limit - Límite de resultados por página
+   * @returns Promise con lista paginada de productos y metadatos
+   */
   async getProducts(
     tenantId: string,
     filters: ProductFilters = {},

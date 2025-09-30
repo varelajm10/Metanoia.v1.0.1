@@ -48,6 +48,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { ManageModulesDialog } from '@/components/admin/ManageModulesDialog'
 
 export default function AdminTenantsPage() {
   const { user, loading } = useAuth()
@@ -56,6 +57,8 @@ export default function AdminTenantsPage() {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [activeTab, setActiveTab] = useState('list')
   const [systemStats, setSystemStats] = useState<any>(null)
+  const [showModulesDialog, setShowModulesDialog] = useState(false)
+  const [selectedTenantForModules, setSelectedTenantForModules] = useState<any>(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -181,6 +184,18 @@ export default function AdminTenantsPage() {
       console.error('Error toggling module:', error)
       alert('Error al cambiar estado del módulo')
     }
+  }
+
+  const handleOpenModulesDialog = (tenant: any) => {
+    setSelectedTenantForModules(tenant)
+    setShowModulesDialog(true)
+  }
+
+  const handleCloseModulesDialog = () => {
+    setShowModulesDialog(false)
+    setSelectedTenantForModules(null)
+    // Refrescar la lista de tenants para obtener los módulos actualizados
+    fetchTenants()
   }
 
   const handleDeleteTenant = async (tenantId: string, tenantName: string) => {
@@ -672,6 +687,18 @@ export default function AdminTenantsPage() {
                             )
                           })}
                         </div>
+
+                        <div className="mt-4 flex justify-end">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenModulesDialog(tenant)}
+                            className="flex items-center gap-2"
+                          >
+                            <Settings className="h-4 w-4" />
+                            Gestionar Módulos
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -791,6 +818,17 @@ export default function AdminTenantsPage() {
           </TabsContent>
         </Tabs>
       </main>
+
+      {/* Dialog para gestionar módulos */}
+      {selectedTenantForModules && (
+        <ManageModulesDialog
+          isOpen={showModulesDialog}
+          onClose={handleCloseModulesDialog}
+          tenantId={selectedTenantForModules.id}
+          tenantName={selectedTenantForModules.name}
+          enabledModules={selectedTenantForModules.enabledModules || []}
+        />
+      )}
     </div>
   )
 }

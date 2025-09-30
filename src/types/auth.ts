@@ -26,6 +26,7 @@ export interface AuthUser {
     slug: string
     domain?: string
   }
+  enabledModules?: string[]
 }
 
 export interface AuthResponse {

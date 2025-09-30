@@ -1,0 +1,175 @@
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@metanoia.com'
+  smtp_auth_username: 'alerts@metanoia.com'
+  smtp_auth_password: 'alert_password'
+
+# Configuración de plantillas
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# Configuración de rutas de alertas
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+  routes:
+    # Alertas críticas del sistema
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 5s
+      repeat_interval: 30m
+    
+    # Alertas de performance
+    - match:
+        alertname: HighCPUUsage
+      receiver: 'performance-alerts'
+      group_wait: 10s
+      repeat_interval: 1h
+    
+    # Alertas de negocio
+    - match:
+        alertname: LowActiveUsers
+      receiver: 'business-alerts'
+      group_wait: 5m
+      repeat_interval: 2h
+    
+    # Alertas de base de datos
+    - match:
+        service: database
+      receiver: 'database-alerts'
+      group_wait: 10s
+      repeat_interval: 30m
+
+# Configuración de inhibiciones
+inhibit_rules:
+  # Si el servicio está down, no alertar sobre métricas individuales
+  - source_match:
+      severity: 'critical'
+      alertname: 'ServiceDown'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'instance']
+
+# Configuración de receptores
+receivers:
+  # Webhook para integraciones (Slack, Discord, etc.)
+  - name: 'web.hook'
+    webhook_configs:
+      - url: 'http://localhost:5001/webhook'
+        send_resolved: true
+
+  # Alertas críticas - notificación inmediata
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'admin@metanoia.com'
+        subject: '🚨 CRITICAL ALERT: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity }}
+          Instance: {{ .Labels.instance }}
+          Time: {{ .StartsAt }}
+          {{ end }}
+        headers:
+          X-Priority: '1'
+    slack_configs:
+      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+        channel: '#alerts'
+        title: '🚨 CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity }}
+          *Instance:* {{ .Labels.instance }}
+          *Time:* {{ .StartsAt }}
+          {{ end }}
+        send_resolved: true
+
+  # Alertas de performance
+  - name: 'performance-alerts'
+    email_configs:
+      - to: 'devops@metanoia.com'
+        subject: '⚠️ Performance Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Performance Issue Detected:
+          - Alert: {{ .Annotations.summary }}
+          - Description: {{ .Annotations.description }}
+          - Current Value: {{ .Annotations.value }}
+          - Threshold: {{ .Annotations.threshold }}
+          - Instance: {{ .Labels.instance }}
+          - Time: {{ .StartsAt }}
+          {{ end }}
+    slack_configs:
+      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+        channel: '#performance'
+        title: '⚠️ Performance: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Issue:* {{ .Annotations.summary }}
+          *Current Value:* {{ .Annotations.value }}
+          *Threshold:* {{ .Annotations.threshold }}
+          *Instance:* {{ .Labels.instance }}
+          {{ end }}
+
+  # Alertas de negocio
+  - name: 'business-alerts'
+    email_configs:
+      - to: 'business@metanoia.com'
+        subject: '📊 Business Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Business Metric Alert:
+          - Metric: {{ .Annotations.summary }}
+          - Description: {{ .Annotations.description }}
+          - Current Value: {{ .Annotations.value }}
+          - Expected: {{ .Annotations.expected }}
+          - Time: {{ .StartsAt }}
+          {{ end }}
+    slack_configs:
+      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+        channel: '#business'
+        title: '📊 Business: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Metric:* {{ .Annotations.summary }}
+          *Current Value:* {{ .Annotations.value }}
+          *Expected:* {{ .Annotations.expected }}
+          {{ end }}
+
+  # Alertas de base de datos
+  - name: 'database-alerts'
+    email_configs:
+      - to: 'dba@metanoia.com'
+        subject: '🗄️ Database Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Database Issue:
+          - Alert: {{ .Annotations.summary }}
+          - Description: {{ .Annotations.description }}
+          - Database: {{ .Labels.database }}
+          - Instance: {{ .Labels.instance }}
+          - Time: {{ .StartsAt }}
+          {{ end }}
+    slack_configs:
+      - api_url: 'YOUR_SLACK_WEBHOOK_URL'
+        channel: '#database'
+        title: '🗄️ Database: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Issue:* {{ .Annotations.summary }}
+          *Database:* {{ .Labels.database }}
+          *Instance:* {{ .Labels.instance }}
+          {{ end }}
+
+  # Receptor de prueba
+  - name: 'test-receiver'
+    webhook_configs:
+      - url: 'http://localhost:5001/test'
+        send_resolved: true
