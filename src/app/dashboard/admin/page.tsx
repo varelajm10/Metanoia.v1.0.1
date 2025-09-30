@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { CreateTenantDialog } from '@/components/admin/CreateTenantDialog'
 
 interface AdminStats {
   totalClients: number
@@ -142,6 +143,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <CreateTenantDialog />
               <ThemeToggle />
             </div>
           </div>

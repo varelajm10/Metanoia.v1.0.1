@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePermission, getTenantId } from '@/lib/middleware/auth'
-import { getCustomerStats } from '@/lib/services/customer'
+import { CustomerCacheService } from '@/lib/services/customer-cache'
 
-// GET /api/customers/stats - Obtener estadísticas de clientes
+// GET /api/customers/stats - Obtener estadísticas básicas de clientes
 export async function GET(request: NextRequest) {
   try {
     // Verificar permisos de lectura
@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
 
     const tenantId = getTenantId(user!)
 
-    // Obtener estadísticas de clientes
-    const stats = await getCustomerStats(tenantId)
+    // Obtener estadísticas con caché
+    const stats = await CustomerCacheService.getCachedStats(tenantId)
 
     return NextResponse.json({
       success: true,

@@ -30,7 +30,9 @@ import {
   Building,
   Server,
   GraduationCap,
+  Cog,
 } from 'lucide-react'
+import { ManageModulesDialog } from '@/components/admin/ManageModulesDialog'
 import {
   toggleTenantStatus,
   deleteTenant,
@@ -265,30 +267,33 @@ export function SuperAdminTable({ tenants }: SuperAdminTableProps) {
               </TableCell>
 
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver detalles
-                    </DropdownMenuItem>
-                    {!tenant.isActive && (
-                      <DropdownMenuItem
-                        onClick={() =>
-                          handleDeleteTenant(tenant.id, tenant.name)
-                        }
-                        className="text-red-600"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Eliminar
+                <div className="flex items-center gap-2">
+                  <ManageModulesDialog tenant={tenant} />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Ver detalles
                       </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                      {!tenant.isActive && (
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleDeleteTenant(tenant.id, tenant.name)
+                          }
+                          className="text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </TableCell>
             </TableRow>
           ))}

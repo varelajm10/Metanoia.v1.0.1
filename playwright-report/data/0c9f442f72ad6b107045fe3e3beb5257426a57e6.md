@@ -1,0 +1,109 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "Super Admin Dashboard" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Gestión centralizada de todos los tenants del sistema
+    - generic [ref=e7]:
+      - generic [ref=e8]: 1 de 1 tenants activos
+      - link "Analytics" [ref=e9] [cursor=pointer]:
+        - /url: /super-admin/analytics
+        - img [ref=e10] [cursor=pointer]
+        - generic [ref=e12] [cursor=pointer]: Analytics
+      - button "Agregar Nuevo Cliente" [ref=e13] [cursor=pointer]:
+        - img [ref=e14] [cursor=pointer]
+        - text: Agregar Nuevo Cliente
+  - generic [ref=e16]:
+    - generic [ref=e17]:
+      - heading "Total Tenants" [level=3] [ref=e19]
+      - generic [ref=e21]:
+        - generic [ref=e22]: "1"
+        - paragraph [ref=e23]: Organizaciones registradas
+    - generic [ref=e24]:
+      - heading "Tenants Activos" [level=3] [ref=e26]
+      - generic [ref=e28]:
+        - generic [ref=e29]: "1"
+        - paragraph [ref=e30]: Organizaciones activas
+    - generic [ref=e31]:
+      - heading "Tenants Inactivos" [level=3] [ref=e33]
+      - generic [ref=e35]:
+        - generic [ref=e36]: "0"
+        - paragraph [ref=e37]: Organizaciones inactivas
+    - generic [ref=e38]:
+      - heading "Total Usuarios" [level=3] [ref=e40]
+      - generic [ref=e42]:
+        - generic [ref=e43]: "1"
+        - paragraph [ref=e44]: Usuarios en el sistema
+    - generic [ref=e45]:
+      - heading "Total Clientes" [level=3] [ref=e47]
+      - generic [ref=e49]:
+        - generic [ref=e50]: "0"
+        - paragraph [ref=e51]: Clientes registrados
+    - generic [ref=e52]:
+      - heading "Total Productos" [level=3] [ref=e54]
+      - generic [ref=e56]:
+        - generic [ref=e57]: "0"
+        - paragraph [ref=e58]: Productos en inventario
+  - generic [ref=e59]:
+    - generic [ref=e60]:
+      - heading "Gestión de Tenants" [level=3] [ref=e61]
+      - paragraph [ref=e62]: Administra todos los tenants del sistema. Puedes activar/desactivar tenants individualmente.
+    - table [ref=e66]:
+      - rowgroup [ref=e67]:
+        - row "Estado Tenant Dominio Usuarios Clientes Productos Órdenes Facturas Otros Creado Acciones" [ref=e68]:
+          - cell "Estado" [ref=e69]
+          - cell "Tenant" [ref=e70]
+          - cell "Dominio" [ref=e71]
+          - cell "Usuarios" [ref=e72]
+          - cell "Clientes" [ref=e73]
+          - cell "Productos" [ref=e74]
+          - cell "Órdenes" [ref=e75]
+          - cell "Facturas" [ref=e76]
+          - cell "Otros" [ref=e77]
+          - cell "Creado" [ref=e78]
+          - cell "Acciones" [ref=e79]
+      - rowgroup [ref=e80]:
+        - row "Activo Super Admin Tenant super-admin-tenant Sin dominio 1 0 0 0 0 hace 1 minuto Gestionar Módulos" [ref=e81]:
+          - cell "Activo" [ref=e82]:
+            - generic [ref=e83]:
+              - switch [checked] [ref=e84] [cursor=pointer]
+              - checkbox [checked]
+              - generic [ref=e85]: Activo
+          - cell "Super Admin Tenant super-admin-tenant" [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]: Super Admin Tenant
+              - generic [ref=e89]: super-admin-tenant
+          - cell "Sin dominio" [ref=e90]:
+            - generic [ref=e91]: Sin dominio
+          - cell "1" [ref=e92]:
+            - generic [ref=e93]:
+              - img [ref=e94]
+              - generic [ref=e99]: "1"
+          - cell "0" [ref=e100]:
+            - generic [ref=e101]:
+              - img [ref=e102]
+              - generic [ref=e105]: "0"
+          - cell "0" [ref=e106]:
+            - generic [ref=e107]:
+              - img [ref=e108]
+              - generic [ref=e112]: "0"
+          - cell "0" [ref=e113]:
+            - generic [ref=e114]:
+              - img [ref=e115]
+              - generic [ref=e119]: "0"
+          - cell "0" [ref=e120]:
+            - generic [ref=e121]:
+              - img [ref=e122]
+              - generic [ref=e125]: "0"
+          - cell [ref=e126]
+          - cell "hace 1 minuto" [ref=e127]:
+            - generic [ref=e128]: hace 1 minuto
+          - cell "Gestionar Módulos" [ref=e129]:
+            - generic [ref=e130]:
+              - button "Gestionar Módulos" [ref=e131] [cursor=pointer]:
+                - img [ref=e132] [cursor=pointer]
+              - button [ref=e143] [cursor=pointer]:
+                - img [ref=e144] [cursor=pointer]
+```

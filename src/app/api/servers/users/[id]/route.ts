@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { ServerUserAccessService } from '@/lib/services/server-user'
 import { UpdateServerUserAccessSchema } from '@/lib/validations/server-user'
+import { requireAuth } from '@/lib/middleware/auth'
 
 // GET /api/servers/users/[id] - Obtener usuario específico
 export async function GET(
@@ -8,6 +9,13 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    const { error: authError, user } = await requireAuth(request)
+    if (authError || !user) {
+      return authError || new Response('No autorizado', { status: 401 })
+    }
+    // FIN DE VERIFICACIÓN DE AUTENTICACIÓN
+
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
 
@@ -48,6 +56,13 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    const { error: authError, user } = await requireAuth(request)
+    if (authError || !user) {
+      return authError || new Response('No autorizado', { status: 401 })
+    }
+    // FIN DE VERIFICACIÓN DE AUTENTICACIÓN
+
     const body = await request.json()
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
@@ -95,6 +110,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    const { error: authError, user } = await requireAuth(request)
+    if (authError || !user) {
+      return authError || new Response('No autorizado', { status: 401 })
+    }
+    // FIN DE VERIFICACIÓN DE AUTENTICACIÓN
+
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
 

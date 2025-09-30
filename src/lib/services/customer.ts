@@ -122,10 +122,18 @@ export async function getCustomers(
   // Obtener total de registros
   const total = await prisma.customer.count({ where })
 
-  // Obtener clientes con paginación
+  // Obtener clientes con paginación - OPTIMIZADO PARA PERFORMANCE
   const customers = await prisma.customer.findMany({
     where,
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      address: true,
+      isActive: true,
+      createdAt: true,
+      updatedAt: true,
       _count: {
         select: {
           orders: true,
@@ -281,53 +289,86 @@ export async function toggleCustomerStatus(
 }
 
 /**
- * Busca clientes por nombre o email para autocompletado
+ * Busca clientes por nombre o email para autocompletado - OPTIMIZADO CON PAGINACIÓN
  * @param query - Término de búsqueda
  * @param tenantId - ID del tenant
- * @param limit - Límite de resultados (por defecto 10)
- * @returns Promise<Customer[]> - Lista de clientes encontrados
+ * @param options - Opciones de paginación
+ * @returns Promise con clientes y metadatos de paginación
  */
 export async function searchCustomers(
   query: string,
   tenantId: string,
-  limit: number = 10
-): Promise<Customer[]> {
+  options: { page: number; limit: number } = { page: 1, limit: 10 }
+): Promise<{
+  customers: Customer[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}> {
   if (!query || query.trim().length < 2) {
-    return []
+    return {
+      customers: [],
+      pagination: {
+        page: options.page,
+        limit: options.limit,
+        total: 0,
+        totalPages: 0,
+      },
+    }
   }
 
-  return prisma.customer.findMany({
-    where: {
-      tenantId,
-      isActive: true,
-      OR: [
-        { name: { contains: query, mode: 'insensitive' } },
-        { email: { contains: query, mode: 'insensitive' } },
-      ],
-    },
+  const { page, limit } = options
+  const skip = (page - 1) * limit
+
+  const where = {
+    tenantId,
+    isActive: true,
+    OR: [
+      { name: { contains: query, mode: 'insensitive' } },
+      { email: { contains: query, mode: 'insensitive' } },
+    ],
+  }
+
+  // Obtener total de registros
+  const total = await prisma.customer.count({ where })
+
+  // Obtener clientes con paginación
+  const customers = await prisma.customer.findMany({
+    where,
     orderBy: {
       name: 'asc',
     },
+    skip,
     take: limit,
   })
+
+  return {
+    customers,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
 }
 
 /**
- * Obtiene estadísticas detalladas de clientes
+ * Obtiene estadísticas básicas de clientes - OPTIMIZADO PARA PERFORMANCE
  * @param tenantId - ID del tenant
- * @returns Promise con estadísticas completas de clientes
+ * @returns Promise con estadísticas básicas de clientes
  */
 export async function getCustomerStats(tenantId: string) {
+  // OPTIMIZACIÓN: Solo consultas esenciales, sin relaciones pesadas
   const [
     totalCustomers,
     activeCustomers,
     inactiveCustomers,
     newThisMonth,
     newThisWeek,
-    customersByMonth,
-    topCustomersByOrders,
-    customersWithOrders,
-    customersWithInvoices,
   ] = await Promise.all([
     // Total de clientes
     prisma.customer.count({ where: { tenantId } }),
@@ -357,49 +398,6 @@ export async function getCustomerStats(tenantId: string) {
         },
       },
     }),
-
-    // Clientes por mes (últimos 12 meses)
-    prisma.customer.groupBy({
-      by: ['createdAt'],
-      where: {
-        tenantId,
-        createdAt: {
-          gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
-        },
-      },
-      _count: { createdAt: true },
-      orderBy: { createdAt: 'asc' },
-    }),
-
-    // Top clientes por órdenes
-    prisma.customer.findMany({
-      where: { tenantId },
-      include: {
-        _count: {
-          select: { orders: true },
-        },
-      },
-      orderBy: {
-        orders: { _count: 'desc' },
-      },
-      take: 5,
-    }),
-
-    // Clientes con órdenes
-    prisma.customer.count({
-      where: {
-        tenantId,
-        orders: { some: {} },
-      },
-    }),
-
-    // Clientes con facturas
-    prisma.customer.count({
-      where: {
-        tenantId,
-        invoices: { some: {} },
-      },
-    }),
   ])
 
   // Calcular tasa de actividad
@@ -408,18 +406,6 @@ export async function getCustomerStats(tenantId: string) {
       ? Math.round((activeCustomers / totalCustomers) * 100)
       : 0
 
-  // Calcular tasa de conversión (clientes con órdenes)
-  const conversionRate =
-    totalCustomers > 0
-      ? Math.round((customersWithOrders / totalCustomers) * 100)
-      : 0
-
-  // Procesar datos mensuales
-  const monthlyData = customersByMonth.map(item => ({
-    month: item.createdAt.toISOString().substring(0, 7),
-    count: item._count.createdAt,
-  }))
-
   return {
     totalCustomers,
     activeCustomers,
@@ -427,16 +413,5 @@ export async function getCustomerStats(tenantId: string) {
     newThisMonth,
     newThisWeek,
     activityRate,
-    conversionRate,
-    customersWithOrders,
-    customersWithInvoices,
-    monthlyData,
-    topCustomersByOrders: topCustomersByOrders.map(customer => ({
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
-      ordersCount: customer._count.orders,
-      isActive: customer.isActive,
-    })),
   }
 }

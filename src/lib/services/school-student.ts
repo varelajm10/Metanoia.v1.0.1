@@ -258,19 +258,45 @@ export class SchoolStudentService {
     }
   }
 
-  // Buscar estudiantes
-  static async searchStudents(tenantId: string, query: string) {
-    return prisma.schoolStudent.findMany({
-      where: {
-        tenantId,
-        OR: [
-          { firstName: { contains: query, mode: 'insensitive' } },
-          { lastName: { contains: query, mode: 'insensitive' } },
-          { studentCode: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
-        ],
-      },
-      take: 10,
+  // Buscar estudiantes - OPTIMIZADO CON PAGINACIÓN
+  static async searchStudents(
+    tenantId: string, 
+    query: string,
+    options: { page: number; limit: number } = { page: 1, limit: 10 }
+  ) {
+    if (!query || query.trim().length < 2) {
+      return {
+        students: [],
+        pagination: {
+          page: options.page,
+          limit: options.limit,
+          total: 0,
+          totalPages: 0,
+        },
+      }
+    }
+
+    const { page, limit } = options
+    const skip = (page - 1) * limit
+
+    const where = {
+      tenantId,
+      OR: [
+        { firstName: { contains: query, mode: 'insensitive' } },
+        { lastName: { contains: query, mode: 'insensitive' } },
+        { studentCode: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } },
+      ],
+    }
+
+    // Obtener total de registros
+    const total = await prisma.schoolStudent.count({ where })
+
+    // Obtener estudiantes con paginación
+    const students = await prisma.schoolStudent.findMany({
+      where,
+      skip,
+      take: limit,
       select: {
         id: true,
         firstName: true,
@@ -283,5 +309,15 @@ export class SchoolStudentService {
         photoUrl: true,
       },
     })
+
+    return {
+      students,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    }
   }
 }

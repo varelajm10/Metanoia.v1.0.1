@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import { CreateLeadInput, UpdateLeadInput } from '@/lib/validations/crm'
 
 const prisma = new PrismaClient()
@@ -59,7 +59,7 @@ export class LeadService {
     } = options
     const skip = (page - 1) * limit
 
-    const where: any = { tenantId }
+    const where: Prisma.LeadWhereInput = { tenantId }
 
     if (search) {
       where.OR = [

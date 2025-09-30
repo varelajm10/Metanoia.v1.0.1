@@ -39,6 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('[useAuth] Enviando petición de login...');
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
@@ -47,27 +48,37 @@ export function AuthProvider({ children }: AuthProviderProps) {
         body: JSON.stringify({ email, password }),
       })
 
+      console.log(`[useAuth] Respuesta recibida con status: ${response.status}`);
+
       if (response.ok) {
+        console.log('[useAuth] La respuesta fue exitosa (status 200). Parseando JSON...');
         const data = await response.json()
+        console.log('[useAuth] JSON parseado. Datos recibidos:', data);
+
+        console.log('[useAuth] Estableciendo usuario en el estado...');
         setUser(data.user)
+        console.log('[useAuth] Usuario establecido en el estado.');
 
         // Redirigir según el rol del usuario
-        if (
-          data.user.role === 'ADMIN' &&
-          data.user.email === 'admin@metanoia.click'
-        ) {
+        console.log(`[useAuth] Verificando rol del usuario: ${data.user.role}`);
+        if (data.user.role === 'SUPER_ADMIN') {
+          console.log('[useAuth] Usuario es SUPER_ADMIN. Redirigiendo a /dashboard/admin...');
           router.push('/dashboard/admin')
+          console.log('[useAuth] Redirección a /dashboard/admin ejecutada.');
         } else {
+          console.log('[useAuth] Usuario no es SUPER_ADMIN. Redirigiendo a /dashboard...');
           router.push('/dashboard')
+          console.log('[useAuth] Redirección a /dashboard ejecutada.');
         }
         return true
       } else {
+        console.error('[useAuth] La respuesta de la API no fue exitosa.');
         const error = await response.json()
         console.error('Error de login:', error)
         return false
       }
     } catch (error) {
-      console.error('Error de login:', error)
+      console.error('🔥🔥🔥 [useAuth] Error catastrófico en el bloque try/catch:', error);
       return false
     }
   }

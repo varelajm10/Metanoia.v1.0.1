@@ -29,11 +29,11 @@ export const CreateCustomerSchema = CustomerCreateInputSchema.omit({
 // Esquema para actualizar un cliente
 export const UpdateCustomerSchema = CreateCustomerSchema.partial()
 
-// Esquema para parámetros de consulta (filtros y paginación)
+// Esquema para parámetros de consulta (filtros y paginación) - OPTIMIZADO PARA PERFORMANCE
 export const CustomerQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(10),
-  search: z.string().optional(),
+  limit: z.coerce.number().min(1).max(50).default(10), // REDUCIDO: Máximo 50 para evitar sobrecarga
+  search: z.string().max(100).optional(), // LIMITADO: Búsqueda máxima 100 caracteres
   isActive: z.coerce.boolean().optional(),
   sortBy: z
     .enum(['name', 'email', 'createdAt', 'updatedAt'])

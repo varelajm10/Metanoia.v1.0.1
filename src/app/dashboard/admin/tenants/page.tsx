@@ -11,76 +11,30 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import {
   Building,
-  Plus,
   Eye,
-  Edit,
   Settings,
-  Users,
-  Server,
   CheckCircle,
   XCircle,
-  AlertTriangle,
   Trash2,
-  History,
   BarChart3,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { ManageModulesDialog } from '@/components/admin/ManageModulesDialog'
+import { CreateTenantDialog } from '@/components/admin/CreateTenantDialog'
 
 export default function AdminTenantsPage() {
   const { user, loading } = useAuth()
   const [tenants, setTenants] = useState([])
   const [selectedTenant, setSelectedTenant] = useState(null)
-  const [showCreateForm, setShowCreateForm] = useState(false)
   const [activeTab, setActiveTab] = useState('list')
   const [systemStats, setSystemStats] = useState<any>(null)
   const [showModulesDialog, setShowModulesDialog] = useState(false)
   const [selectedTenantForModules, setSelectedTenantForModules] = useState<any>(null)
 
-  const [formData, setFormData] = useState({
-    name: '',
-    slug: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-    timezone: 'UTC',
-    currency: 'USD',
-    contactName: '',
-    contactEmail: '',
-    contactPhone: '',
-    subscriptionPlan: 'BASIC',
-    subscriptionStartDate: '',
-    maxUsers: 5,
-    maxServers: 10,
-    maxStorageGB: 100,
-    enabledModules: ['customers', 'servers'],
-    notes: '',
-  })
 
   const availableModules = [
     { id: 'customers', name: 'Gestión de Clientes', category: 'BUSINESS' },
@@ -127,30 +81,6 @@ export default function AdminTenantsPage() {
     }
   }
 
-  const handleCreateTenant = async () => {
-    try {
-      const response = await fetch('/api/admin/tenants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        setShowCreateForm(false)
-        resetForm()
-        fetchTenants()
-        fetchSystemStats()
-        alert('Tenant creado exitosamente')
-      } else {
-        alert(`Error: ${result.error}`)
-      }
-    } catch (error) {
-      console.error('Error creating tenant:', error)
-      alert('Error al crear tenant')
-    }
-  }
 
   const handleToggleModule = async (
     tenantId: string,
@@ -225,29 +155,6 @@ export default function AdminTenantsPage() {
     }
   }
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      slug: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-      timezone: 'UTC',
-      currency: 'USD',
-      contactName: '',
-      contactEmail: '',
-      contactPhone: '',
-      subscriptionPlan: 'BASIC',
-      subscriptionStartDate: '',
-      maxUsers: 5,
-      maxServers: 10,
-      maxStorageGB: 100,
-      enabledModules: ['customers', 'servers'],
-      notes: '',
-    })
-  }
 
   if (loading) {
     return (
@@ -290,9 +197,8 @@ export default function AdminTenantsPage() {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="list">Lista de Tenants</TabsTrigger>
-            <TabsTrigger value="create">Crear Tenant</TabsTrigger>
             <TabsTrigger value="modules">Gestión de Módulos</TabsTrigger>
             <TabsTrigger value="stats">Estadísticas</TabsTrigger>
           </TabsList>
@@ -306,13 +212,7 @@ export default function AdminTenantsPage() {
                     <Building className="mr-2 h-5 w-5" />
                     Tenants Registrados
                   </span>
-                  <Button
-                    className="btn-primary-gradient"
-                    onClick={() => setActiveTab('create')}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Nuevo Tenant
-                  </Button>
+                  <CreateTenantDialog onTenantCreated={fetchTenants} />
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -385,240 +285,6 @@ export default function AdminTenantsPage() {
             </Card>
           </TabsContent>
 
-          {/* Create Tab */}
-          <TabsContent value="create">
-            <Card className="card-enhanced">
-              <CardHeader>
-                <CardTitle>Crear Nuevo Tenant</CardTitle>
-                <CardDescription>
-                  Crear una nueva empresa cliente con sus módulos habilitados
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Nombre de la Empresa *</Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={e =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      placeholder="Ariel S.A."
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="slug">Slug *</Label>
-                    <Input
-                      id="slug"
-                      value={formData.slug}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          slug: e.target.value.toLowerCase(),
-                        })
-                      }
-                      placeholder="ariel"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={e =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      placeholder="contacto@ariel.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Teléfono</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={e =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      placeholder="+1 (555) 123-4567"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contactName">Nombre del Contacto *</Label>
-                    <Input
-                      id="contactName"
-                      value={formData.contactName}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          contactName: e.target.value,
-                        })
-                      }
-                      placeholder="Juan Pérez"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contactEmail">Email del Contacto *</Label>
-                    <Input
-                      id="contactEmail"
-                      type="email"
-                      value={formData.contactEmail}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          contactEmail: e.target.value,
-                        })
-                      }
-                      placeholder="juan@ariel.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="city">Ciudad</Label>
-                    <Input
-                      id="city"
-                      value={formData.city}
-                      onChange={e =>
-                        setFormData({ ...formData, city: e.target.value })
-                      }
-                      placeholder="Buenos Aires"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">País</Label>
-                    <Input
-                      id="country"
-                      value={formData.country}
-                      onChange={e =>
-                        setFormData({ ...formData, country: e.target.value })
-                      }
-                      placeholder="Argentina"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="currency">Moneda</Label>
-                    <Select
-                      value={formData.currency}
-                      onValueChange={value =>
-                        setFormData({ ...formData, currency: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="EUR">EUR</SelectItem>
-                        <SelectItem value="COP">COP</SelectItem>
-                        <SelectItem value="ARS">ARS</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="subscriptionPlan">
-                      Plan de Suscripción
-                    </Label>
-                    <Select
-                      value={formData.subscriptionPlan}
-                      onValueChange={value =>
-                        setFormData({ ...formData, subscriptionPlan: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="BASIC">Básico</SelectItem>
-                        <SelectItem value="STANDARD">Estándar</SelectItem>
-                        <SelectItem value="PREMIUM">Premium</SelectItem>
-                        <SelectItem value="ENTERPRISE">Empresarial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="subscriptionStartDate">
-                      Fecha de Inicio *
-                    </Label>
-                    <Input
-                      id="subscriptionStartDate"
-                      type="date"
-                      value={formData.subscriptionStartDate}
-                      onChange={e =>
-                        setFormData({
-                          ...formData,
-                          subscriptionStartDate: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Módulos Habilitados</Label>
-                  <div className="mt-2 grid grid-cols-2 gap-4">
-                    {availableModules.map(module => (
-                      <div
-                        key={module.id}
-                        className="flex items-center space-x-2"
-                      >
-                        <Switch
-                          checked={formData.enabledModules.includes(module.id)}
-                          onCheckedChange={checked => {
-                            if (checked) {
-                              setFormData({
-                                ...formData,
-                                enabledModules: [
-                                  ...formData.enabledModules,
-                                  module.id,
-                                ],
-                              })
-                            } else {
-                              setFormData({
-                                ...formData,
-                                enabledModules: formData.enabledModules.filter(
-                                  id => id !== module.id
-                                ),
-                              })
-                            }
-                          }}
-                        />
-                        <Label className="text-sm">{module.name}</Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="notes">Notas</Label>
-                  <Textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={e =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                    placeholder="Notas adicionales sobre este tenant..."
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex justify-end space-x-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab('list')}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button onClick={handleCreateTenant}>Crear Tenant</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* Modules Tab */}
           <TabsContent value="modules">

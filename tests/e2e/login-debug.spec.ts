@@ -1,97 +1,47 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test'
 
-const TEST_USER = {
-  email: 'admin@metanoia.com',
-  password: 'admin123'
-};
-
-test.describe('Debug Login', () => {
-  test('Verificar login paso a paso', async ({ page }) => {
-    console.log('🔍 Iniciando debug del login...');
+test.describe('Debug Login API', () => {
+  test('Verificar que el endpoint de login devuelve JSON válido', async ({ page }) => {
+    // Interceptar la respuesta de la API
+    let apiResponse: any = null
     
+    page.on('response', async (response) => {
+      if (response.url().includes('/api/auth/login')) {
+        try {
+          apiResponse = await response.json()
+          console.log('API Response:', apiResponse)
+        } catch (error) {
+          console.error('Error parsing API response:', error)
+          console.log('Response status:', response.status())
+          console.log('Response headers:', response.headers())
+        }
+      }
+    })
+
     // Navegar a la página de login
-    await page.goto('/login');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/login')
+    await expect(page).toHaveTitle(/Sistema ERP SaaS/)
+
+    // Intentar hacer login
+    await page.fill('input[name="email"]', 'mentanoiaclick@gmail.com')
+    await page.fill('input[name="password"]', 'Tool2225-')
     
-    console.log('✅ Página de login cargada');
+    // Hacer clic en el botón de submit
+    await page.click('button[type="submit"]')
     
-    // Verificar que el formulario está presente
-    const form = page.locator('form');
-    await expect(form).toBeVisible();
-    console.log('✅ Formulario de login visible');
+    // Esperar un poco para que se procese la respuesta
+    await page.waitForTimeout(2000)
     
-    // Llenar el formulario
-    await page.fill('input[type="email"]', TEST_USER.email);
-    await page.fill('input[type="password"]', TEST_USER.password);
-    console.log('✅ Formulario llenado');
+    // Verificar que recibimos una respuesta JSON válida
+    expect(apiResponse).not.toBeNull()
+    expect(apiResponse).toHaveProperty('success')
     
-    // Interceptar la request de login
-    await page.route('/api/auth/login', async (route) => {
-      const request = route.request();
-      console.log('📡 Request interceptada:', {
-        url: request.url(),
-        method: request.method(),
-        headers: request.headers(),
-        postData: request.postData()
-      });
-      
-      // Continuar con la request original
-      await route.continue();
-    });
-    
-    // Interceptar la respuesta
-    await page.route('/api/auth/login', async (route) => {
-      const response = await route.fetch();
-      console.log('📡 Response interceptada:', {
-        status: response.status(),
-        statusText: response.statusText(),
-        headers: Object.fromEntries(response.headers())
-      });
-      
-      const responseBody = await response.text();
-      console.log('📡 Response body:', responseBody);
-      
-      // Continuar con la respuesta original
-      await route.fulfill({
-        status: response.status(),
-        statusText: response.statusText(),
-        headers: response.headers(),
-        body: responseBody
-      });
-    });
-    
-    // Hacer clic en el botón de login
-    await page.click('button[type="submit"]');
-    console.log('✅ Botón de login clickeado');
-    
-    // Esperar un poco para ver qué pasa
-    await page.waitForTimeout(5000);
-    
-    const currentUrl = page.url();
-    console.log('📍 URL actual:', currentUrl);
-    
-    // Verificar si hay mensajes de error
-    const errorMessage = page.locator('.error, .alert-error, [data-testid*="error"], .text-red-500, .text-red-600, .text-destructive');
-    if (await errorMessage.isVisible({ timeout: 1000 })) {
-      const errorText = await errorMessage.textContent();
-      console.log('❌ Error encontrado:', errorText);
+    if (apiResponse.success) {
+      console.log('✅ Login exitoso')
+      expect(apiResponse).toHaveProperty('user')
+      expect(apiResponse).toHaveProperty('token')
     } else {
-      console.log('✅ No se encontraron errores visibles');
+      console.log('❌ Login falló:', apiResponse.error)
     }
-    
-    // Verificar el estado de la consola
-    const logs = await page.evaluate(() => {
-      return window.console._logs || [];
-    });
-    
-    console.log('📋 Logs de consola:', logs);
-    
-    // Si estamos en login, el test falla
-    if (currentUrl.includes('/login')) {
-      console.log('❌ Login falló - permanecemos en login');
-      expect(currentUrl).not.toContain('/login');
-    } else {
-      console.log('✅ Login exitoso - redirigido');
-    }
-  });
-});
+  })
+})

@@ -14,49 +14,62 @@ export class EmployeeService {
    * @throws Error si el email ya existe o hay problemas de validación
    */
   async createEmployee(data: CreateEmployeeInput & { tenantId: string }) {
-    // Generar número de empleado si no se proporciona
-    if (!data.employeeNumber) {
-      const lastEmployee = await this.prisma.employee.findFirst({
-        where: { tenantId: data.tenantId },
-        orderBy: { employeeNumber: 'desc' },
+    try {
+      // Generar número de empleado si no se proporciona
+      if (!data.employeeNumber) {
+        const lastEmployee = await this.prisma.employee.findFirst({
+          where: { tenantId: data.tenantId },
+          orderBy: { employeeNumber: 'desc' },
+        })
+
+        const nextNumber = lastEmployee
+          ? parseInt(lastEmployee.employeeNumber) + 1
+          : 1000
+
+        data.employeeNumber = nextNumber.toString().padStart(4, '0')
+      }
+
+      // Verificar que el email no esté en uso
+      const existingEmployee = await this.prisma.employee.findFirst({
+        where: {
+          email: data.email,
+          tenantId: data.tenantId,
+        },
       })
 
-      const nextNumber = lastEmployee
-        ? parseInt(lastEmployee.employeeNumber) + 1
-        : 1000
+      if (existingEmployee) {
+        throw new Error('Ya existe un empleado con este email')
+      }
 
-      data.employeeNumber = nextNumber.toString().padStart(4, '0')
+      return await this.prisma.employee.create({
+        data: {
+          ...data,
+          hireDate: new Date(data.hireDate),
+          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+          terminationDate: data.terminationDate
+            ? new Date(data.terminationDate)
+            : null,
+        },
+        include: {
+          manager: true,
+          subordinates: true,
+          payrolls: true,
+          vacations: true,
+          performances: true,
+        },
+      })
+    } catch (error) {
+      console.error('Error en createEmployee:', {
+        error: error instanceof Error ? error.message : 'Error desconocido',
+        stack: error instanceof Error ? error.stack : undefined,
+        data: {
+          email: data.email,
+          employeeNumber: data.employeeNumber,
+          tenantId: data.tenantId,
+        },
+      })
+      throw error
     }
-
-    // Verificar que el email no esté en uso
-    const existingEmployee = await this.prisma.employee.findFirst({
-      where: {
-        email: data.email,
-        tenantId: data.tenantId,
-      },
-    })
-
-    if (existingEmployee) {
-      throw new Error('Ya existe un empleado con este email')
-    }
-
-    return await this.prisma.employee.create({
-      data: {
-        ...data,
-        hireDate: new Date(data.hireDate),
-        dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
-        terminationDate: data.terminationDate
-          ? new Date(data.terminationDate)
-          : null,
-      },
-      include: {
-        manager: true,
-        subordinates: true,
-        payrolls: true,
-        vacations: true,
-        performances: true,
-      },
-    })
   }
 
   /**
@@ -335,18 +348,43 @@ export class EmployeeService {
     }
   }
 
-  async searchEmployees(tenantId: string, query: string) {
-    return await this.prisma.employee.findMany({
-      where: {
-        tenantId,
-        OR: [
-          { firstName: { contains: query, mode: 'insensitive' } },
-          { lastName: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
-          { employeeNumber: { contains: query } },
-          { position: { contains: query, mode: 'insensitive' } },
-        ],
-      },
+  async searchEmployees(
+    tenantId: string, 
+    query: string,
+    options: { page: number; limit: number } = { page: 1, limit: 10 }
+  ) {
+    if (!query || query.trim().length < 2) {
+      return {
+        employees: [],
+        pagination: {
+          page: options.page,
+          limit: options.limit,
+          total: 0,
+          totalPages: 0,
+        },
+      }
+    }
+
+    const { page, limit } = options
+    const skip = (page - 1) * limit
+
+    const where = {
+      tenantId,
+      OR: [
+        { firstName: { contains: query, mode: 'insensitive' } },
+        { lastName: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } },
+        { employeeNumber: { contains: query } },
+        { position: { contains: query, mode: 'insensitive' } },
+      ],
+    }
+
+    // Obtener total de registros
+    const total = await this.prisma.employee.count({ where })
+
+    // Obtener empleados con paginación
+    const employees = await this.prisma.employee.findMany({
+      where,
       select: {
         id: true,
         firstName: true,
@@ -356,7 +394,18 @@ export class EmployeeService {
         position: true,
         department: true,
       },
-      take: 10,
+      skip,
+      take: limit,
     })
+
+    return {
+      employees,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    }
   }
 }

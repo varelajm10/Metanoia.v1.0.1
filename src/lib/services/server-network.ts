@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import {
   CreateNetworkConfigInput,
   UpdateNetworkConfigInput,
@@ -123,7 +123,7 @@ export class ServerNetworkService {
   }
 
   static async getNetworkConfigs(tenantId: string, serverId?: string) {
-    const where: any = { tenantId }
+    const where: Prisma.NetworkConfigWhereInput = { tenantId }
     if (serverId) {
       where.serverId = serverId
     }
@@ -256,7 +256,7 @@ export class ServerNetworkService {
       sortOrder,
     } = options
 
-    const where: any = { tenantId }
+    const where: Prisma.NetworkMetricWhereInput = { tenantId }
 
     if (serverId) {
       where.serverId = serverId
@@ -337,7 +337,7 @@ export class ServerNetworkService {
   }
 
   static async getConnectivityAlerts(tenantId: string, serverId?: string) {
-    const where: any = {
+    const where: Prisma.ConnectivityAlertWhereInput = {
       tenantId,
       type: {
         in: [
@@ -548,7 +548,7 @@ export class ServerNetworkService {
 
   // Análisis de conectividad
   static async getConnectivityAnalysis(tenantId: string, serverId?: string) {
-    const where: any = { tenantId }
+    const where: Prisma.NetworkMetricWhereInput = { tenantId }
     if (serverId) {
       where.serverId = serverId
     }

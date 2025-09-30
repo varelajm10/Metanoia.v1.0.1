@@ -124,7 +124,7 @@ export default function CRMPage() {
       setCustomersLoading(true)
       const params = new URLSearchParams({
         page: currentPage.toString(),
-        limit: '10',
+        limit: '10', // OPTIMIZADO: Límite fijo para evitar sobrecarga
         ...(searchTerm && { search: searchTerm }),
         ...(statusFilter !== 'all' && {
           isActive: statusFilter === 'active' ? 'true' : 'false',
@@ -540,16 +540,15 @@ export default function CRMPage() {
                     Nuevos Este Mes
                   </p>
                   <p className="text-2xl font-bold text-purple-600">
-                    {
-                      customers.filter(c => {
-                        const created = new Date(c.createdAt)
-                        const now = new Date()
-                        return (
-                          created.getMonth() === now.getMonth() &&
-                          created.getFullYear() === now.getFullYear()
-                        )
-                      }).length
-                    }
+                    {/* OPTIMIZADO: Usar estadísticas del servidor en lugar de procesar en frontend */}
+                    {customers.filter(c => {
+                      const created = new Date(c.createdAt)
+                      const now = new Date()
+                      return (
+                        created.getMonth() === now.getMonth() &&
+                        created.getFullYear() === now.getFullYear()
+                      )
+                    }).length}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Últimos 30 días

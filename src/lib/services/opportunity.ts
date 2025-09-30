@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import {
   CreateOpportunityInput,
   UpdateOpportunityInput,
@@ -56,7 +56,7 @@ export class OpportunityService {
     const { page = 1, limit = 20, search, stage, assignedTo, leadId } = options
     const skip = (page - 1) * limit
 
-    const where: any = { tenantId }
+    const where: Prisma.OpportunityWhereInput = { tenantId }
 
     if (search) {
       where.OR = [

@@ -4,10 +4,18 @@ import {
   ServerUserAccessSchema,
   ServerUserQuerySchema,
 } from '@/lib/validations/server-user'
+import { requireAuth } from '@/lib/middleware/auth'
 
 // GET /api/servers/users - Listar usuarios de servidores
 export async function GET(request: NextRequest) {
   try {
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    const { error: authError, user } = await requireAuth(request)
+    if (authError || !user) {
+      return authError || new Response('No autorizado', { status: 401 })
+    }
+    // FIN DE VERIFICACIÓN DE AUTENTICACIÓN
+
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'
 
@@ -55,6 +63,13 @@ export async function GET(request: NextRequest) {
 // POST /api/servers/users - Crear nuevo acceso de usuario
 export async function POST(request: NextRequest) {
   try {
+    // VERIFICACIÓN DE AUTENTICACIÓN
+    const { error: authError, user } = await requireAuth(request)
+    if (authError || !user) {
+      return authError || new Response('No autorizado', { status: 401 })
+    }
+    // FIN DE VERIFICACIÓN DE AUTENTICACIÓN
+
     const body = await request.json()
     const searchParams = request.nextUrl.searchParams
     const tenantId = searchParams.get('tenantId') || 'demo-tenant'

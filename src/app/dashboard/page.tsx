@@ -533,13 +533,22 @@ export default function DashboardPage() {
                 </Link>
               </Button>
               {user.role === 'SUPER_ADMIN' && (
-                <Button 
-                  className="btn-primary-gradient hover:scale-105 transition-transform duration-200"
-                  onClick={() => window.location.href = '/dashboard/modules'}
-                >
-                  <Settings className="mr-2 h-5 w-5" />
-                  Gestionar Módulos
-                </Button>
+                <>
+                  <Button 
+                    className="btn-primary-gradient hover:scale-105 transition-transform duration-200"
+                    onClick={() => window.location.href = '/dashboard/modules'}
+                  >
+                    <Settings className="mr-2 h-5 w-5" />
+                    Gestionar Módulos
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white hover:scale-105 transition-transform duration-200"
+                    onClick={() => window.location.href = '/dashboard/admin/tenants'}
+                  >
+                    <Building2 className="mr-2 h-5 w-5" />
+                    Gestionar Tenants
+                  </Button>
+                </>
               )}
             </div>
           </div>

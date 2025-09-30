@@ -124,85 +124,99 @@ export async function createOrder(
   tenantId: string,
   userId: string
 ): Promise<OrderWithRelations> {
-  // Validar que el cliente existe
-  const customer = await prisma.customer.findFirst({
-    where: {
-      id: data.customerId,
-      tenantId,
-      isActive: true,
-    },
-  })
-
-  if (!customer) {
-    throw new Error('Cliente no encontrado o inactivo')
-  }
-
-  // Validar stock disponible
-  const stockValidation = await validateStock(data.items, tenantId)
-  if (!stockValidation.valid) {
-    throw new Error(`Errores de stock: ${stockValidation.errors.join(', ')}`)
-  }
-
-  // Generar número de orden si no se proporciona
-  const orderNumber = data.orderNumber || (await generateOrderNumber(tenantId))
-
-  // Crear la orden y los items en una transacción
-  const result = await prisma.$transaction(async tx => {
-    // Crear la orden
-    const order = await tx.order.create({
-      data: {
-        orderNumber,
-        customerId: data.customerId,
-        userId: userId,
-        subtotal: data.subtotal,
-        taxRate: data.taxRate,
-        taxAmount: data.taxAmount,
-        discountAmount: data.discountAmount,
-        total: data.total,
-        status: data.status,
-        paymentMethod: data.paymentMethod,
-        paymentStatus: data.paymentStatus,
-        shippingAddress: data.shippingAddress,
-        notes: data.notes,
-        expectedDeliveryDate: data.expectedDeliveryDate,
+  try {
+    // Validar que el cliente existe
+    const customer = await prisma.customer.findFirst({
+      where: {
+        id: data.customerId,
         tenantId,
+        isActive: true,
       },
     })
 
-    // Crear los items de la orden
-    const orderItems = await Promise.all(
-      data.items.map(async item => {
-        const orderItem = await tx.orderItem.create({
-          data: {
-            orderId: order.id,
-            productId: item.productId,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            discount: item.discount,
-            total: item.quantity * item.unitPrice * (1 - item.discount / 100),
-            notes: item.notes,
-          },
-        })
+    if (!customer) {
+      throw new Error('Cliente no encontrado o inactivo')
+    }
 
-        // Reducir stock del producto
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: {
-              decrement: item.quantity,
-            },
-          },
-        })
+    // Validar stock disponible
+    const stockValidation = await validateStock(data.items, tenantId)
+    if (!stockValidation.valid) {
+      throw new Error(`Errores de stock: ${stockValidation.errors.join(', ')}`)
+    }
 
-        return orderItem
+    // Generar número de orden si no se proporciona
+    const orderNumber = data.orderNumber || (await generateOrderNumber(tenantId))
+
+    // Crear la orden y los items en una transacción
+    const result = await prisma.$transaction(async tx => {
+      // Crear la orden
+      const order = await tx.order.create({
+        data: {
+          orderNumber,
+          customerId: data.customerId,
+          userId: userId,
+          subtotal: data.subtotal,
+          taxRate: data.taxRate,
+          taxAmount: data.taxAmount,
+          discountAmount: data.discountAmount,
+          total: data.total,
+          status: data.status,
+          paymentMethod: data.paymentMethod,
+          paymentStatus: data.paymentStatus,
+          shippingAddress: data.shippingAddress,
+          notes: data.notes,
+          expectedDeliveryDate: data.expectedDeliveryDate,
+          tenantId,
+        },
       })
-    )
 
-    return { order, items: orderItems }
-  })
+      // Crear los items de la orden
+      const orderItems = await Promise.all(
+        data.items.map(async item => {
+          const orderItem = await tx.orderItem.create({
+            data: {
+              orderId: order.id,
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              discount: item.discount,
+              total: item.quantity * item.unitPrice * (1 - item.discount / 100),
+              notes: item.notes,
+            },
+          })
 
-  // Obtener la orden completa con relaciones
-  return getOrderById(result.order.id, tenantId) as Promise<OrderWithRelations>
+          // Reducir stock del producto
+          await tx.product.update({
+            where: { id: item.productId },
+            data: {
+              stock: {
+                decrement: item.quantity,
+              },
+            },
+          })
+
+          return orderItem
+        })
+      )
+
+      return { order, items: orderItems }
+    })
+
+    // Obtener la orden completa con relaciones
+    return getOrderById(result.order.id, tenantId) as Promise<OrderWithRelations>
+  } catch (error) {
+    console.error('Error en createOrder:', {
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      stack: error instanceof Error ? error.stack : undefined,
+      data: {
+        customerId: data.customerId,
+        tenantId,
+        userId,
+        itemsCount: data.items.length,
+      },
+    })
+    throw error
+  }
 }
 
 /**

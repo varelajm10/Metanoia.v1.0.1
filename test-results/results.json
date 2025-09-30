@@ -4,7 +4,7 @@
     "rootDir": "C:/Users/Juan/Desktop/Metanoia_v1.0.1/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": true,
-    "globalSetup": null,
+    "globalSetup": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\global.setup.ts",
     "globalTeardown": null,
     "globalTimeout": 0,
     "grep": {},
@@ -158,27 +158,27 @@
     "workers": 2,
     "webServer": {
       "command": "npm run dev",
-      "url": "http://localhost:3000",
+      "url": "http://localhost:3002",
       "reuseExistingServer": true,
       "timeout": 120000
     }
   },
   "suites": [
     {
-      "title": "onboarding.spec.ts",
-      "file": "onboarding.spec.ts",
+      "title": "tenant-lifecycle-simple.spec.ts",
+      "file": "tenant-lifecycle-simple.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "Flujo de Onboarding Crítico",
-          "file": "onboarding.spec.ts",
+          "title": "Ciclo de Vida Simplificado de Tenant",
+          "file": "tenant-lifecycle-simple.spec.ts",
           "line": 18,
           "column": 6,
           "specs": [
             {
-              "title": "Flujo completo: Login → Dashboard → Crear Cliente",
+              "title": "Flujo básico: Login y navegación",
               "ok": false,
               "tags": [],
               "tests": [
@@ -192,100 +192,65 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 27010,
+                      "status": "timedOut",
+                      "duration": 34427,
                       "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('form').first()\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('form').first()\u001b[22m\n\n    at C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\onboarding.spec.ts:156:24",
-                        "location": {
-                          "file": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\onboarding.spec.ts",
-                          "column": 24,
-                          "line": 156
-                        },
-                        "snippet": "  154 |     // Verificar que el formulario está presente\n  155 |     const form = page.locator('form').first();\n> 156 |     await expect(form).toBeVisible();\n      |                        ^\n  157 |     \n  158 |     console.log('✅ Modal de creación verificado');\n  159 |"
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                       },
                       "errors": [
                         {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
                           "location": {
-                            "file": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\onboarding.spec.ts",
-                            "column": 24,
-                            "line": 156
+                            "file": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\tenant-lifecycle-simple.spec.ts",
+                            "column": 16,
+                            "line": 55
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form').first()\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('form').first()\u001b[22m\n\n\n  154 |     // Verificar que el formulario está presente\n  155 |     const form = page.locator('form').first();\n> 156 |     await expect(form).toBeVisible();\n      |                        ^\n  157 |     \n  158 |     console.log('✅ Modal de creación verificado');\n  159 |\n    at C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\onboarding.spec.ts:156:24"
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"http://localhost:3002/super-admin\", waiting until \"load\"\u001b[22m\n\n\n  53 |     \n  54 |     // Navegar al panel de Super-Admin\n> 55 |     await page.goto('/super-admin')\n     |                ^\n  56 |     \n  57 |     // Esperar a que la página cargue completamente\n  58 |     await page.waitForLoadState('networkidle')\n    at C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\tenant-lifecycle-simple.spec.ts:55:16"
                         }
                       ],
                       "stdout": [
                         {
-                          "text": "🔐 Paso 1: Iniciando sesión...\n"
+                          "text": "🔐 Iniciando sesión como Super-Admin...\n"
                         },
                         {
-                          "text": "📝 Formulario de login llenado\n"
+                          "text": "✅ Super-Admin logueado exitosamente\n"
                         },
                         {
-                          "text": "🔄 Enviando formulario de login...\n"
-                        },
-                        {
-                          "text": "✅ Login exitoso - redirigido al dashboard\n"
-                        },
-                        {
-                          "text": "📊 Paso 2: Verificando dashboard...\n"
-                        },
-                        {
-                          "text": "⚠️ No se encontraron tarjetas de estadísticas específicas, pero el dashboard está cargado\n"
-                        },
-                        {
-                          "text": "✅ Dashboard cargado correctamente\n"
-                        },
-                        {
-                          "text": "👥 Paso 3: Navegando a la sección de clientes...\n"
-                        },
-                        {
-                          "text": "✅ Navegación a clientes exitosa\n"
-                        },
-                        {
-                          "text": "➕ Paso 4: Creando nuevo cliente...\n"
-                        },
-                        {
-                          "text": "✅ Modal de creación abierto\n"
-                        },
-                        {
-                          "text": "📝 Paso 5: Verificando modal de creación...\n"
+                          "text": "🏢 Navegando a la gestión de tenants...\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-30T16:45:57.018Z",
+                      "startTime": "2025-09-30T22:04:31.304Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\\test-failed-1.png"
+                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\tenant-lifecycle-simple-Ci-72925-o-básico-Login-y-navegación-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "video",
                           "contentType": "video/webm",
-                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\\video.webm"
+                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\tenant-lifecycle-simple-Ci-72925-o-básico-Login-y-navegación-chromium\\video.webm"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\onboarding-Flujo-de-Onboar-4e5a1-→-Dashboard-→-Crear-Cliente-chromium\\error-context.md"
+                          "path": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\test-results\\tenant-lifecycle-simple-Ci-72925-o-básico-Login-y-navegación-chromium\\error-context.md"
                         }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\Users\\Juan\\Desktop\\Metanoia_v1.0.1\\tests\\e2e\\onboarding.spec.ts",
-                        "column": 24,
-                        "line": 156
-                      }
+                      ]
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "fe534f0825407f213faa-011048dc98bc1581d000",
-              "file": "onboarding.spec.ts",
-              "line": 27,
+              "id": "9e19af22a7e573311446-2d2f1d2182faee7cb230",
+              "file": "tenant-lifecycle-simple.spec.ts",
+              "line": 25,
               "column": 7
             }
           ]
@@ -295,8 +260,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-30T16:45:29.005Z",
-    "duration": 56537.054000000004,
+    "startTime": "2025-09-30T22:04:26.615Z",
+    "duration": 40759.935,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,

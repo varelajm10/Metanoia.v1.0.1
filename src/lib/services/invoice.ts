@@ -60,40 +60,53 @@ export async function createInvoice(
   data: CreateInvoiceInput,
   tenantId: string
 ): Promise<InvoiceWithRelations> {
-  // Validar que el cliente existe
-  const customer = await prisma.customer.findFirst({
-    where: {
-      id: data.customerId,
-      tenantId,
-      isActive: true,
-    },
-  })
+  try {
+    // Validar que el cliente existe
+    const customer = await prisma.customer.findFirst({
+      where: {
+        id: data.customerId,
+        tenantId,
+        isActive: true,
+      },
+    })
 
-  if (!customer) {
-    throw new Error('Cliente no encontrado o inactivo')
+    if (!customer) {
+      throw new Error('Cliente no encontrado o inactivo')
+    }
+
+    // Generar número de factura si no se proporciona
+    const invoiceNumber =
+      data.invoiceNumber || (await generateInvoiceNumber(tenantId))
+
+    // Crear la factura
+    const invoice = await prisma.invoice.create({
+      data: {
+        invoiceNumber,
+        customerId: data.customerId,
+        subtotal: data.subtotal,
+        tax: data.tax,
+        total: data.total,
+        dueDate: data.dueDate,
+        notes: data.notes,
+        status: data.status,
+        tenantId,
+      } as any,
+    })
+
+    // Obtener la factura completa con relaciones
+    return getInvoiceById(invoice.id, tenantId) as Promise<InvoiceWithRelations>
+  } catch (error) {
+    console.error('Error en createInvoice:', {
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      stack: error instanceof Error ? error.stack : undefined,
+      data: {
+        customerId: data.customerId,
+        tenantId,
+        invoiceNumber: data.invoiceNumber,
+      },
+    })
+    throw error
   }
-
-  // Generar número de factura si no se proporciona
-  const invoiceNumber =
-    data.invoiceNumber || (await generateInvoiceNumber(tenantId))
-
-  // Crear la factura
-  const invoice = await prisma.invoice.create({
-    data: {
-      invoiceNumber,
-      customerId: data.customerId,
-      subtotal: data.subtotal,
-      tax: data.tax,
-      total: data.total,
-      dueDate: data.dueDate,
-      notes: data.notes,
-      status: data.status,
-      tenantId,
-    } as any,
-  })
-
-  // Obtener la factura completa con relaciones
-  return getInvoiceById(invoice.id, tenantId) as Promise<InvoiceWithRelations>
 }
 
 /**
@@ -537,29 +550,54 @@ export async function getInvoiceStats(tenantId: string) {
 }
 
 /**
- * Busca facturas por número o cliente
+ * Busca facturas por número o cliente - OPTIMIZADO CON PAGINACIÓN
  * @param query - Término de búsqueda
  * @param tenantId - ID del tenant
- * @param limit - Límite de resultados (por defecto 10)
- * @returns Promise<Invoice[]> - Lista de facturas encontradas
+ * @param options - Opciones de paginación
+ * @returns Promise con facturas y metadatos de paginación
  */
 export async function searchInvoices(
   query: string,
   tenantId: string,
-  limit: number = 10
-): Promise<Invoice[]> {
+  options: { page: number; limit: number } = { page: 1, limit: 10 }
+): Promise<{
+  invoices: Invoice[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}> {
   if (!query || query.trim().length < 2) {
-    return []
+    return {
+      invoices: [],
+      pagination: {
+        page: options.page,
+        limit: options.limit,
+        total: 0,
+        totalPages: 0,
+      },
+    }
   }
 
-  return prisma.invoice.findMany({
-    where: {
-      tenantId,
-      OR: [
-        { invoiceNumber: { contains: query, mode: 'insensitive' } },
-        { customer: { name: { contains: query, mode: 'insensitive' } } },
-      ],
-    },
+  const { page, limit } = options
+  const skip = (page - 1) * limit
+
+  const where = {
+    tenantId,
+    OR: [
+      { invoiceNumber: { contains: query, mode: 'insensitive' } },
+      { customer: { name: { contains: query, mode: 'insensitive' } } },
+    ],
+  }
+
+  // Obtener total de registros
+  const total = await prisma.invoice.count({ where })
+
+  // Obtener facturas con paginación
+  const invoices = await prisma.invoice.findMany({
+    where,
     include: {
       customer: {
         select: {
@@ -573,26 +611,54 @@ export async function searchInvoices(
     orderBy: {
       createdAt: 'desc',
     },
+    skip,
     take: limit,
   })
+
+  return {
+    invoices,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
 }
 
 /**
- * Obtiene facturas vencidas
+ * Obtiene facturas vencidas - OPTIMIZADO CON PAGINACIÓN
  * @param tenantId - ID del tenant
- * @param limit - Límite de resultados (por defecto 50)
- * @returns Promise<Invoice[]> - Lista de facturas vencidas
+ * @param options - Opciones de paginación
+ * @returns Promise con facturas vencidas y metadatos de paginación
  */
 export async function getOverdueInvoices(
   tenantId: string,
-  limit: number = 50
-): Promise<Invoice[]> {
-  return prisma.invoice.findMany({
-    where: {
-      tenantId,
-      status: { in: ['SENT'] },
-      dueDate: { lt: new Date() },
-    },
+  options: { page: number; limit: number } = { page: 1, limit: 50 }
+): Promise<{
+  invoices: Invoice[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}> {
+  const { page, limit } = options
+  const skip = (page - 1) * limit
+
+  const where = {
+    tenantId,
+    status: { in: ['SENT'] },
+    dueDate: { lt: new Date() },
+  }
+
+  // Obtener total de registros
+  const total = await prisma.invoice.count({ where })
+
+  // Obtener facturas con paginación
+  const invoices = await prisma.invoice.findMany({
+    where,
     include: {
       customer: {
         select: {
@@ -606,6 +672,17 @@ export async function getOverdueInvoices(
     orderBy: {
       dueDate: 'asc',
     },
+    skip,
     take: limit,
   })
+
+  return {
+    invoices,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
 }

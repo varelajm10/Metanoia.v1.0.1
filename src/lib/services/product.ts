@@ -25,29 +25,42 @@ export async function createProduct(
   data: CreateProductInput,
   tenantId: string
 ): Promise<Product> {
-  // Verificar que el SKU no exista en el tenant
-  const existingProduct = await prisma.product.findFirst({
-    where: {
-      sku: data.sku,
-      tenantId,
-    },
-  })
+  try {
+    // Verificar que el SKU no exista en el tenant
+    const existingProduct = await prisma.product.findFirst({
+      where: {
+        sku: data.sku,
+        tenantId,
+      },
+    })
 
-  if (existingProduct) {
-    throw new Error('Ya existe un producto con este SKU en el tenant')
+    if (existingProduct) {
+      throw new Error('Ya existe un producto con este SKU en el tenant')
+    }
+
+    // Validar que maxStock sea mayor que minStock si ambos están definidos
+    if (data.maxStock && data.minStock && data.maxStock <= data.minStock) {
+      throw new Error('El stock máximo debe ser mayor que el stock mínimo')
+    }
+
+    return prisma.product.create({
+      data: {
+        ...data,
+        tenantId,
+      },
+    })
+  } catch (error) {
+    console.error('Error en createProduct:', {
+      error: error instanceof Error ? error.message : 'Error desconocido',
+      stack: error instanceof Error ? error.stack : undefined,
+      data: {
+        sku: data.sku,
+        name: data.name,
+        tenantId,
+      },
+    })
+    throw error
   }
-
-  // Validar que maxStock sea mayor que minStock si ambos están definidos
-  if (data.maxStock && data.minStock && data.maxStock <= data.minStock) {
-    throw new Error('El stock máximo debe ser mayor que el stock mínimo')
-  }
-
-  return prisma.product.create({
-    data: {
-      ...data,
-      tenantId,
-    },
-  })
 }
 
 /**
@@ -250,7 +263,7 @@ export async function updateProduct(
 }
 
 /**
- * Elimina un producto del sistema
+ * Elimina un producto del sistema - OPERACIÓN ATÓMICA
  * @param id - ID del producto a eliminar
  * @param tenantId - ID del tenant
  * @returns Promise<Product> - Producto eliminado
@@ -260,34 +273,37 @@ export async function deleteProduct(
   id: string,
   tenantId: string
 ): Promise<Product> {
-  // Verificar que el producto existe y pertenece al tenant
-  const existingProduct = await prisma.product.findFirst({
-    where: {
-      id,
-      tenantId,
-    },
-  })
+  // Ejecutar todas las operaciones en una transacción atómica
+  return await prisma.$transaction(async (tx) => {
+    // Verificar que el producto existe y pertenece al tenant
+    const existingProduct = await tx.product.findFirst({
+      where: {
+        id,
+        tenantId,
+      },
+    })
 
-  if (!existingProduct) {
-    throw new Error('Producto no encontrado')
-  }
+    if (!existingProduct) {
+      throw new Error('Producto no encontrado')
+    }
 
-  // Verificar que no tenga órdenes asociadas
-  const orderItemsCount = await prisma.orderItem.count({
-    where: {
-      productId: id,
-    },
-  })
+    // Verificar que no tenga órdenes asociadas
+    const orderItemsCount = await tx.orderItem.count({
+      where: {
+        productId: id,
+      },
+    })
 
-  if (orderItemsCount > 0) {
-    throw new Error(
-      'No se puede eliminar el producto porque tiene órdenes asociadas'
-    )
-  }
+    if (orderItemsCount > 0) {
+      throw new Error(
+        'No se puede eliminar el producto porque tiene órdenes asociadas'
+      )
+    }
 
-  // Eliminar físicamente el producto
-  return prisma.product.delete({
-    where: { id },
+    // Eliminar físicamente el producto
+    return await tx.product.delete({
+      where: { id },
+    })
   })
 }
 

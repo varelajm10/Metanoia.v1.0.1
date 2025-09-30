@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requirePermission, getTenantId } from '@/lib/middleware/auth'
+import { rateLimit } from '@/lib/middleware/rate-limit'
 import { getCustomers, createCustomer } from '@/lib/services/customer'
+import { CustomerCacheService } from '@/lib/services/customer-cache'
 import {
   CustomerQuerySchema,
   CreateCustomerSchema,
@@ -9,6 +11,10 @@ import {
 // GET /api/customers - Listar clientes con filtros y paginación
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting para prevenir abuso
+    const rateLimitError = rateLimit(50, 15 * 60 * 1000)(request) // 50 requests por 15 min
+    if (rateLimitError) return rateLimitError
+
     // Verificar permisos de lectura
     const { error, user } = await requirePermission(
       request,
@@ -36,8 +42,8 @@ export async function GET(request: NextRequest) {
 
     const query = validation.data
 
-    // Obtener clientes
-    const result = await getCustomers(query, tenantId)
+    // Obtener clientes con caché
+    const result = await CustomerCacheService.getCachedCustomers(query, tenantId)
 
     return NextResponse.json({
       success: true,
@@ -87,6 +93,9 @@ export async function POST(request: NextRequest) {
 
     // Crear cliente
     const customer = await createCustomer(customerData, tenantId)
+
+    // Invalidar caché después de crear
+    await CustomerCacheService.onCustomerCreated(tenantId)
 
     return NextResponse.json(
       {
